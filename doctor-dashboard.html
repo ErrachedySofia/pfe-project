@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParrotDiag - Tableau de Bord Médecin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <style>
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        :root {
+            --bg-primary:#f5f7fa; --bg-secondary:#ffffff; --bg-card:#ffffff;
+            --bg-card-hover:#f0f2f5; --bg-elevated:#f0f2f5;
+            --border:rgba(0,0,0,0.08); --border-accent:rgba(180,145,80,0.4);
+            --gold:#b49150; --gold-light:#d4af72; --gold-glow:rgba(180,145,80,0.15);
+            --teal:#2fa37c; --teal-dim:rgba(47,163,124,0.1);
+            --text-primary:#1a1f2c; --text-secondary:#4a5568; --text-muted:#8898aa;
+            --red:#e55c5c; --red-dim:rgba(229,92,92,0.1);
+            --amber:#f0a04a; --amber-dim:rgba(240,160,74,0.1);
+            --blue:#5b8dee; --blue-dim:rgba(91,141,238,0.1);
+            --green-main:#2fa37c; --green-dark:#1d7558;
+            --shadow-card:0 4px 24px rgba(0,0,0,0.08);
+            --transition:all 0.25s cubic-bezier(0.4,0,0.2,1);
+            --beige-main:#f5f7fa; --beige-light:#ffffff;
+            --text-main:#1a1f2c; --shadow-soft:0 4px 24px rgba(0,0,0,0.06);
+            --hover-overlay:rgba(0,0,0,0.03); --hover-overlay-md:rgba(0,0,0,0.05);
+            --hover-overlay-lg:rgba(0,0,0,0.07); --scrollbar-thumb:rgba(0,0,0,0.12);
+            --border-light:rgba(0,0,0,0.05);
+        }
+        [data-theme="dark"] {
+            --bg-primary:#0f1a17; --bg-secondary:#131f1b; --bg-card:#1c2b25;
+            --bg-card-hover:#223329; --bg-elevated:#2a3d34;
+            --border:rgba(255,255,255,0.07); --border-accent:rgba(180,145,80,0.4);
+            --gold:#b49150; --gold-light:#d4af72; --gold-glow:rgba(180,145,80,0.15);
+            --teal:#4cc99e; --teal-dim:rgba(76,201,158,0.1);
+            --text-primary:#e8f0ed; --text-secondary:#93b3a8; --text-muted:#566f67;
+            --red:#e55c5c; --red-dim:rgba(229,92,92,0.1);
+            --amber:#f0a04a; --amber-dim:rgba(240,160,74,0.1);
+            --blue:#5b8dee; --blue-dim:rgba(91,141,238,0.1);
+            --green-main:#4cc99e; --green-dark:#2fa37c;
+            --shadow-card:0 4px 24px rgba(0,0,0,0.4);
+            --beige-main:#0f1a17; --beige-light:#1c2b25;
+            --text-main:#e8f0ed; --shadow-soft:0 4px 24px rgba(0,0,0,0.3);
+            --hover-overlay:rgba(255,255,255,0.04); --hover-overlay-md:rgba(255,255,255,0.05);
+            --hover-overlay-lg:rgba(255,255,255,0.07); --scrollbar-thumb:rgba(255,255,255,0.08);
+            --border-light:rgba(255,255,255,0.04);
+        }
+        body { background-color:var(--bg-primary); color:var(--text-primary); min-height:100vh; display:flex; overflow-x:hidden; font-family:'DM Sans',sans-serif; font-size:14px; }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar { width:260px; background:var(--bg-secondary); border-right:1px solid var(--border); display:flex; flex-direction:column; height:100vh; position:fixed; z-index:1000; }
+        .sidebar::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); }
+        .logo { padding:28px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:14px; }
+        .logo-icon { color:var(--gold); background:var(--gold-glow); border:1px solid var(--border-accent); padding:10px; border-radius:10px; width:42px; height:42px; display:flex; align-items:center; justify-content:center; }
+        .logo-icon i { font-size:1.1rem; }
+        .logo h2 { font-family:'Playfair Display',serif; font-size:20px; font-weight:700; color:var(--text-primary); letter-spacing:0.5px; }
+        .logo h2 span { color:var(--gold); }
+        .nav-menu { flex:1; padding:16px 0; overflow-y:auto; }
+        .nav-section { padding:8px 20px 4px; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted); font-weight:500; margin-top:8px; }
+        .nav-item { display:flex; align-items:center; padding:11px 20px; color:var(--text-secondary); text-decoration:none; transition:var(--transition); gap:12px; margin:2px 12px; border-radius:8px; position:relative; cursor:pointer; font-size:13.5px; font-weight:400; }
+        .nav-item:hover { background:var(--hover-overlay); color:var(--text-primary); }
+        .nav-item.active { background:linear-gradient(90deg,rgba(61,217,180,0.12) 0%,rgba(61,217,180,0.04) 100%); color:var(--teal); font-weight:500; }
+        .nav-item.active::before { content:''; position:absolute; left:-12px; top:50%; transform:translateY(-50%); width:3px; height:60%; background:var(--teal); border-radius:0 2px 2px 0; }
+        .nav-item i { width:18px; text-align:center; font-size:13px; }
+        .notification-badge { position:absolute; right:14px; background:var(--red); color:white; font-size:0.65rem; padding:1px 5px; border-radius:8px; min-width:18px; text-align:center; font-family:'DM Mono',monospace; }
+        .user-section { padding:16px; border-top:1px solid var(--border); display:flex; align-items:center; gap:12px; cursor:pointer; transition:var(--transition); position:relative; }
+        .user-section:hover { background:var(--hover-overlay); }
+        .user-avatar { width:40px; height:40px; border-radius:10px; background:linear-gradient(135deg,var(--gold) 0%,#8a6b38 100%); color:var(--bg-primary); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; letter-spacing:0.5px; flex-shrink:0; }
+        .user-info { flex:1; min-width:0; }
+        .user-name { font-weight:600; font-size:13px; color:var(--text-primary); }
+        .user-role { font-size:11px; color:var(--text-muted); display:flex; align-items:center; gap:4px; margin-top:2px; }
+        .user-role i { font-size:9px; color:var(--teal); }
+        .user-dropdown { position:absolute; bottom:100%; left:0; width:100%; background:var(--bg-elevated); border:1px solid var(--border); border-radius:12px; margin-bottom:8px; overflow:hidden; z-index:1000; display:none; box-shadow:0 -20px 60px rgba(0,0,0,0.5); }
+        .user-dropdown.show { display:block; }
+        .dropdown-header { padding:16px; background:linear-gradient(135deg,rgba(180,145,80,0.08),rgba(61,217,180,0.04)); border-bottom:1px solid var(--border); }
+        .dropdown-item { display:flex; align-items:center; gap:12px; padding:11px 16px; cursor:pointer; transition:var(--transition); color:var(--text-secondary); text-decoration:none; font-size:13px; }
+        .dropdown-item:hover { background:var(--hover-overlay); color:var(--text-primary); }
+        .dropdown-item i { width:16px; color:var(--teal); font-size:12px; }
+        .dropdown-item.logout { color:var(--red); }
+        .dropdown-item.logout i { color:var(--red); }
+        .dropdown-item.logout:hover { background:var(--red-dim); }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content { flex:1; margin-left:260px; padding:24px 28px; max-width:calc(100% - 260px); }
+        .top-bar { display:flex; justify-content:space-between; align-items:center; margin-bottom:28px; padding-bottom:20px; border-bottom:1px solid var(--border); }
+        .page-title-section h1 { font-family:'Playfair Display',serif; font-size:1.75rem; font-weight:600; color:var(--text-primary); margin-bottom:4px; }
+        .date-info { color:var(--text-muted); font-size:12px; display:flex; align-items:center; gap:6px; font-family:'DM Mono',monospace; }
+        .date-info i { color:var(--gold); font-size:10px; }
+        .search-bar { display:flex; align-items:center; background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:10px 16px; width:320px; transition:var(--transition); }
+        .search-bar:focus-within { border-color:rgba(61,217,180,0.3); box-shadow:0 0 0 3px rgba(61,217,180,0.06); }
+        .search-bar i { color:var(--text-muted); margin-right:10px; font-size:12px; }
+        .search-bar input { border:none; outline:none; flex:1; font-size:13px; background:transparent; color:var(--text-primary); font-family:'DM Sans',sans-serif; }
+        .search-bar input::placeholder { color:var(--text-muted); }
+
+        /* ===== STATS CARDS ===== */
+        .stats-container { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-bottom:28px; }
+        .stat-card { background:var(--bg-card); border:1px solid var(--border); border-radius:14px; padding:24px; display:flex; flex-direction:column; transition:var(--transition); position:relative; overflow:hidden; }
+        .stat-card::after { content:''; position:absolute; bottom:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--teal),transparent); opacity:0; transition:var(--transition); }
+        .stat-card:hover { border-color:rgba(61,217,180,0.2); background:var(--bg-card-hover); transform:translateY(-2px); box-shadow:0 8px 32px rgba(0,0,0,0.3); }
+        .stat-card:hover::after { opacity:1; }
+        .stat-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; }
+        .stat-title { font-size:10px; color:var(--text-muted); font-weight:500; text-transform:uppercase; letter-spacing:1.5px; }
+        .stat-icon { width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--teal); font-size:14px; background:var(--teal-dim); border:1px solid rgba(61,217,180,0.15); }
+        .stat-value { font-family:'Playfair Display',serif; font-size:2.2rem; font-weight:700; margin-bottom:8px; color:var(--text-primary); line-height:1; }
+        .stat-change { font-size:11px; display:flex; align-items:center; gap:5px; font-weight:500; font-family:'DM Mono',monospace; }
+        .stat-change.positive { color:var(--teal); }
+        .stat-change.negative { color:var(--red); }
+        .stat-change i { font-size:9px; }
+
+        /* ===== CONTENT CARDS ===== */
+        .content-card { background:var(--bg-card); border:1px solid var(--border); border-radius:14px; padding:24px; margin-bottom:20px; }
+        .card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid var(--border); }
+        .card-title { font-size:15px; font-weight:600; color:var(--text-primary); display:flex; align-items:center; gap:10px; font-family:'Playfair Display',serif; }
+        .card-title i { color:var(--gold); font-size:14px; }
+        .card-actions { display:flex; gap:8px; }
+
+        /* ===== BUTTONS ===== */
+        .btn { background:var(--teal); color:var(--bg-primary); border:none; border-radius:8px; padding:9px 18px; font-weight:600; cursor:pointer; transition:var(--transition); display:inline-flex; align-items:center; gap:7px; font-size:12.5px; font-family:'DM Sans',sans-serif; letter-spacing:0.2px; }
+        .btn:hover { background:#4de8c0; transform:translateY(-1px); box-shadow:0 4px 20px rgba(61,217,180,0.3); }
+        .btn-secondary { background:var(--bg-elevated); color:var(--text-secondary); border:1px solid var(--border); }
+        .btn-secondary:hover { background:var(--hover-overlay-md); color:var(--text-primary); border-color:var(--hover-overlay-lg); box-shadow:none; }
+        .btn-success { background:var(--teal); color:var(--bg-primary); }
+        .btn-danger { background:var(--red); color:white; }
+        .btn-danger:hover { background:#f06060; box-shadow:0 4px 20px rgba(229,92,92,0.3); }
+        .btn-sm { padding:7px 14px; font-size:11.5px; }
+        .btn-icon { padding:8px; width:34px; height:34px; justify-content:center; border-radius:7px; background:var(--bg-elevated); color:var(--text-secondary); border:1px solid var(--border); }
+        .btn-icon:hover { background:var(--hover-overlay-md); color:var(--text-primary); box-shadow:none; transform:none; }
+
+        /* ===== QUICK ACTIONS ===== */
+        .quick-actions { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin-bottom:24px; }
+        .quick-actions .btn { padding:13px 18px; border-radius:10px; justify-content:center; font-size:13px; }
+        .quick-actions .btn:first-child { background:linear-gradient(135deg,var(--teal),var(--green-dark)); }
+        .quick-actions .btn-success { background:linear-gradient(135deg,var(--gold),#8a6b38); color:var(--bg-primary); }
+        .quick-actions .btn-success:hover { box-shadow:0 4px 20px rgba(180,145,80,0.3); }
+
+        /* ===== TABLES ===== */
+        .table-container { overflow-x:auto; border-radius:10px; border:1px solid var(--border); }
+        table { width:100%; border-collapse:collapse; min-width:700px; }
+        thead { background:var(--bg-elevated); }
+        th { text-align:left; padding:13px 14px; font-weight:500; color:var(--text-muted); font-size:10px; text-transform:uppercase; letter-spacing:1.5px; border-bottom:1px solid var(--border); }
+        tbody tr { transition:var(--transition); border-bottom:1px solid var(--border-light); }
+        tbody tr:hover { background:var(--hover-overlay); }
+        tbody tr:last-child { border-bottom:none; }
+        td { padding:14px; vertical-align:middle; }
+        .patient-info { display:flex; align-items:center; gap:12px; }
+        .patient-avatar { width:36px; height:36px; border-radius:8px; background:linear-gradient(135deg,var(--teal),var(--green-dark)); color:var(--bg-primary); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:11px; letter-spacing:0.5px; flex-shrink:0; }
+        .patient-details h4 { font-weight:600; color:var(--text-primary); font-size:13px; }
+        .patient-details p { font-size:11px; color:var(--text-muted); margin-top:2px; }
+
+        /* ===== BADGES ===== */
+        .badge { display:inline-flex; align-items:center; padding:4px 10px; border-radius:20px; font-size:10.5px; font-weight:600; gap:5px; white-space:nowrap; font-family:'DM Mono',monospace; letter-spacing:0.3px; }
+        .badge-primary { background:var(--teal-dim); color:var(--teal); border:1px solid rgba(61,217,180,0.2); }
+        .badge-success { background:rgba(61,217,180,0.08); color:#5fe8c8; border:1px solid rgba(61,217,180,0.15); }
+        .badge-warning { background:var(--amber-dim); color:var(--amber); border:1px solid rgba(240,160,74,0.2); }
+        .badge-danger { background:var(--red-dim); color:var(--red); border:1px solid rgba(229,92,92,0.2); }
+        .badge-info { background:var(--blue-dim); color:var(--blue); border:1px solid rgba(91,141,238,0.2); }
+
+        /* ===== FILTERS ===== */
+        .appointment-filters { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
+        .filter-btn { padding:8px 16px; border-radius:20px; font-size:11.5px; font-weight:500; background:var(--bg-elevated); color:var(--text-muted); border:1px solid var(--border); cursor:pointer; transition:var(--transition); display:flex; align-items:center; gap:6px; font-family:'DM Sans',sans-serif; }
+        .filter-btn:hover { color:var(--text-primary); border-color:var(--hover-overlay-lg); }
+        .filter-btn.active { background:var(--teal-dim); color:var(--teal); border-color:rgba(61,217,180,0.3); }
+
+        /* ===== APPOINTMENTS ===== */
+        .appointment-list { display:flex; flex-direction:column; gap:10px; }
+        .appointment-item { display:flex; align-items:center; padding:16px 18px; border-radius:10px; background:var(--bg-secondary); border:1px solid var(--border); transition:var(--transition); position:relative; gap:16px; }
+        .appointment-item:hover { background:var(--bg-card-hover); border-color:rgba(61,217,180,0.15); transform:translateX(3px); }
+        .appointment-item::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--teal); border-radius:10px 0 0 10px; opacity:0.6; }
+        .appointment-time { min-width:80px; font-weight:600; font-size:15px; color:var(--text-primary); font-family:'DM Mono',monospace; }
+        .appointment-patient { display:flex; align-items:center; gap:12px; flex:1; }
+        .appointment-actions { display:flex; gap:6px; }
+        .action-btn { padding:7px 12px; border-radius:7px; border:none; font-size:11.5px; font-weight:600; cursor:pointer; transition:var(--transition); display:flex; align-items:center; gap:6px; font-family:'DM Sans',sans-serif; }
+        .action-btn:hover { transform:translateY(-1px); }
+        .btn-accept { background:var(--teal-dim); color:var(--teal); border:1px solid rgba(61,217,180,0.2); }
+        .btn-accept:hover { background:var(--teal); color:var(--bg-primary); }
+        .btn-reject { background:var(--red-dim); color:var(--red); border:1px solid rgba(229,92,92,0.2); }
+        .btn-reject:hover { background:var(--red); color:white; }
+        .btn-reschedule { background:var(--amber-dim); color:var(--amber); border:1px solid rgba(240,160,74,0.2); }
+        .btn-reschedule:hover { background:var(--amber); color:var(--bg-primary); }
+        .btn-video { background:var(--blue-dim); color:var(--blue); border:1px solid rgba(91,141,238,0.2); }
+        .btn-video:hover { background:var(--blue); color:white; }
+
+        /* ===== MODALS ===== */
+        .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); backdrop-filter:blur(8px); z-index:2000; align-items:center; justify-content:center; animation:fadeIn 0.25s ease; }
+        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+        .modal-content { background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:32px; width:90%; max-width:800px; max-height:85vh; overflow-y:auto; box-shadow:0 40px 80px rgba(0,0,0,0.6); animation:slideUp 0.25s ease; scrollbar-width:thin; scrollbar-color:var(--border) transparent; }
+        .modal-content::-webkit-scrollbar { width:4px; }
+        .modal-content::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
+        @keyframes slideUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+        .modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid var(--border); }
+        .modal-header h2 { font-family:'Playfair Display',serif; font-size:1.2rem; color:var(--text-primary); font-weight:600; }
+        .close-btn { background:var(--bg-elevated); border:1px solid var(--border); border-radius:7px; font-size:1rem; cursor:pointer; color:var(--text-muted); transition:var(--transition); width:32px; height:32px; display:flex; align-items:center; justify-content:center; }
+        .close-btn:hover { color:var(--text-primary); background:var(--hover-overlay-md); }
+        .form-group { margin-bottom:16px; }
+        .form-group label { display:block; margin-bottom:6px; font-weight:500; color:var(--text-secondary); font-size:12px; text-transform:uppercase; letter-spacing:0.8px; }
+        .form-control { width:100%; padding:10px 14px; border:1px solid var(--border); border-radius:8px; font-size:13px; transition:var(--transition); background:var(--bg-secondary); color:var(--text-primary); font-family:'DM Sans',sans-serif; }
+        .form-control:focus { outline:none; border-color:rgba(61,217,180,0.4); box-shadow:0 0 0 3px rgba(61,217,180,0.06); }
+        .form-control[readonly] { background:var(--bg-elevated); color:var(--text-muted); }
+        .form-control option { background:var(--bg-card); }
+        textarea.form-control { resize:vertical; }
+        .form-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:24px; padding-top:20px; border-top:1px solid var(--border); }
+        .modal-section { background:var(--bg-secondary); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:16px; }
+        .modal-section h3 { font-size:12px; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-muted); margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+        .modal-section h3 i { color:var(--gold); font-size:11px; }
+
+        /* ===== SWITCH ===== */
+        .switch { position:relative; display:inline-block; width:44px; height:22px; }
+        .switch input { opacity:0; width:0; height:0; }
+        .slider { position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background:var(--bg-elevated); border:1px solid var(--border); transition:.3s; border-radius:22px; }
+        .slider:before { position:absolute; content:""; height:16px; width:16px; left:3px; bottom:2px; background:var(--text-muted); transition:.3s; border-radius:50%; }
+        input:checked+.slider { background:var(--teal); border-color:var(--teal); }
+        input:checked+.slider:before { transform:translateX(22px); background:var(--bg-primary); }
+        .settings-tab { padding:10px 14px; border-radius:8px; margin-bottom:4px; cursor:pointer; display:flex; align-items:center; gap:10px; font-size:13px; color:var(--text-muted); transition:var(--transition); }
+        .settings-tab:hover { background:var(--hover-overlay)!important; color:var(--text-primary)!important; }
+        .settings-tab.active { background:var(--teal-dim)!important; color:var(--teal)!important; font-weight:500!important; }
+
+        /* ===== LOADING ===== */
+        .loading { text-align:center; padding:48px; color:var(--text-muted); }
+        .loading-spinner { border:2px solid var(--border); border-top:2px solid var(--teal); border-radius:50%; width:40px; height:40px; animation:spin 0.8s linear infinite; margin:0 auto 16px; }
+        .loading p { font-size:13px; color:var(--text-muted); }
+        @keyframes spin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+        .empty-state { text-align:center; padding:48px 20px; color:var(--text-muted); }
+        .empty-state i { font-size:2.5rem; color:var(--text-muted); margin-bottom:12px; opacity:0.3; }
+        .empty-state h3 { margin-bottom:6px; color:var(--text-secondary); font-size:14px; }
+        .empty-state p { font-size:12px; }
+        @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(229,92,92,0.4)} 70%{box-shadow:0 0 0 8px rgba(229,92,92,0)} 100%{box-shadow:0 0 0 0 rgba(229,92,92,0)} }
+        .pulse { animation:pulse 2s infinite; }
+
+        /* ===== MESSAGING ===== */
+        .messaging-modal { max-width:980px; height:680px; padding:0; overflow:hidden; }
+        .messaging-modal .modal-header { padding:18px 24px; margin:0; border-bottom:1px solid var(--border); }
+        .chat-container { display:flex; height:calc(100% - 72px); }
+        .conversations-list { width:300px; border-right:1px solid var(--border); background:var(--bg-secondary); overflow-y:auto; }
+        .conversation-item { padding:14px 18px; border-bottom:1px solid var(--border-light); cursor:pointer; transition:var(--transition); display:flex; align-items:center; gap:12px; }
+        .conversation-item:hover { background:var(--hover-overlay); }
+        .conversation-item.active { background:var(--teal-dim); border-left:2px solid var(--teal); }
+        .chat-messages { flex:1; padding:20px; overflow-y:auto; display:flex; flex-direction:column; background:var(--bg-primary); position:relative; }
+        .message { max-width:68%; padding:10px 14px; border-radius:10px; position:relative; animation:fadeIn 0.2s ease; word-wrap:break-word; font-size:13px; line-height:1.5; }
+        .message.sent { align-self:flex-end; background:var(--teal); color:var(--bg-primary); border-bottom-right-radius:3px; }
+        .message.received { align-self:flex-start; background:var(--bg-elevated); color:var(--text-primary); border-bottom-left-radius:3px; border:1px solid var(--border); }
+        .chat-input { padding:16px 20px; border-top:1px solid var(--border); display:flex; gap:10px; background:var(--bg-secondary); }
+        .chat-input input { flex:1; border-radius:20px; padding:10px 18px; }
+        .chat-input button { width:40px; height:40px; border-radius:50%; background:var(--teal); color:var(--bg-primary); border:none; }
+        .chat-input button:hover { background:#4de8c0; box-shadow:0 4px 16px rgba(61,217,180,0.3); }
+        .notifications-dropdown { position:relative; }
+        #notificationToast { background:var(--bg-card)!important; border-left:3px solid var(--teal)!important; border:1px solid var(--border); border-radius:10px!important; }
+        #toastTitle { color:var(--text-primary); font-size:13px; }
+        #toastMessage { color:var(--text-muted); font-size:12px; }
+        ::-webkit-scrollbar { width:4px; }
+        ::-webkit-scrollbar-track { background:transparent; }
+        ::-webkit-scrollbar-thumb { background:var(--scrollbar-thumb); border-radius:4px; }
+        .appointment-item.pulse::before { background:var(--red); }
+        .dropdown-menu { background:var(--bg-elevated)!important; border:1px solid var(--border)!important; border-radius:10px!important; }
+        .medication-item, .medication-row, .exam-item { background:var(--bg-primary); padding:10px; border-radius:8px; border:1px solid var(--border); }
+        .prescription-card, .medical-record-card { background:var(--bg-secondary)!important; border:1px solid var(--border)!important; }
+        #notificationsPanel { background:var(--bg-elevated)!important; border:1px solid var(--border)!important; border-radius:10px!important; }
+        .notification-item { border-bottom-color:var(--border)!important; color:var(--text-secondary); }
+        .danger-zone { background:rgba(229,92,92,0.06)!important; border:1px solid rgba(229,92,92,0.15)!important; border-radius:10px!important; }
+
+        /* =============================================
+           ══ STATISTICS PAGE CSS ══
+        ============================================= */
+        @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+        .stats-kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+        .stats-kpi-card { background:var(--bg-card); border:1px solid var(--border); border-radius:14px; padding:22px; position:relative; overflow:hidden; transition:var(--transition); animation:fadeUp 0.4s ease both; }
+        .stats-kpi-card:nth-child(1){animation-delay:.05s}
+        .stats-kpi-card:nth-child(2){animation-delay:.10s}
+        .stats-kpi-card:nth-child(3){animation-delay:.15s}
+        .stats-kpi-card:nth-child(4){animation-delay:.20s}
+        .stats-kpi-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; opacity:0; transition:var(--transition); }
+        .stats-kpi-card:hover { transform:translateY(-2px); border-color:rgba(61,217,180,0.2); }
+        .stats-kpi-card:hover::before { opacity:1; }
+        .stats-kpi-card.c-teal::before { background:linear-gradient(90deg,var(--teal),transparent); }
+        .stats-kpi-card.c-gold::before { background:linear-gradient(90deg,var(--gold),transparent); }
+        .stats-kpi-card.c-red::before  { background:linear-gradient(90deg,var(--red),transparent); }
+        .stats-kpi-card.c-blue::before { background:linear-gradient(90deg,var(--blue),transparent); }
+        .skpi-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; }
+        .skpi-label  { font-size:10px; color:var(--text-muted); font-weight:500; text-transform:uppercase; letter-spacing:1.5px; }
+        .skpi-icon   { width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:14px; }
+        .skpi-icon.c-teal { background:var(--teal-dim); color:var(--teal); border:1px solid rgba(61,217,180,0.15); }
+        .skpi-icon.c-gold { background:var(--gold-glow); color:var(--gold); border:1px solid rgba(180,145,80,0.2); }
+        .skpi-icon.c-red  { background:rgba(229,92,92,0.1); color:var(--red); border:1px solid rgba(229,92,92,0.15); }
+        .skpi-icon.c-blue { background:rgba(91,141,238,0.1); color:var(--blue); border:1px solid rgba(91,141,238,0.15); }
+        .skpi-value { font-family:'Playfair Display',serif; font-size:2.3rem; font-weight:700; line-height:1; margin-bottom:10px; color:var(--text-primary); }
+        .skpi-footer { display:flex; align-items:center; gap:6px; font-size:11px; }
+        .skpi-trend  { display:flex; align-items:center; gap:4px; font-family:'DM Mono',monospace; font-weight:500; }
+        .skpi-trend.up   { color:var(--teal); }
+        .skpi-trend.down { color:var(--red); }
+        .skpi-trend.neu  { color:var(--amber); }
+        .skpi-period { color:var(--text-muted); }
+        .s-sparkline { display:flex; align-items:flex-end; gap:2px; height:26px; margin-top:12px; }
+        .s-spark-bar { flex:1; border-radius:2px 2px 0 0; background:rgba(61,217,180,0.18); min-height:3px; transition:var(--transition); }
+        .s-spark-bar.hi { background:var(--teal); }
+        .stats-kpi-card.c-gold .s-spark-bar    { background:rgba(180,145,80,0.18); }
+        .stats-kpi-card.c-gold .s-spark-bar.hi { background:var(--gold); }
+        .stats-kpi-card.c-red  .s-spark-bar    { background:rgba(229,92,92,0.18); }
+        .stats-kpi-card.c-red  .s-spark-bar.hi { background:var(--red); }
+        .stats-kpi-card.c-blue .s-spark-bar    { background:rgba(91,141,238,0.18); }
+        .stats-kpi-card.c-blue .s-spark-bar.hi { background:var(--blue); }
+        .stats-period-selector { display:flex; background:var(--bg-card); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+        .stats-period-btn { padding:8px 16px; border:none; background:transparent; color:var(--text-muted); font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500; cursor:pointer; transition:var(--transition); }
+        .stats-period-btn.active { background:var(--teal); color:var(--bg-primary); font-weight:600; }
+        .stats-period-btn:hover:not(.active) { color:var(--text-primary); background:var(--hover-overlay); }
+        .stats-charts-grid  { display:grid; grid-template-columns:2fr 1fr; gap:16px; margin-bottom:16px; }
+        .stats-charts-row3  { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:16px; }
+        .stats-charts-row2  { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+        .stats-charts-row22 { display:grid; grid-template-columns:2fr 1fr; gap:16px; margin-bottom:16px; }
+        .schart-card { background:var(--bg-card); border:1px solid var(--border); border-radius:14px; padding:22px; animation:fadeUp 0.5s ease both; animation-delay:.25s; }
+        .schart-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding-bottom:14px; border-bottom:1px solid var(--border); }
+        .schart-title { font-family:'Playfair Display',serif; font-size:14px; font-weight:600; display:flex; align-items:center; gap:9px; }
+        .schart-title i { color:var(--gold); font-size:13px; }
+        .schart-sub { font-size:11px; color:var(--text-muted); margin-top:3px; }
+        .schart-badge { display:inline-flex; align-items:center; gap:5px; padding:4px 11px; border-radius:20px; font-size:10.5px; font-weight:600; font-family:'DM Mono',monospace; }
+        .schart-badge.teal { background:var(--teal-dim); color:var(--teal); border:1px solid rgba(61,217,180,0.2); }
+        .schart-badge.gold { background:var(--gold-glow); color:var(--gold-light); border:1px solid rgba(180,145,80,0.2); }
+        .schart-badge.red  { background:rgba(229,92,92,0.1); color:var(--red); border:1px solid rgba(229,92,92,0.15); }
+        .s-donut-legend { display:flex; flex-direction:column; gap:9px; margin-top:16px; }
+        .s-legend-item  { display:flex; align-items:center; justify-content:space-between; font-size:12px; }
+        .s-legend-left  { display:flex; align-items:center; gap:9px; }
+        .s-legend-dot   { width:9px; height:9px; border-radius:3px; flex-shrink:0; }
+        .s-legend-label { color:var(--text-secondary); }
+        .s-legend-val   { font-family:'DM Mono',monospace; font-weight:500; color:var(--text-primary); }
+        .s-legend-bar-wrap { height:3px; flex:1; margin:0 10px; background:var(--hover-overlay-md); border-radius:99px; overflow:hidden; }
+        .s-legend-bar-fill { height:100%; border-radius:99px; transition:width 1s ease; }
+        .s-heatmap-days  { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; margin-bottom:6px; }
+        .s-heatmap-label { font-size:9px; color:var(--text-muted); text-align:center; font-family:'DM Mono',monospace; }
+        .s-heatmap-grid  { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
+        .s-heatmap-cell  { aspect-ratio:1; border-radius:4px; background:rgba(61,217,180,0.05); transition:var(--transition); cursor:pointer; position:relative; }
+        .s-heatmap-cell:hover { transform:scale(1.15); z-index:2; }
+        .s-heatmap-cell:hover::after { content:attr(data-tip); position:absolute; bottom:110%; left:50%; transform:translateX(-50%); background:var(--bg-elevated); border:1px solid var(--border); border-radius:6px; padding:3px 8px; font-size:10px; white-space:nowrap; color:var(--text-primary); z-index:10; pointer-events:none; }
+        .s-heatmap-cell.l1 { background:rgba(61,217,180,0.12); }
+        .s-heatmap-cell.l2 { background:rgba(61,217,180,0.28); }
+        .s-heatmap-cell.l3 { background:rgba(61,217,180,0.50); }
+        .s-heatmap-cell.l4 { background:rgba(61,217,180,0.78); }
+        .s-heatmap-cell.l5 { background:var(--teal); box-shadow:0 0 7px rgba(61,217,180,0.4); }
+        .s-ranking-list { display:flex; flex-direction:column; gap:9px; margin-top:2px; }
+        .s-ranking-item { display:flex; align-items:center; gap:11px; padding:11px 14px; border-radius:10px; background:var(--bg-secondary); border:1px solid var(--border); transition:var(--transition); }
+        .s-ranking-item:hover { background:var(--bg-card-hover); border-color:rgba(61,217,180,0.15); }
+        .s-rank-num  { font-family:'Playfair Display',serif; font-size:1.05rem; font-weight:700; color:var(--text-muted); width:20px; text-align:center; flex-shrink:0; }
+        .s-rank-num.rg { color:var(--gold); }
+        .s-rank-num.rs { color:#9ca3af; }
+        .s-rank-num.rb { color:#c28060; }
+        .s-rank-bar-wrap { width:70px; height:4px; background:var(--hover-overlay-md); border-radius:99px; overflow:hidden; }
+        .s-rank-bar-fill { height:100%; border-radius:99px; background:var(--teal); transition:width 1s ease; }
+        .s-timeline { display:flex; flex-direction:column; }
+        .s-tl-item  { display:flex; gap:13px; padding:11px 0; border-bottom:1px solid var(--border-light); }
+        .s-tl-item:last-child { border-bottom:none; }
+        .s-tl-dot-wrap { display:flex; flex-direction:column; align-items:center; flex-shrink:0; width:16px; }
+        .s-tl-dot  { width:9px; height:9px; border-radius:50%; margin-top:4px; flex-shrink:0; }
+        .s-tl-line { flex:1; width:1px; background:var(--border); margin-top:3px; }
+        .s-tl-item:last-child .s-tl-line { display:none; }
+        .s-tl-title { font-size:12.5px; font-weight:500; color:var(--text-primary); margin-bottom:2px; }
+        .s-tl-meta  { font-size:11px; color:var(--text-muted); display:flex; gap:8px; }
+
+        /* ===== THEME TOGGLE ===== */
+        .theme-toggle { position:relative; width:56px; height:30px; background:var(--bg-elevated); border:1px solid var(--border); border-radius:30px; cursor:pointer; overflow:hidden; padding:0; display:flex; align-items:center; }
+        .theme-icon { position:absolute; top:50%; transform:translateY(-50%); font-size:13px; transition:opacity 0.3s ease; z-index:1; line-height:1; }
+        .light-icon { left:6px; opacity:1; }
+        .dark-icon { right:6px; opacity:0.4; }
+        [data-theme="dark"] .light-icon { opacity:0.4; }
+        [data-theme="dark"] .dark-icon { opacity:1; }
+        .theme-thumb { position:absolute; left:3px; top:50%; transform:translateY(-50%); width:24px; height:24px; background:var(--teal); border-radius:50%; transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 2px 6px rgba(0,0,0,0.15); }
+        [data-theme="dark"] .theme-thumb { transform:translateY(-50%) translateX(26px); }
+
+        /* ──── Mobile Sidebar Toggle ────*/
+        .mobile-sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 12px; left: 12px;
+            z-index: 1001;
+            width: 40px; height: 40px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            align-items: center; justify-content: center;
+            flex-direction: column; gap: 5px; padding: 10px;
+            transition: all 0.2s;
+        }
+        .mobile-sidebar-toggle:hover { border-color: var(--accent); }
+        .mobile-sidebar-toggle span {
+            display: block; width: 100%; height: 2px;
+            background: var(--text-primary); border-radius: 2px;
+            transition: all 0.2s;
+        }
+        .mobile-sidebar-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+        .mobile-sidebar-toggle.active span:nth-child(2) { opacity: 0; }
+        .mobile-sidebar-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 99;
+        }
+        .sidebar-overlay.active { display: block; }
+
+        @media (max-width:1200px) { 
+            .sidebar{transform:translateX(-100%)} 
+            .sidebar.active{transform:translateX(0)} 
+            .main-content{margin-left:0;max-width:100%} 
+            .search-bar{width:260px} 
+            .mobile-sidebar-toggle { display: flex; }
+        }
+        @media (max-width:1100px) { 
+            .stats-kpi-grid{grid-template-columns:repeat(2,1fr)} 
+            .stats-charts-grid,.stats-charts-row3,.stats-charts-row2,.stats-charts-row22{grid-template-columns:1fr} 
+        }
+        @media (max-width:768px) { 
+            .main-content{padding:16px} 
+            .top-bar{flex-direction:column;align-items:flex-start;gap:14px;padding-left:50px} 
+            .search-bar{width:100%} 
+            .stats-container{grid-template-columns:1fr} 
+            .card-header{flex-direction:column;align-items:flex-start;gap:12px} 
+            .appointment-item{flex-direction:column;align-items:stretch;gap:12px} 
+            .chat-container{flex-direction:column} 
+            .conversations-list{width:100%;height:180px} 
+            .modal-box { max-width: 95%; padding: 20px; }
+        }
+        @media (max-width:640px) {
+            .main-content { padding: 12px; }
+            .top-bar { padding-left: 55px; }
+            .stats-kpi-grid { grid-template-columns: 1fr; }
+            .kpi-card { padding: 16px; }
+            .form-grid-2 { grid-template-columns: 1fr; }
+        }
+        @media (max-width:480px) {
+            .mobile-sidebar-toggle { top: 8px; left: 8px; width: 36px; height: 36px; }
+            .top-bar h1 { font-size: 20px; }
+            .card-body { padding: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Sidebar Toggle -->
+    <button class="mobile-sidebar-toggle" id="mobileSidebarToggle" aria-label="Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ===== SIDEBAR ===== -->
+    <div class="sidebar" id="sidebar">
+        <div class="logo">
+            <div class="logo-icon"><i class="fa-solid fa-robot"></i></div>
+            <h2>Parrot<span>Diag</span></h2>
+        </div>
+        <div class="nav-menu">
+            <div class="nav-section">Principal</div>
+            <div class="nav-item active" data-page="dashboard"><i class="fas fa-home"></i><span>Tableau de bord</span></div>
+            <div class="nav-item" data-page="patients"><i class="fas fa-user-injured"></i><span>Patients</span><span class="notification-badge" id="patientsBadge">0</span></div>
+            <div class="nav-item" data-page="appointments"><i class="fas fa-calendar-check"></i><span>Rendez-vous</span><span class="notification-badge" id="appointmentsBadge">0</span></div>
+            <div class="nav-section">Clinique</div>
+            <div class="nav-item" data-page="consultations"><i class="fas fa-file-medical"></i><span>Consultations</span></div>
+            <div class="nav-item" data-page="availability"><i class="fas fa-calendar-days"></i><span>Disponibilités</span></div>
+            <div class="nav-item" data-page="messages"><i class="fas fa-comments"></i><span>Messages</span><span class="notification-badge" id="messagesBadge">0</span></div>
+            <div class="nav-item" data-page="statistics"><i class="fas fa-chart-line"></i><span>Statistiques</span></div>
+        </div>
+        <div class="user-section" id="userProfileSection">
+            <div class="user-avatar" id="userAvatar">DR</div>
+            <div class="user-info">
+                <div class="user-name" id="userName">Chargement...</div>
+                <div class="user-role" id="userRole"><i class="fas fa-circle"></i><span>Médecin</span></div>
+            </div>
+            <i class="fas fa-chevron-up" style="color:var(--text-muted);font-size:10px;"></i>
+            <div class="user-dropdown" id="userDropdown">
+                <div class="dropdown-header">
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <div class="user-avatar" style="width:40px;height:40px;" id="dropdownAvatar">DR</div>
+                        <div>
+                            <div style="font-weight:600;color:var(--text-primary);font-size:13px;" id="dropdownName">Chargement...</div>
+                            <div style="font-size:11px;color:var(--teal);" id="dropdownSpecialty">Médecin</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="padding:6px;">
+                    <div class="dropdown-item" onclick="openDoctorProfileSettings()"><i class="fas fa-user-cog"></i><span>Mon profil professionnel</span></div>
+                    <div class="dropdown-item" onclick="openSettings()"><i class="fas fa-cog"></i><span>Paramètres</span></div>
+                    <div class="dropdown-item logout" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i><span>Déconnexion</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main-content">
+        <div class="top-bar">
+            <div class="page-title-section">
+                <h1 id="pageTitle">Tableau de bord</h1>
+                <div class="date-info" id="currentDate"><i class="fas fa-circle"></i><span>Chargement...</span></div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Rechercher patients, rendez-vous...">
+                </div>
+                <button class="theme-toggle" id="themeToggle" aria-label="Changer le thème">
+                    <span class="theme-icon light-icon">☀️</span>
+                    <span class="theme-icon dark-icon">🌙</span>
+                    <div class="theme-thumb"></div>
+                </button>
+                <div class="notifications-dropdown">
+                    <button onclick="toggleNotifications()" class="btn btn-icon" style="position:relative;width:40px;height:40px;">
+                        <i class="fas fa-bell"></i>
+                        <span id="notificationBadge" class="notification-badge" style="display:none;position:absolute;top:-4px;right:-4px;">0</span>
+                    </button>
+                    <div id="notificationsPanel" class="dropdown-menu" style="display:none;position:absolute;right:0;top:48px;width:300px;z-index:1000;">
+                        <div style="padding:12px 16px;border-bottom:1px solid var(--border);">
+                            <h4 style="font-size:12px;margin:0;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px;">Notifications</h4>
+                        </div>
+                        <div id="notificationsList" style="max-height:360px;overflow-y:auto;"></div>
+                        <div style="padding:8px;border-top:1px solid var(--border);">
+                            <button onclick="markAllAsRead()" class="btn-secondary btn btn-sm" style="width:100%;justify-content:center;">Tout marquer comme lu</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ DASHBOARD ══ -->
+        <div id="dashboardContent">
+            <div class="quick-actions">
+                <button class="btn" onclick="openNewAppointmentModal()"><i class="fas fa-calendar-plus"></i> Nouveau RDV</button>
+                <button class="btn btn-success" onclick="openNewConsultationModal()"><i class="fas fa-file-medical"></i> Nouvelle consultation</button>
+                <button class="btn btn-secondary" onclick="openPrescriptionModalFromDashboard()"><i class="fas fa-prescription"></i> Nouvelle ordonnance</button>
+            </div>
+            <div class="stats-container" id="statsContainer">
+                <div class="loading"><div class="loading-spinner"></div><p>Chargement des statistiques...</p></div>
+            </div>
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title"><i class="fas fa-user-injured"></i> Patients récents</h2>
+                    <div class="card-actions">
+                        <button class="btn btn-secondary btn-sm" onclick="loadPatients()"><i class="fas fa-sync-alt"></i> Actualiser</button>
+                        <button class="btn btn-sm" onclick="viewAllPatients()"><i class="fas fa-users"></i> Voir tous</button>
+                    </div>
+                </div>
+                <div class="table-container"><div id="patientsContainer"><div class="loading"><div class="loading-spinner"></div><p>Chargement des patients...</p></div></div></div>
+            </div>
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title"><i class="fas fa-calendar-check"></i> Rendez-vous d'aujourd'hui</h2>
+                    <div class="card-actions"><button class="btn btn-sm" onclick="openNewAppointmentModal()"><i class="fas fa-plus"></i> Nouveau RDV</button></div>
+                </div>
+                <div class="appointment-filters" id="appointmentFilters">
+                    <button class="filter-btn active" data-filter="all" onclick="filterAppointments('all')"><i class="fas fa-list"></i> Tous <span class="badge badge-primary" id="filterAllCount">0</span></button>
+                    <button class="filter-btn" data-filter="pending" onclick="filterAppointments('pending')"><i class="fas fa-clock"></i> En attente <span class="badge badge-warning" id="filterPendingCount">0</span></button>
+                    <button class="filter-btn" data-filter="confirmed" onclick="filterAppointments('confirmed')"><i class="fas fa-check-circle"></i> Confirmés <span class="badge badge-success" id="filterConfirmedCount">0</span></button>
+                    <button class="filter-btn" data-filter="completed" onclick="filterAppointments('completed')"><i class="fas fa-check-double"></i> Terminés <span class="badge badge-primary" id="filterCompletedCount">0</span></button>
+                </div>
+                <div class="appointment-list" id="appointmentsContainer"><div class="loading"><div class="loading-spinner"></div><p>Chargement des rendez-vous...</p></div></div>
+            </div>
+        </div>
+
+        <!-- ══ PATIENTS ══ -->
+        <div id="patientsContent" style="display:none;">
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title"><i class="fas fa-users"></i> Tous mes patients</h2>
+                    <div class="card-actions"><div class="search-bar" style="width:260px;"><i class="fas fa-search"></i><input type="text" id="patientSearchInput" placeholder="Rechercher un patient..."></div></div>
+                </div>
+                <div id="allPatientsContainer"><div class="loading"><div class="loading-spinner"></div><p>Chargement des patients...</p></div></div>
+            </div>
+        </div>
+
+        <!-- ══ APPOINTMENTS ══ -->
+        <div id="appointmentsContent" style="display:none;">
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title"><i class="fas fa-calendar-check"></i> Gestion des rendez-vous</h2>
+                    <div class="card-actions"><button class="btn btn-sm" onclick="openNewAppointmentModal()"><i class="fas fa-calendar-plus"></i> Nouveau RDV</button></div>
+                </div>
+                <div class="appointment-filters">
+                    <button class="filter-btn active" data-filter="all" onclick="filterAllAppointments('all')">Tous (<span id="allFilterCount">0</span>)</button>
+                    <button class="filter-btn" data-filter="pending" onclick="filterAllAppointments('pending')">En attente (<span id="pendingFilterCount">0</span>)</button>
+                    <button class="filter-btn" data-filter="confirmed" onclick="filterAllAppointments('confirmed')">Confirmés (<span id="confirmedFilterCount">0</span>)</button>
+                    <button class="filter-btn" data-filter="completed" onclick="filterAllAppointments('completed')">Terminés (<span id="completedFilterCount">0</span>)</button>
+                </div>
+                <div id="allAppointmentsContainer"><div class="loading"><div class="loading-spinner"></div><p>Chargement des rendez-vous...</p></div></div>
+            </div>
+        </div>
+
+        <!-- ══ STATISTIQUES ══ -->
+        <div id="statisticsContent" style="display:none;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;">
+                <div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-top:4px;font-family:'DM Mono',monospace;">
+                        <i class="fas fa-circle" style="color:var(--teal);font-size:8px;margin-right:6px;"></i>
+                        Données en temps réel &bull; <span id="statsLiveDate"></span>
+                    </div>
+                </div>
+                <div class="stats-period-selector">
+                    <button class="stats-period-btn" onclick="setStatsPeriod(7,this)">7J</button>
+                    <button class="stats-period-btn active" onclick="setStatsPeriod(30,this)">30J</button>
+                    <button class="stats-period-btn" onclick="setStatsPeriod(90,this)">3M</button>
+                    <button class="stats-period-btn" onclick="setStatsPeriod(365,this)">1A</button>
+                </div>
+            </div>
+
+            <!-- KPI CARDS -->
+            <div class="stats-kpi-grid">
+                <div class="stats-kpi-card c-teal">
+                    <div class="skpi-header"><span class="skpi-label">Patients actifs</span><div class="skpi-icon c-teal"><i class="fas fa-user-injured"></i></div></div>
+                    <div class="skpi-value" id="sKpiPatients">—</div>
+                    <div class="skpi-footer"><span class="skpi-trend up" id="sTrendPat"><i class="fas fa-arrow-up"></i> —</span><span class="skpi-period">vs mois dernier</span></div>
+                    <div class="s-sparkline" id="sSparkPat"></div>
+                </div>
+                <div class="stats-kpi-card c-gold">
+                    <div class="skpi-header"><span class="skpi-label">Rendez-vous</span><div class="skpi-icon c-gold"><i class="fas fa-calendar-check"></i></div></div>
+                    <div class="skpi-value" id="sKpiRdv">—</div>
+                    <div class="skpi-footer"><span class="skpi-trend up" id="sTrendRdv"><i class="fas fa-arrow-up"></i> —</span><span class="skpi-period">vs mois dernier</span></div>
+                    <div class="s-sparkline" id="sSparkRdv"></div>
+                </div>
+                <div class="stats-kpi-card c-red">
+                    <div class="skpi-header"><span class="skpi-label">Taux annulation</span><div class="skpi-icon c-red"><i class="fas fa-times-circle"></i></div></div>
+                    <div class="skpi-value" id="sKpiCancel">—</div>
+                    <div class="skpi-footer"><span class="skpi-trend neu" id="sTrendCan"><i class="fas fa-minus"></i> —</span><span class="skpi-period">vs mois dernier</span></div>
+                    <div class="s-sparkline" id="sSparkCan"></div>
+                </div>
+                <div class="stats-kpi-card c-blue">
+                    <div class="skpi-header"><span class="skpi-label">Consultations</span><div class="skpi-icon c-blue"><i class="fas fa-file-medical"></i></div></div>
+                    <div class="skpi-value" id="sKpiCons">—</div>
+                    <div class="skpi-footer"><span class="skpi-trend up" id="sTrendCons"><i class="fas fa-arrow-up"></i> —</span><span class="skpi-period">vs mois dernier</span></div>
+                    <div class="s-sparkline" id="sSparkCons"></div>
+                </div>
+            </div>
+
+            <!-- ROW 1 : Line + Donut -->
+            <div class="stats-charts-grid">
+                <div class="schart-card">
+                    <div class="schart-header">
+                        <div><div class="schart-title"><i class="fas fa-chart-area"></i> Activité mensuelle</div><div class="schart-sub">Rendez-vous, consultations & annulations</div></div>
+                        <span class="schart-badge teal"><i class="fas fa-circle" style="font-size:7px;"></i> Live</span>
+                    </div>
+                    <div style="position:relative;height:240px;"><canvas id="sLineChart"></canvas></div>
+                </div>
+                <div class="schart-card">
+                    <div class="schart-header"><div><div class="schart-title"><i class="fas fa-chart-pie"></i> Statuts RDV</div><div class="schart-sub">Répartition ce mois</div></div></div>
+                    <div style="height:170px;display:flex;align-items:center;justify-content:center;"><canvas id="sDonutChart"></canvas></div>
+                    <div class="s-donut-legend" id="sDonutLegend"></div>
+                </div>
+            </div>
+
+            <!-- ROW 2 : Bar + Radar + Heatmap -->
+            <div class="stats-charts-row3">
+                <div class="schart-card">
+                    <div class="schart-header"><div><div class="schart-title"><i class="fas fa-chart-bar"></i> RDV par jour</div><div class="schart-sub">Volume cette semaine</div></div><span class="schart-badge gold">Semaine</span></div>
+                    <div style="height:190px;"><canvas id="sBarChart"></canvas></div>
+                </div>
+                <div class="schart-card">
+                    <div class="schart-header"><div><div class="schart-title"><i class="fas fa-star"></i> Motifs fréquents</div><div class="schart-sub">Top raisons de consultation</div></div></div>
+                    <div style="height:190px;display:flex;align-items:center;justify-content:center;"><canvas id="sRadarChart"></canvas></div>
+                </div>
+                <div class="schart-card">
+                    <div class="schart-header"><div><div class="schart-title"><i class="fas fa-th"></i> Carte d'activité</div><div class="schart-sub">12 semaines</div></div></div>
+                    <div class="s-heatmap-days">
+                        <div class="s-heatmap-label">L</div><div class="s-heatmap-label">M</div><div class="s-heatmap-label">M</div><div class="s-heatmap-label">J</div><div class="s-heatmap-label">V</div><div class="s-heatmap-label">S</div><div class="s-heatmap-label">D</div>
+                    </div>
+                    <div class="s-heatmap-grid" id="sHeatmapGrid"></div>
+                    <div style="display:flex;align-items:center;gap:6px;margin-top:12px;">
+                        <span style="font-size:10px;color:var(--text-muted);">Moins</span>
+                        <div style="width:9px;height:9px;border-radius:3px;background:rgba(61,217,180,0.05);"></div>
+                        <div style="width:9px;height:9px;border-radius:3px;background:rgba(61,217,180,0.2);"></div>
+                        <div style="width:9px;height:9px;border-radius:3px;background:rgba(61,217,180,0.5);"></div>
+                        <div style="width:9px;height:9px;border-radius:3px;background:var(--teal);"></div>
+                        <span style="font-size:10px;color:var(--text-muted);">Plus</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ROW 3 : Ranking + Timeline -->
+            <div class="stats-charts-row2">
+                <div class="schart-card">
+                    <div class="schart-header"><div><div class="schart-title"><i class="fas fa-trophy"></i> Patients les + assidus</div><div class="schart-sub">Classement par visites</div></div></div>
+                    <div class="s-ranking-list" id="sRankingList"></div>
+                </div>
+                <div class="schart-card">
+                    <div class="schart-header"><div><div class="schart-title"><i class="fas fa-history"></i> Activité récente</div><div class="schart-sub">Dernières actions</div></div></div>
+                    <div class="s-timeline" id="sTimeline"></div>
+                </div>
+            </div>
+
+            <!-- ROW 4 : Horaires + Types -->
+            <div class="stats-charts-row22">
+                <div class="schart-card">
+                    <div class="schart-header"><div><div class="schart-title"><i class="fas fa-clock"></i> Affluence par heure</div><div class="schart-sub">Créneaux les plus demandés</div></div><span class="schart-badge red">Pic: 10h–11h</span></div>
+                    <div style="height:170px;"><canvas id="sHourChart"></canvas></div>
+                </div>
+                <div class="schart-card">
+                    <div class="schart-header"><div><div class="schart-title"><i class="fas fa-notes-medical"></i> Types consultation</div><div class="schart-sub">Répartition</div></div></div>
+                    <div style="height:170px;display:flex;align-items:center;justify-content:center;"><canvas id="sPolarChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+        <!-- ══ FIN STATISTIQUES ══ -->
+
+        <!-- ══ DISPONIBILITÉS ══ -->
+        <div id="availabilityContent" style="display:none;">
+            <div class="content-card">
+                <div class="card-header">
+                    <h2 class="card-title"><i class="fas fa-calendar-days"></i> Gérer mes disponibilités</h2>
+                    <div class="card-actions">
+                        <button class="btn btn-secondary btn-sm" onclick="refreshAvailability()"><i class="fas fa-sync-alt"></i> Actualiser</button>
+                        <button class="btn btn-sm" onclick="openWorkingHoursModal()"><i class="fas fa-clock"></i> Horaires réguliers</button>
+                    </div>
+                </div>
+
+                <!-- CALENDRIER -->
+                <div style="margin-bottom: 24px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="font-size: 14px; color: var(--text-primary);">Sélectionner une période</h3>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-secondary btn-sm" onclick="previousMonth()"><i class="fas fa-chevron-left"></i></button>
+                            <span id="currentMonth" style="min-width: 150px; text-align: center; color: var(--text-primary);"></span>
+                            <button class="btn btn-secondary btn-sm" onclick="nextMonth()"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+
+                    <div id="calendarGrid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 24px;"></div>
+
+                    <!-- LÉGENDE -->
+                    <div style="display: flex; gap: 24px; flex-wrap: wrap; padding: 16px; background: var(--bg-secondary); border-radius: 12px; border: 1px solid var(--border);">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 20px; height: 20px; border-radius: 6px; background: #4ade80;"></div>
+                            <span style="font-size: 12px; color: var(--text-secondary);">Disponible</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 20px; height: 20px; border-radius: 6px; background: #f97316;"></div>
+                            <span style="font-size: 12px; color: var(--text-secondary);">Weekend/Jour fermé</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 20px; height: 20px; border-radius: 6px; background: #ef4444;"></div>
+                            <span style="font-size: 12px; color: var(--text-secondary);">Complet/Saturé</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DÉTAILS DU JOUR SÉLECTIONNÉ -->
+                <div id="dayDetailsSection" style="display: none; padding: 20px; background: var(--bg-secondary); border-radius: 12px; border: 1px solid var(--border); margin-top: 20px;">
+                    <h3 style="margin-bottom: 16px; font-size: 14px; color: var(--text-primary);">Détails du jour</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+                        <div>
+                            <label style="display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Date sélectionnée</label>
+                            <span id="selectedDateDisplay" style="font-size: 14px; color: var(--text-primary);">-</span>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Patients inscrits</label>
+                            <span id="selectedDatePatients" style="font-size: 14px; color: var(--text-primary);">0</span>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Capacité maximale</label>
+                            <input type="number" id="selectedDateMaxPatients" min="1" max="20" value="5" style="width: 100%; padding: 8px 12px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary);">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">État</label>
+                            <select id="selectedDateStatus" style="width: 100%; padding: 8px 12px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary);">
+                                <option value="open">Ouvert</option>
+                                <option value="closed">Fermé</option>
+                                <option value="full">Complet</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Notes</label>
+                        <textarea id="selectedDateNotes" style="width: 100%; padding: 10px 12px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-family: 'DM Sans', sans-serif; resize: vertical; height: 80px;" placeholder="Ajouter des notes..."></textarea>
+                    </div>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="btn" onclick="saveAvailability()"><i class="fas fa-save"></i> Enregistrer</button>
+                        <button class="btn btn-secondary" onclick="resetAvailability()"><i class="fas fa-undo"></i> Réinitialiser</button>
+                        <button class="btn btn-secondary" onclick="cancelDateEdit()"><i class="fas fa-times"></i> Annuler</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ══ FIN DISPONIBILITÉS ══ -->
+
+    </div><!-- fin .main-content -->
+
+    <!-- ===== MODALS (inchangées) ===== -->
+    <div class="modal" id="doctorProfileSettingsModal">
+        <div class="modal-content" style="max-width:800px;">
+            <div class="modal-header"><h2><i class="fas fa-user-md" style="color:var(--gold);margin-right:10px;"></i> Mon Profil Professionnel</h2><button class="close-btn" onclick="closeModal('doctorProfileSettingsModal')"><i class="fas fa-times"></i></button></div>
+            <form id="doctorProfileForm">
+                <input type="hidden" id="profileUserId" value="">
+                <div class="modal-section"><h3><i class="fas fa-id-card"></i> Identité professionnelle</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;"><div class="form-group"><label>Nom complet</label><input type="text" id="profileFullName" class="form-control" required></div><div class="form-group"><label>Âge</label><input type="number" id="profileAge" class="form-control" min="25" max="80" required></div></div></div>
+                <div class="modal-section"><h3><i class="fas fa-stethoscope"></i> Spécialité & Localisation</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;"><div class="form-group"><label>Spécialité</label><select id="profileSpecialty" class="form-control" required><option value="">Sélectionnez</option><option value="Généraliste">Médecin Généraliste</option><option value="Cardiologue">Cardiologue</option><option value="Neurologue">Neurologue</option><option value="Pédiatre">Pédiatre</option><option value="Gynécologue">Gynécologue</option><option value="Dermatologue">Dermatologue</option><option value="Ophtalmologue">Ophtalmologue</option><option value="ORL">ORL</option><option value="Psychiatre">Psychiatre</option><option value="Radiologue">Radiologue</option><option value="Chirurgien">Chirurgien</option></select></div><div class="form-group"><label>Ville</label><input type="text" id="profileLocation" class="form-control" placeholder="Casablanca, Rabat, Fès..." required></div></div><div class="form-group"><label>Adresse complète</label><input type="text" id="profileAddress" class="form-control" placeholder="15, Rue de la Liberté..."></div></div>
+                <div class="modal-section"><h3><i class="fas fa-phone-alt"></i> Contact</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;"><div class="form-group"><label>Téléphone</label><input type="tel" id="profilePhone" class="form-control" placeholder="06 12 34 56 78" required></div><div class="form-group"><label>Email</label><input type="email" id="profileEmail" class="form-control" readonly></div></div></div>
+                <div class="modal-section"><h3><i class="fas fa-graduation-cap"></i> Formation & Expérience</h3><div class="form-group"><label>Diplômes</label><textarea id="profileDiplomas" class="form-control" rows="3" placeholder="Doctorat en Médecine..." required></textarea></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;"><div class="form-group"><label>Expérience</label><select id="profileExperience" class="form-control" required><option value="">Sélectionnez</option><option value="0-5 ans">0-5 ans</option><option value="5-10 ans">5-10 ans</option><option value="10-15 ans">10-15 ans</option><option value="15-20 ans">15-20 ans</option><option value="20+ ans">Plus de 20 ans</option></select></div><div class="form-group"><label>Prix consultation (Dhs)</label><input type="number" id="profilePrice" class="form-control" min="0" step="50" placeholder="250" required></div></div><div class="form-group"><label>Biographie</label><textarea id="profileBio" class="form-control" rows="4" placeholder="Présentez votre parcours..." required></textarea></div></div>
+                <div class="modal-section"><h3><i class="fas fa-camera"></i> Photo de profil</h3><div style="display:flex;align-items:center;gap:24px;"><div id="profilePhotoPreview" style="width:80px;height:80px;border-radius:12px;background:linear-gradient(135deg,var(--gold),#8a6b38);display:flex;align-items:center;justify-content:center;color:var(--bg-primary);font-size:24px;font-weight:700;overflow:hidden;flex-shrink:0;"><span id="profilePhotoInitials">DR</span></div><div style="flex:1;"><div style="border:1px dashed var(--border);border-radius:10px;padding:18px;text-align:center;cursor:pointer;transition:var(--transition);" onclick="document.getElementById('profilePhotoInput').click();" onmouseenter="this.style.borderColor='rgba(61,217,180,0.4)'" onmouseleave="this.style.borderColor='var(--border)'"><i class="fas fa-cloud-upload-alt" style="font-size:20px;color:var(--teal);margin-bottom:6px;"></i><p style="color:var(--text-muted);font-size:12px;">Cliquez pour changer votre photo</p><input type="file" id="profilePhotoInput" accept="image/*" style="display:none;" onchange="previewProfilePhoto(this);"></div></div></div><input type="hidden" id="profilePhotoBase64"></div>
+                <div class="form-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('doctorProfileSettingsModal')">Annuler</button><button type="submit" class="btn" id="saveProfileBtn"><i class="fas fa-save"></i> Enregistrer</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="patientDetailsModal">
+        <div class="modal-content" style="max-width:800px;">
+            <div class="modal-header"><h2><i class="fas fa-user-injured" style="color:var(--gold);margin-right:10px;"></i> Détails du patient</h2><button class="close-btn" onclick="closeModal('patientDetailsModal')"><i class="fas fa-times"></i></button></div>
+            <div id="patientDetailsContent"><div class="loading"><div class="loading-spinner"></div><p>Chargement des informations...</p></div></div>
+        </div>
+    </div>
+
+    <div class="modal" id="rescheduleAppointmentModal">
+        <div class="modal-content" style="max-width:460px;">
+            <div class="modal-header"><h2><i class="fas fa-calendar-alt" style="color:var(--amber);margin-right:10px;"></i> Reprogrammer</h2><button class="close-btn" onclick="closeModal('rescheduleAppointmentModal')"><i class="fas fa-times"></i></button></div>
+            <form id="rescheduleAppointmentForm">
+                <input type="hidden" id="rescheduleAppointmentId"><input type="hidden" id="reschedulePatientId">
+                <div class="form-group"><label>Patient</label><input type="text" id="reschedulePatientName" class="form-control" readonly></div>
+                <div class="form-group"><label>Nouvelle date</label><input type="date" id="rescheduleNewDate" class="form-control" required></div>
+                <div class="form-group"><label>Nouvelle heure</label><select id="rescheduleNewTime" class="form-control" required><option value="">Sélectionnez une heure</option><option value="09:00">09:00</option><option value="09:30">09:30</option><option value="10:00">10:00</option><option value="10:30">10:30</option><option value="11:00">11:00</option><option value="11:30">11:30</option><option value="14:00">14:00</option><option value="14:30">14:30</option><option value="15:00">15:00</option><option value="15:30">15:30</option><option value="16:00">16:00</option></select></div>
+                <div class="form-group"><label>Motif du changement</label><textarea id="rescheduleReason" class="form-control" rows="2" placeholder="Expliquez la raison..."></textarea></div>
+                <div class="form-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('rescheduleAppointmentModal')">Annuler</button><button type="submit" class="btn" style="background:var(--amber);color:var(--bg-primary);">Proposer la nouvelle date</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="newAppointmentModal">
+        <div class="modal-content" style="max-width:460px;">
+            <div class="modal-header"><h2><i class="fas fa-calendar-plus" style="color:var(--teal);margin-right:10px;"></i> Nouveau Rendez-vous</h2><button class="close-btn" onclick="closeModal('newAppointmentModal')"><i class="fas fa-times"></i></button></div>
+            <form id="appointmentForm">
+                <div class="form-group"><label>Patient</label><select class="form-control" id="patientSelect" required><option value="">Sélectionner un patient</option></select></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;"><div class="form-group"><label>Date</label><input type="date" class="form-control" id="appointmentDate" required></div><div class="form-group"><label>Heure</label><input type="time" class="form-control" id="appointmentTime" required></div></div>
+                <div class="form-group"><label>Motif</label><textarea class="form-control" id="appointmentReason" rows="3" required></textarea></div>
+                <div class="form-group"><label>Type de consultation</label><select class="form-control" id="appointmentType" required><option value="consultation">Consultation standard</option><option value="followup">Suivi</option><option value="emergency">Urgence</option><option value="teleconsultation">Téléconsultation</option></select></div>
+                <div class="form-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('newAppointmentModal')">Annuler</button><button type="submit" class="btn">Programmer</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="messagingModal">
+        <div class="modal-content messaging-modal">
+            <div class="modal-header"><h2><i class="fas fa-comments" style="color:var(--teal);margin-right:10px;"></i> Messagerie</h2><button class="close-btn" onclick="closeModal('messagingModal')"><i class="fas fa-times"></i></button></div>
+            <div class="chat-container">
+                <div class="conversations-list" id="conversationsList"><div style="padding:32px 20px;text-align:center;color:var(--text-muted);"><i class="fas fa-comments" style="font-size:36px;margin-bottom:12px;opacity:0.3;display:block;"></i><p style="font-size:12px;">Chargement des conversations...</p></div></div>
+                <div style="flex:1;display:flex;flex-direction:column;background:var(--bg-primary);">
+                    <div class="chat-messages" id="chatMessages"><div style="text-align:center;color:var(--text-muted);padding:60px 20px;"><i class="fas fa-comment-dots" style="font-size:36px;margin-bottom:12px;opacity:0.2;display:block;"></i><h4 style="margin-bottom:6px;font-size:14px;">Sélectionnez une conversation</h4><p style="font-size:12px;">Choisissez un patient pour commencer</p></div></div>
+                    <div class="chat-input"><input type="text" id="messageInput" class="form-control" placeholder="Écrivez votre message..." disabled><button class="btn btn-icon" onclick="sendMessage()" disabled style="background:var(--teal);color:var(--bg-primary);border:none;width:40px;height:40px;border-radius:50%;flex-shrink:0;"><i class="fas fa-paper-plane"></i></button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="settingsModal">
+        <div class="modal-content" style="max-width:780px;">
+            <div class="modal-header"><h2><i class="fas fa-cog" style="color:var(--gold);margin-right:10px;"></i> Paramètres</h2><button class="close-btn" onclick="closeModal('settingsModal')"><i class="fas fa-times"></i></button></div>
+            <div style="display:grid;grid-template-columns:180px 1fr;gap:24px;">
+                <div style="border-right:1px solid var(--border);padding-right:16px;">
+                    <div class="settings-tab active" data-tab="account" onclick="switchSettingsTab('account')"><i class="fas fa-user-circle"></i> Compte</div>
+                    <div class="settings-tab" data-tab="notifications" onclick="switchSettingsTab('notifications')"><i class="fas fa-bell"></i> Notifications</div>
+                    <div class="settings-tab" data-tab="appearance" onclick="switchSettingsTab('appearance')"><i class="fas fa-palette"></i> Apparence</div>
+                    <div class="settings-tab" data-tab="privacy" onclick="switchSettingsTab('privacy')"><i class="fas fa-shield-alt"></i> Confidentialité</div>
+                </div>
+                <div style="max-height:480px;overflow-y:auto;padding-right:8px;">
+                    <div id="settingsAccountTab" style="display:block;">
+                        <h3 style="margin-bottom:16px;font-size:14px;color:var(--text-primary);">Informations du compte</h3>
+                        <form id="accountSettingsForm"><div class="form-group"><label>Email</label><input type="email" id="settingsEmail" class="form-control" readonly></div><div class="form-group"><label>Téléphone</label><input type="tel" id="settingsPhone" class="form-control" placeholder="06 12 34 56 78"></div><div class="form-group"><label>Adresse</label><input type="text" id="settingsAddress" class="form-control" placeholder="Votre adresse"></div><button type="submit" class="btn btn-sm">Enregistrer</button></form>
+                        <hr style="margin:24px 0;border-color:var(--border);">
+                        <h3 style="margin-bottom:16px;font-size:14px;color:var(--text-primary);">Changer le mot de passe</h3>
+                        <form id="passwordChangeForm"><div class="form-group"><label>Mot de passe actuel</label><input type="password" id="currentPassword" class="form-control" required></div><div class="form-group"><label>Nouveau mot de passe</label><input type="password" id="newPassword" class="form-control" required></div><div class="form-group"><label>Confirmer</label><input type="password" id="confirmPassword" class="form-control" required></div><button type="submit" class="btn btn-secondary btn-sm">Mettre à jour</button></form>
+                    </div>
+                    <div id="settingsNotificationsTab" style="display:none;">
+                        <h3 style="margin-bottom:16px;font-size:14px;">Préférences de notification</h3>
+                        <div class="modal-section">
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><div><h4 style="font-size:13px;margin-bottom:3px;color:var(--text-primary);">Rendez-vous</h4><p style="color:var(--text-muted);font-size:11px;">Notifications pour les nouveaux RDV</p></div><label class="switch"><input type="checkbox" id="notifAppointments" checked><span class="slider"></span></label></div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><div><h4 style="font-size:13px;margin-bottom:3px;color:var(--text-primary);">Messages</h4><p style="color:var(--text-muted);font-size:11px;">Notifications pour les nouveaux messages</p></div><label class="switch"><input type="checkbox" id="notifMessages" checked><span class="slider"></span></label></div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;"><div><h4 style="font-size:13px;margin-bottom:3px;color:var(--text-primary);">Email</h4><p style="color:var(--text-muted);font-size:11px;">Recevoir les notifications par email</p></div><label class="switch"><input type="checkbox" id="notifEmail"><span class="slider"></span></label></div>
+                        </div>
+                        <button onclick="saveNotificationSettings()" class="btn btn-sm" style="margin-top:16px;">Enregistrer</button>
+                    </div>
+                    <div id="settingsAppearanceTab" style="display:none;">
+                        <h3 style="margin-bottom:16px;font-size:14px;">Apparence</h3>
+                        <div class="modal-section">
+                            <div style="margin-bottom:20px;"><h4 style="font-size:12px;margin-bottom:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);">Thème</h4><div style="display:flex;gap:16px;"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--text-secondary);font-size:13px;"><input type="radio" name="theme" value="light" checked> <span>Clair</span></label><label style="display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--text-secondary);font-size:13px;"><input type="radio" name="theme" value="dark"> <span>Sombre</span></label></div></div>
+                            <div><h4 style="font-size:12px;margin-bottom:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);">Langue</h4><select class="form-control" style="width:200px;" id="languageSelect"><option value="fr" selected>Français</option><option value="en">English</option><option value="ar">العربية</option></select></div>
+                        </div>
+                        <button onclick="saveAppearanceSettings()" class="btn btn-sm" style="margin-top:16px;">Enregistrer</button>
+                    </div>
+                    <div id="settingsPrivacyTab" style="display:none;">
+                        <h3 style="margin-bottom:16px;font-size:14px;">Confidentialité</h3>
+                        <div class="modal-section">
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><div><h4 style="font-size:13px;margin-bottom:3px;color:var(--text-primary);">Profil public</h4><p style="color:var(--text-muted);font-size:11px;">Afficher mon profil dans les recherches</p></div><label class="switch"><input type="checkbox" id="profilePublic" checked><span class="slider"></span></label></div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;"><div><h4 style="font-size:13px;margin-bottom:3px;color:var(--text-primary);">Partager les statistiques</h4><p style="color:var(--text-muted);font-size:11px;">Contribuer à l'amélioration de l'IA</p></div><label class="switch"><input type="checkbox" id="shareStats" checked><span class="slider"></span></label></div>
+                        </div>
+                        <div class="danger-zone" style="margin-top:20px;padding:18px;"><h4 style="color:var(--red);margin-bottom:8px;font-size:13px;">Zone dangereuse</h4><p style="color:var(--red);margin-bottom:14px;font-size:12px;opacity:0.8;">Ces actions sont irréversibles.</p><div style="display:flex;gap:10px;"><button onclick="exportData()" class="btn btn-secondary btn-sm">Exporter mes données</button><button onclick="deleteAccount()" class="btn btn-danger btn-sm">Supprimer mon compte</button></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="medicalRecordModal">
+        <div class="modal-content" style="max-width:800px;">
+            <div class="modal-header"><h2><i class="fas fa-file-medical" style="color:var(--teal);margin-right:10px;"></i> Dossier Médical</h2><button class="close-btn" onclick="closeModal('medicalRecordModal')"><i class="fas fa-times"></i></button></div>
+            <div id="medicalRecordContent"><div class="loading"><div class="loading-spinner"></div><p>Chargement du dossier médical...</p></div></div>
+        </div>
+    </div>
+
+    <div class="modal" id="createMedicalRecordModal">
+        <div class="modal-content" style="max-width:700px;">
+            <div class="modal-header"><h2><i class="fas fa-notes-medical" style="color:var(--teal);margin-right:10px;"></i> Nouvelle Consultation</h2><button class="close-btn" onclick="closeModal('createMedicalRecordModal')"><i class="fas fa-times"></i></button></div>
+            <form id="createMedicalRecordForm">
+                <input type="hidden" id="recordPatientId"><input type="hidden" id="recordAppointmentId">
+                <div class="modal-section"><h3><i class="fas fa-user-injured"></i> Patient</h3><div style="display:flex;align-items:center;gap:14px;"><div id="recordPatientAvatar" class="patient-avatar" style="width:48px;height:48px;font-size:1.2rem;border-radius:10px;">DR</div><div><h4 id="recordPatientName" style="color:var(--text-primary);margin-bottom:3px;">Chargement...</h4><p id="recordPatientInfo" style="color:var(--text-muted);font-size:12px;"></p></div></div></div>
+                <div class="modal-section"><h3><i class="fas fa-heartbeat"></i> Constantes vitales</h3><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;"><div class="form-group"><label>Tension artérielle</label><div style="display:flex;align-items:center;gap:8px;"><input type="text" id="recordBloodPressure" class="form-control" placeholder="120/80" style="flex:1;"><span style="color:var(--text-muted);font-size:11px;white-space:nowrap;">mmHg</span></div></div><div class="form-group"><label>Fréq. cardiaque</label><div style="display:flex;align-items:center;gap:8px;"><input type="number" id="recordHeartRate" class="form-control" placeholder="70" style="flex:1;"><span style="color:var(--text-muted);font-size:11px;">bpm</span></div></div><div class="form-group"><label>Température</label><div style="display:flex;align-items:center;gap:8px;"><input type="number" id="recordTemperature" class="form-control" placeholder="37.0" step="0.1" style="flex:1;"><span style="color:var(--text-muted);font-size:11px;">°C</span></div></div><div class="form-group"><label>Saturation O2</label><div style="display:flex;align-items:center;gap:8px;"><input type="number" id="recordOxygen" class="form-control" placeholder="98" style="flex:1;"><span style="color:var(--text-muted);font-size:11px;">%</span></div></div><div class="form-group"><label>Poids</label><div style="display:flex;align-items:center;gap:8px;"><input type="number" id="recordWeight" class="form-control" placeholder="70" step="0.1" style="flex:1;"><span style="color:var(--text-muted);font-size:11px;">kg</span></div></div><div class="form-group"><label>Taille</label><div style="display:flex;align-items:center;gap:8px;"><input type="number" id="recordHeight" class="form-control" placeholder="175" style="flex:1;"><span style="color:var(--text-muted);font-size:11px;">cm</span></div></div></div></div>
+                <div class="modal-section"><h3><i class="fas fa-stethoscope"></i> Consultation</h3><div class="form-group"><label>Motif de la consultation</label><input type="text" id="recordReason" class="form-control" placeholder="Ex: Douleur thoracique..." required></div><div class="form-group"><label>Histoire de la maladie</label><textarea id="recordHistory" class="form-control" rows="3" placeholder="Description des symptômes..."></textarea></div><div class="form-group"><label>Examen clinique</label><textarea id="recordExamination" class="form-control" rows="3" placeholder="Résultats de l'examen physique..."></textarea></div><div class="form-group"><label>Diagnostic</label><input type="text" id="recordDiagnosis" class="form-control" placeholder="Diagnostic principal" required></div><div class="form-group"><label>Diagnostics secondaires</label><input type="text" id="recordSecondaryDiagnosis" class="form-control" placeholder="Autres diagnostics, séparés par des virgules"></div></div>
+                <div class="modal-section"><h3><i class="fas fa-pills"></i> Traitement prescrit</h3><div id="medicationsContainer"><div class="medication-item" style="display:grid;grid-template-columns:2fr 1fr 1fr 34px;gap:8px;margin-bottom:8px;background:var(--bg-primary);padding:10px;border-radius:8px;border:1px solid var(--border);"><input type="text" class="form-control medication-name" placeholder="Médicament"><input type="text" class="form-control medication-dosage" placeholder="Dosage"><input type="text" class="form-control medication-frequency" placeholder="Fréquence"><button type="button" class="btn-icon" onclick="removeMedication(this)" style="background:var(--red-dim);color:var(--red);border-color:rgba(229,92,92,0.2);width:34px;height:34px;flex-shrink:0;"><i class="fas fa-times"></i></button></div></div><button type="button" onclick="addMedication()" class="btn btn-secondary btn-sm" style="margin-top:8px;"><i class="fas fa-plus"></i> Ajouter un médicament</button><div style="margin-top:14px;"><label style="display:block;margin-bottom:6px;font-weight:500;color:var(--text-secondary);font-size:12px;text-transform:uppercase;letter-spacing:0.8px;">Instructions supplémentaires</label><textarea id="recordInstructions" class="form-control" rows="2" placeholder="Durée du traitement, précautions..."></textarea></div></div>
+                <div class="modal-section"><h3><i class="fas fa-flask"></i> Examens complémentaires</h3><div id="examsContainer"><div class="exam-item" style="display:grid;grid-template-columns:2fr 1fr 34px;gap:8px;margin-bottom:8px;background:var(--bg-primary);padding:10px;border-radius:8px;border:1px solid var(--border);"><input type="text" class="form-control exam-name" placeholder="Examen"><input type="text" class="form-control exam-result" placeholder="Résultat"><button type="button" class="btn-icon" onclick="removeExam(this)" style="background:var(--red-dim);color:var(--red);border-color:rgba(229,92,92,0.2);width:34px;height:34px;flex-shrink:0;"><i class="fas fa-times"></i></button></div></div><button type="button" onclick="addExam()" class="btn btn-secondary btn-sm" style="margin-top:8px;"><i class="fas fa-plus"></i> Ajouter un examen</button></div>
+                <div class="modal-section"><h3><i class="fas fa-notes-medical"></i> Notes</h3><div class="form-group"><label>Notes personnelles</label><textarea id="recordNotes" class="form-control" rows="3" placeholder="Informations supplémentaires..."></textarea></div></div>
+                <div class="form-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('createMedicalRecordModal')"><i class="fas fa-times"></i> Annuler</button><button type="submit" class="btn" id="saveMedicalRecordBtn"><i class="fas fa-save"></i> Enregistrer le dossier</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div id="notificationToast" style="display:none;position:fixed;top:20px;right:20px;padding:14px 18px;z-index:3000;">
+        <div style="display:flex;align-items:center;gap:12px;"><div><div style="font-weight:600;" id="toastTitle">Notification</div><div id="toastMessage"></div></div><button onclick="closeToast()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;margin-left:8px;"><i class="fas fa-times"></i></button></div>
+    </div>
+
+    <div class="modal" id="prescriptionModal">
+        <div class="modal-content" style="max-width:800px;">
+            <div class="modal-header"><h2><i class="fas fa-prescription" style="color:var(--gold);margin-right:10px;"></i> Nouvelle Ordonnance</h2><button class="close-btn" onclick="closeModal('prescriptionModal')"><i class="fas fa-times"></i></button></div>
+            <form id="prescriptionForm">
+                <input type="hidden" id="prescriptionPatientId"><input type="hidden" id="prescriptionDoctorId"><input type="hidden" id="prescriptionAppointmentId">
+                <div class="modal-section"><h3><i class="fas fa-user-injured"></i> Patient</h3><div style="display:flex;align-items:center;gap:14px;"><div id="prescriptionPatientAvatar" class="patient-avatar" style="width:48px;height:48px;font-size:1.2rem;border-radius:10px;">JD</div><div><h4 id="prescriptionPatientName" style="color:var(--text-primary);margin-bottom:3px;">Chargement...</h4><p id="prescriptionPatientInfo" style="color:var(--text-muted);font-size:12px;"></p></div></div></div>
+                <div class="modal-section"><h3><i class="fas fa-stethoscope"></i> Diagnostic</h3><div class="form-group"><label>Diagnostic *</label><input type="text" id="prescriptionDiagnosis" class="form-control" placeholder="Diagnostic principal" required></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;"><div class="form-group"><label>Date de l'ordonnance</label><input type="date" id="prescriptionDate" class="form-control" required></div><div class="form-group"><label>Date d'expiration</label><input type="date" id="prescriptionExpiry" class="form-control"></div></div></div>
+                <div class="modal-section"><h3><i class="fas fa-pills"></i> Médicaments prescrits</h3><div id="prescriptionMedicationsContainer"><div class="medication-row" style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 34px;gap:8px;margin-bottom:8px;background:var(--bg-primary);padding:10px;border-radius:8px;border:1px solid var(--border);"><input type="text" class="form-control med-name" placeholder="Médicament" required><input type="text" class="form-control med-dosage" placeholder="Dosage" required><input type="text" class="form-control med-frequency" placeholder="Fréquence" required><input type="text" class="form-control med-duration" placeholder="Durée"><button type="button" class="btn-icon" onclick="removePrescriptionMedication(this)" style="background:var(--red-dim);color:var(--red);border-color:rgba(229,92,92,0.2);width:34px;height:34px;flex-shrink:0;"><i class="fas fa-times"></i></button></div></div><button type="button" onclick="addPrescriptionMedication()" class="btn btn-secondary btn-sm" style="margin-top:8px;"><i class="fas fa-plus"></i> Ajouter un médicament</button></div>
+                <div class="modal-section"><h3><i class="fas fa-notes-medical"></i> Instructions</h3><div class="form-group"><label>Instructions détaillées</label><textarea id="prescriptionInstructions" class="form-control" rows="3" placeholder="Posologie, précautions..." required></textarea></div><div class="form-group"><label>Notes supplémentaires</label><textarea id="prescriptionNotes" class="form-control" rows="2" placeholder="Informations complémentaires..."></textarea></div></div>
+                <div class="modal-section"><div style="display:flex;align-items:center;gap:20px;"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--text-secondary);font-size:13px;"><input type="checkbox" id="prescriptionActive" checked><span>Ordonnance active</span></label><label style="display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--text-secondary);font-size:13px;"><input type="checkbox" id="prescriptionNotifyPatient" checked><span>Notifier le patient</span></label></div></div>
+                <div class="form-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('prescriptionModal')"><i class="fas fa-times"></i> Annuler</button><button type="submit" class="btn" id="savePrescriptionBtn"><i class="fas fa-prescription"></i> Créer l'ordonnance</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="prescriptionsHistoryModal">
+        <div class="modal-content" style="max-width:900px;">
+            <div class="modal-header"><h2><i class="fas fa-history" style="color:var(--gold);margin-right:10px;"></i> Historique des ordonnances</h2><button class="close-btn" onclick="closeModal('prescriptionsHistoryModal')"><i class="fas fa-times"></i></button></div>
+            <div class="modal-body"><div id="prescriptionsHistoryContent"><div class="loading"><div class="loading-spinner"></div><p>Chargement des ordonnances...</p></div></div></div>
+        </div>
+    </div>
+
+    <div class="modal" id="workingHoursModal">
+        <div class="modal-content" style="max-width:600px;">
+            <div class="modal-header"><h2><i class="fas fa-clock" style="color:var(--teal);margin-right:10px;"></i> Horaires réguliers</h2><button class="close-btn" onclick="closeModal('workingHoursModal')"><i class="fas fa-times"></i></button></div>
+            <div style="max-height:500px;overflow-y:auto;padding:20px;">
+                <p style="color:var(--text-muted);font-size:12px;margin-bottom:20px;">Définissez vos horaires réguliers de travail par jour de la semaine.</p>
+                <div id="workingHoursContainer">
+                    <div class="loading"><div class="loading-spinner"></div><p>Chargement...</p></div>
+                </div>
+            </div>
+            <div style="padding:16px;border-top:1px solid var(--border);display:flex;gap:10px;">
+                <button class="btn btn-secondary" onclick="closeModal('workingHoursModal')">Annuler</button>
+                <button class="btn" onclick="saveWorkingHours()"><i class="fas fa-save"></i> Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="medecin.js"></script>
+    <script>
+    // Mobile Sidebar Toggle
+    document.addEventListener('DOMContentLoaded', function() {
+        const mobileSidebarToggle = document.getElementById('mobileSidebarToggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        
+        if (mobileSidebarToggle && sidebar && sidebarOverlay) {
+            mobileSidebarToggle.addEventListener('click', function() {
+                mobileSidebarToggle.classList.toggle('active');
+                sidebar.classList.toggle('active');
+                sidebarOverlay.classList.toggle('active');
+                document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+            });
+            
+            sidebarOverlay.addEventListener('click', function() {
+                mobileSidebarToggle.classList.remove('active');
+                sidebar.classList.remove('active');
+                sidebarOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+            
+            // Close sidebar when clicking on a nav item on mobile
+            const navItems = sidebar.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    if (window.innerWidth <= 1200) {
+                        mobileSidebarToggle.classList.remove('active');
+                        sidebar.classList.remove('active');
+                        sidebarOverlay.classList.remove('active');
+                        document.body.style.overflow = '';
+                    }
+                });
+            });
+            
+            // Close sidebar when window is resized above breakpoint
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 1200) {
+                    mobileSidebarToggle.classList.remove('active');
+                    sidebar.classList.remove('active');
+                    sidebarOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+        }
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1569 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParrotDiag — Espace Patient</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        /* =============================================
+           DESIGN TOKENS (from page 2)
+        ============================================= */
+        :root {
+          --accent: #2fa37c;
+          --accent-dark: #1d7558;
+          --accent-glow: rgba(47, 163, 124, 0.2);
+          --accent-light: #e8f7f2;
+
+          --bg: #fafaf9;
+          --bg-2: #f3f1ed;
+          --bg-card: #ffffff;
+          --bg-card-hover: #f8f7f5;
+          --bg-glass: rgba(255,255,255,0.75);
+
+          --text: #1a2421;
+          --text-2: #4a5d57;
+          --text-3: #8a9e99;
+
+          --border: rgba(0,0,0,0.08);
+          --border-strong: rgba(0,0,0,0.15);
+
+          --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+          --shadow-md: 0 8px 24px rgba(0,0,0,0.1);
+          --shadow-lg: 0 20px 48px rgba(0,0,0,0.14);
+          --shadow-accent: 0 8px 24px rgba(47,163,124,0.25);
+
+          --header-bg: rgba(250,250,249,0.9);
+          --nav-link: #4a5d57;
+
+          --t: all 0.25s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        [data-theme="dark"] {
+          --bg: #0f1a17;
+          --bg-2: #162019;
+          --bg-card: #1c2b25;
+          --bg-card-hover: #223329;
+          --bg-glass: rgba(28,43,37,0.85);
+
+          --text: #e8f0ed;
+          --text-2: #93b3a8;
+          --text-3: #566f67;
+
+          --border: rgba(255,255,255,0.07);
+          --border-strong: rgba(255,255,255,0.14);
+
+          --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+          --shadow-md: 0 8px 24px rgba(0,0,0,0.4);
+          --shadow-lg: 0 20px 48px rgba(0,0,0,0.5);
+
+          --header-bg: rgba(15,26,23,0.92);
+          --nav-link: #93b3a8;
+
+          --accent-light: rgba(47,163,124,0.12);
+        }
+
+        /* =============================================
+           RESET & BASE
+        ============================================= */
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+        body {
+          font-family: 'DM Sans', sans-serif;
+          background: var(--bg);
+          color: var(--text);
+          transition: background 0.35s ease, color 0.35s ease;
+          overflow-x: hidden;
+          min-height: 100vh;
+        }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+
+        /* =============================================
+           HEADER
+        ============================================= */
+        header {
+          position: sticky;
+          top: 0;
+          z-index: 1000;
+          background: var(--header-bg);
+          backdrop-filter: blur(16px) saturate(160%);
+          border-bottom: 1px solid var(--border);
+          padding: 0 64px;
+          height: 70px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 24px;
+          transition: var(--t);
+        }
+
+        .header-logo {
+          display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+        }
+        .logo-icon {
+          width: 38px; height: 38px;
+          background: var(--accent);
+          border-radius: 10px;
+          display: flex; align-items: center; justify-content: center;
+          color: white; font-size: 16px;
+        }
+        .logo-text {
+          font-family: 'Playfair Display', serif;
+          font-size: 20px; font-weight: 700; color: var(--text);
+        }
+        .logo-text em { color: var(--accent); font-style: normal; }
+
+        .main-nav ul { display: flex; gap: 4px; }
+        .main-nav a {
+          padding: 6px 14px; font-size: 14px; font-weight: 500;
+          color: var(--nav-link); border-radius: 8px; transition: var(--t);
+        }
+        .main-nav a:hover, .main-nav a.active {
+          background: var(--accent-light); color: var(--accent);
+        }
+
+        .header-controls { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+
+        /* Theme Toggle */
+        .theme-toggle {
+          position: relative; width: 56px; height: 30px;
+          background: var(--bg-2); border: 1px solid var(--border);
+          border-radius: 30px; cursor: pointer; padding: 0;
+          display: flex; align-items: center;
+          transition: var(--t); overflow: hidden;
+        }
+        .theme-toggle:hover { border-color: var(--accent); }
+        .theme-icon {
+          position: absolute; font-size: 13px; transition: var(--t); pointer-events: none;
+        }
+        .light-icon { left: 6px; opacity: 1; }
+        .dark-icon { right: 6px; opacity: 0.4; }
+        [data-theme="dark"] .light-icon { opacity: 0.4; }
+        [data-theme="dark"] .dark-icon { opacity: 1; }
+        .theme-thumb {
+          position: absolute; left: 3px; width: 24px; height: 24px;
+          background: white; border-radius: 50%; box-shadow: var(--shadow-sm);
+          transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        [data-theme="dark"] .theme-thumb { transform: translateX(26px); background: var(--accent); }
+
+        /* Notification Bell */
+        .notif-btn {
+          position: relative; width: 38px; height: 38px;
+          background: var(--bg-2); border: 1px solid var(--border);
+          border-radius: 10px; cursor: pointer;
+          display: flex; align-items: center; justify-content: center;
+          color: var(--text-2); font-size: 15px; transition: var(--t);
+        }
+        .notif-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+        .notif-badge {
+          position: absolute; top: -5px; right: -5px;
+          background: #ef4444; color: white; border-radius: 50%;
+          width: 18px; height: 18px; font-size: 10px;
+          display: flex; align-items: center; justify-content: center; font-weight: 700;
+        }
+
+        /* User Menu */
+        .profile-menu { position: relative; }
+        .profile-trigger {
+          display: flex; align-items: center; gap: 8px;
+          padding: 5px 12px 5px 5px;
+          background: var(--bg-2); border: 1px solid var(--border);
+          border-radius: 40px; cursor: pointer; transition: var(--t);
+        }
+        .profile-trigger:hover { border-color: var(--accent); }
+        .profile-avatar {
+          width: 32px; height: 32px;
+          background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+          border-radius: 50%;
+          display: flex; align-items: center; justify-content: center;
+          color: white; font-size: 13px; font-weight: 700; overflow: hidden;
+        }
+        .profile-name { font-size: 14px; font-weight: 600; color: var(--text); }
+        .profile-trigger .fa-chevron-down { font-size: 10px; color: var(--text-3); transition: transform 0.2s; }
+        .profile-menu.active .fa-chevron-down { transform: rotate(180deg); }
+
+        .profile-dropdown {
+          position: absolute; top: calc(100% + 8px); right: 0;
+          width: 260px; background: var(--bg-card);
+          border: 1px solid var(--border); border-radius: 14px;
+          box-shadow: var(--shadow-lg); overflow: hidden;
+          opacity: 0; visibility: hidden; transform: translateY(-6px);
+          transition: var(--t); z-index: 1000;
+        }
+        .profile-menu.active .profile-dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
+
+        .dropdown-header {
+          padding: 18px; background: var(--bg-2);
+          display: flex; align-items: center; gap: 12px;
+        }
+        .dropdown-avatar {
+          width: 42px; height: 42px;
+          background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+          border-radius: 50%;
+          display: flex; align-items: center; justify-content: center;
+          color: white; font-size: 16px; font-weight: 700; overflow: hidden;
+        }
+        .dropdown-name { font-size: 14px; font-weight: 600; color: var(--text); }
+        .dropdown-email { font-size: 12px; color: var(--text-3); margin: 2px 0 4px; }
+        .dropdown-role {
+          display: inline-block; padding: 2px 8px;
+          background: var(--accent); color: white;
+          border-radius: 20px; font-size: 10px; font-weight: 700;
+        }
+        .dropdown-divider { height: 1px; background: var(--border); margin: 4px 0; }
+        .dropdown-item {
+          display: flex; align-items: center; gap: 10px;
+          padding: 11px 18px; font-size: 14px; color: var(--text-2);
+          cursor: pointer; transition: background 0.15s;
+        }
+        .dropdown-item i { width: 18px; color: var(--accent); }
+        .dropdown-item:hover { background: var(--accent-light); color: var(--text); }
+        .dropdown-item.logout { color: #ef4444; }
+        .dropdown-item.logout i { color: #ef4444; }
+        .dropdown-item.logout:hover { background: rgba(239,68,68,0.08); }
+
+        /* =============================================
+           NOTIFICATIONS PANEL
+        ============================================= */
+        .notifications-panel {
+          position: fixed; top: 82px; right: 20px; width: 360px;
+          background: var(--bg-card); border: 1px solid var(--border);
+          border-radius: 16px; box-shadow: var(--shadow-lg);
+          z-index: 1000; display: none; overflow: hidden;
+        }
+        .notifications-panel.show { display: block; animation: slideInRight 0.3s ease; }
+        .notif-panel-header {
+          padding: 16px 20px;
+          background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+          color: white;
+          display: flex; justify-content: space-between; align-items: center;
+        }
+        .notif-panel-header h3 { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .mark-all-btn {
+          background: rgba(255,255,255,0.2); border: none; color: white;
+          padding: 5px 12px; border-radius: 20px; font-size: 11px;
+          cursor: pointer; transition: var(--t);
+        }
+        .mark-all-btn:hover { background: rgba(255,255,255,0.35); }
+        .notif-list { max-height: 380px; overflow-y: auto; }
+        .notif-item {
+          padding: 14px 18px; border-bottom: 1px solid var(--border);
+          cursor: pointer; transition: background 0.15s;
+          display: flex; gap: 12px;
+        }
+        .notif-item:hover { background: var(--bg-2); }
+        .notif-item.unread { background: var(--accent-light); }
+        .notif-icon {
+          width: 36px; height: 36px; border-radius: 50%;
+          background: var(--accent-light);
+          display: flex; align-items: center; justify-content: center;
+          color: var(--accent); flex-shrink: 0; font-size: 14px;
+        }
+        .notif-content { flex: 1; }
+        .notif-title { font-weight: 600; font-size: 13px; color: var(--text); margin-bottom: 3px; }
+        .notif-msg { font-size: 12px; color: var(--text-2); margin-bottom: 4px; }
+        .notif-time { font-size: 11px; color: var(--text-3); }
+
+        /* =============================================
+           MAIN CONTENT
+        ============================================= */
+        .main-content { padding: 40px 64px; max-width: 1400px; margin: 0 auto; }
+
+        /* =============================================
+           WELCOME CARD
+        ============================================= */
+        .welcome-card {
+          position: relative; overflow: hidden;
+          background: var(--bg-card);
+          border: 1px solid var(--border);
+          border-radius: 20px;
+          padding: 32px 36px;
+          margin-bottom: 32px;
+          display: flex; justify-content: space-between; align-items: center;
+          box-shadow: var(--shadow-sm);
+        }
+        .welcome-card::before {
+          content: '';
+          position: absolute; top: 0; left: 0; right: 0; height: 3px;
+          background: linear-gradient(90deg, var(--accent), var(--accent-dark), transparent);
+        }
+        .welcome-shapes { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+        .welcome-shape {
+          position: absolute; border-radius: 50%; filter: blur(60px);
+        }
+        .ws1 { width: 300px; height: 300px; top: -100px; right: -80px; background: var(--accent-glow); }
+        .ws2 { width: 200px; height: 200px; bottom: -80px; left: 30%; background: rgba(47,163,124,0.06); }
+
+        .welcome-left { display: flex; align-items: center; gap: 20px; position: relative; z-index: 1; }
+        .welcome-avatar {
+          width: 72px; height: 72px; border-radius: 18px;
+          background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+          display: flex; align-items: center; justify-content: center;
+          color: white; font-size: 26px; font-weight: 700; overflow: hidden;
+          box-shadow: var(--shadow-accent);
+        }
+        .welcome-text h1 {
+          font-family: 'Playfair Display', serif;
+          font-size: 24px; font-weight: 900; color: var(--text); margin-bottom: 6px;
+        }
+        .welcome-text h1 em { color: var(--accent); font-style: italic; }
+        .welcome-text p { font-size: 14px; color: var(--text-2); display: flex; align-items: center; gap: 6px; }
+        .welcome-text p i { color: var(--accent); }
+
+        .stats-quick { display: flex; gap: 8px; position: relative; z-index: 1; }
+        .stat-quick-item {
+          background: var(--bg-2); border: 1px solid var(--border);
+          border-radius: 14px; padding: 16px 24px; text-align: center;
+          transition: var(--t);
+        }
+        .stat-quick-item:hover { border-color: var(--accent); box-shadow: var(--shadow-sm); }
+        .stat-quick-value {
+          font-family: 'Playfair Display', serif;
+          font-size: 28px; font-weight: 900; color: var(--accent); line-height: 1;
+        }
+        .stat-quick-label { font-size: 12px; color: var(--text-3); margin-top: 4px; }
+
+        /* =============================================
+           TABS
+        ============================================= */
+        .tabs-container {
+          display: flex; gap: 6px; margin-bottom: 28px;
+          padding-bottom: 16px; border-bottom: 1px solid var(--border);
+          flex-wrap: wrap;
+        }
+        .tab {
+          padding: 8px 18px; border-radius: 10px;
+          font-size: 14px; font-weight: 500; color: var(--text-2);
+          cursor: pointer; transition: var(--t);
+          display: flex; align-items: center; gap: 7px;
+          border: 1px solid transparent;
+        }
+        .tab:hover { background: var(--accent-light); color: var(--accent); }
+        .tab.active {
+          background: var(--accent); color: white;
+          box-shadow: var(--shadow-accent);
+        }
+
+        /* =============================================
+           SECTIONS
+        ============================================= */
+        .section { display: none; }
+        .section.active { display: block; animation: fadeInUp 0.3s ease; }
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(12px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header {
+          display: flex; justify-content: space-between; align-items: center;
+          margin-bottom: 24px;
+        }
+        .section-header h2 {
+          font-family: 'Playfair Display', serif;
+          font-size: 22px; font-weight: 900; color: var(--text);
+          display: flex; align-items: center; gap: 10px;
+        }
+        .section-header h2 i { color: var(--accent); }
+
+        /* =============================================
+           STATS GRID
+        ============================================= */
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          gap: 16px; margin-bottom: 40px;
+        }
+        .stat-card {
+          background: var(--bg-card); border: 1px solid var(--border);
+          border-radius: 16px; padding: 22px;
+          display: flex; align-items: center; gap: 16px;
+          transition: var(--t); position: relative; overflow: hidden;
+        }
+        .stat-card::before {
+          content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+          background: linear-gradient(90deg, var(--accent), transparent);
+          opacity: 0; transition: var(--t);
+        }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--accent-glow); }
+        .stat-card:hover::before { opacity: 1; }
+        .stat-icon {
+          width: 50px; height: 50px; border-radius: 12px;
+          background: var(--accent-light);
+          display: flex; align-items: center; justify-content: center;
+          color: var(--accent); font-size: 20px; flex-shrink: 0;
+          transition: var(--t);
+        }
+        .stat-card:hover .stat-icon { background: var(--accent); color: white; }
+        .stat-info h4 { font-size: 12px; color: var(--text-3); font-weight: 500; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-info p { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 900; color: var(--text); line-height: 1; }
+
+        /* =============================================
+           SECTION TITLES
+        ============================================= */
+        .sub-section-title {
+          display: flex; align-items: center; gap: 10px;
+          font-family: 'Playfair Display', serif;
+          font-size: 18px; font-weight: 700; color: var(--text);
+          margin: 36px 0 16px;
+        }
+        .sub-section-title::after {
+          content: ''; flex: 1; height: 1px; background: var(--border);
+        }
+        .sub-section-title i { color: var(--accent); }
+
+        /* =============================================
+           APPOINTMENT CARD
+        ============================================= */
+        .appointments-list, .prescriptions-list { display: flex; flex-direction: column; gap: 14px; }
+
+        .appointment-card, .prescription-card {
+          background: var(--bg-card); border: 1px solid var(--border);
+          border-radius: 16px; padding: 20px 22px;
+          transition: var(--t); position: relative; overflow: hidden;
+          display: flex; align-items: center; gap: 20px;
+        }
+        .appointment-card:hover, .prescription-card:hover {
+          border-color: var(--accent-glow); box-shadow: var(--shadow-md); transform: translateX(4px);
+        }
+        .appt-left-bar {
+          width: 4px; align-self: stretch; border-radius: 4px;
+          background: linear-gradient(180deg, var(--accent), var(--accent-dark));
+          flex-shrink: 0;
+        }
+        .prescription-card .appt-left-bar {
+          background: linear-gradient(180deg, #8b5cf6, #6366f1);
+        }
+
+        .doctor-info { display: flex; align-items: center; gap: 12px; flex: 1; }
+        .doctor-avatar-small {
+          width: 44px; height: 44px; border-radius: 12px;
+          background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+          display: flex; align-items: center; justify-content: center;
+          color: white; font-weight: 700; font-size: 16px; flex-shrink: 0;
+        }
+        .doctor-name { font-weight: 600; font-size: 15px; color: var(--text); margin-bottom: 2px; }
+        .doctor-specialty { font-size: 13px; color: var(--text-2); }
+
+        .appointment-date { text-align: right; flex-shrink: 0; }
+        .appointment-day { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--accent); }
+        .appointment-time { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+
+        .appt-status { flex-shrink: 0; }
+        .status-badge {
+          display: inline-block; padding: 4px 12px; border-radius: 20px;
+          font-size: 11px; font-weight: 700; letter-spacing: 0.3px; text-transform: uppercase;
+        }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-confirmed { background: #d1fae5; color: #065f46; }
+        .status-completed { background: #dbeafe; color: #1e40af; }
+        .status-cancelled { background: #fee2e2; color: #991b1b; }
+        .status-rescheduled { background: #fff3cd; color: #856404; }
+        .status-active { background: #d1fae5; color: #065f46; }
+        .status-expired { background: #fee2e2; color: #991b1b; }
+
+        /* =============================================
+           PRESCRIPTION CARD
+        ============================================= */
+        .prescription-card { flex-direction: column; align-items: stretch; }
+        .prescription-card-inner { display: flex; align-items: center; gap: 20px; }
+        .pres-info { flex: 1; }
+        .pres-title { font-weight: 600; font-size: 15px; color: var(--text); margin-bottom: 2px; }
+        .pres-doctor { font-size: 13px; color: var(--text-2); }
+
+        .medications-list-mini {
+          margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border);
+          display: flex; flex-wrap: wrap; gap: 8px;
+        }
+        .med-pill {
+          display: inline-flex; align-items: center; gap: 6px;
+          padding: 5px 12px; background: var(--bg-2);
+          border: 1px solid var(--border); border-radius: 20px;
+          font-size: 12px; color: var(--text-2);
+          transition: var(--t);
+        }
+        .med-pill:hover { border-color: var(--accent); color: var(--accent); }
+        .med-pill strong { color: var(--text); }
+        .med-pill span { color: var(--accent); font-weight: 600; }
+
+        .prescription-footer {
+          display: flex; justify-content: space-between; align-items: center;
+          margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border);
+        }
+        .pres-date { font-size: 12px; color: var(--text-3); display: flex; align-items: center; gap: 5px; }
+        .pres-date i { color: var(--accent); }
+        .pres-actions { display: flex; gap: 8px; }
+
+        /* =============================================
+           DOCTORS GRID
+        ============================================= */
+        .doctors-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+          gap: 20px;
+        }
+
+        .doctor-card {
+          background: var(--bg-card);
+          border: 1px solid var(--border);
+          border-radius: 16px;
+          padding: 20px;
+          transition: var(--t);
+        }
+        .doctor-card:hover {
+          border-color: var(--accent);
+          box-shadow: var(--shadow-md);
+          transform: translateY(-2px);
+        }
+
+        .doctor-card-header {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          margin-bottom: 16px;
+        }
+
+        .doctor-avatar-large {
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-size: 20px;
+          font-weight: 700;
+          overflow: hidden;
+        }
+
+        .doctor-rating {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          margin-left: auto;
+          background: var(--accent-light);
+          padding: 4px 8px;
+          border-radius: 20px;
+          font-size: 13px;
+          color: var(--accent);
+        }
+
+        .doctor-card-info {
+          margin-bottom: 16px;
+          font-size: 13px;
+          color: var(--text-2);
+        }
+
+        .doctor-card-info p {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 6px;
+        }
+
+        .doctor-card-info i {
+          width: 16px;
+          color: var(--accent);
+        }
+
+        /* =============================================
+           BUTTONS
+        ============================================= */
+        .btn {
+          display: inline-flex; align-items: center; gap: 7px;
+          padding: 9px 20px; border-radius: 10px;
+          font-size: 14px; font-weight: 600; cursor: pointer;
+          transition: var(--t); border: none; font-family: inherit;
+        }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { background: var(--accent-dark); transform: translateY(-1px); box-shadow: var(--shadow-accent); }
+        .btn-outline {
+          background: transparent; color: var(--text-2);
+          border: 1px solid var(--border-strong);
+        }
+        .btn-outline:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+        .btn-sm { padding: 6px 14px; font-size: 12px; }
+
+        /* Filter buttons */
+        .filter-bar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        .btn-filter {
+          padding: 7px 16px; border: 1px solid var(--border);
+          background: var(--bg-card); border-radius: 20px;
+          font-size: 13px; font-weight: 500; color: var(--text-2);
+          cursor: pointer; transition: var(--t); font-family: inherit;
+        }
+        .btn-filter:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+        .btn-filter.active { background: var(--accent); color: white; border-color: transparent; }
+
+        /* =============================================
+           EMPTY STATE
+        ============================================= */
+        .empty-state {
+          text-align: center; padding: 60px 20px;
+          background: var(--bg-card); border: 1px solid var(--border);
+          border-radius: 16px; color: var(--text-3);
+        }
+        .empty-state i { font-size: 48px; margin-bottom: 16px; opacity: 0.3; }
+        .empty-state h3 { font-size: 18px; color: var(--text-2); margin-bottom: 8px; }
+        .empty-state p { font-size: 14px; }
+
+        /* =============================================
+           MODALS
+        ============================================= */
+        .modal-overlay {
+          display: none; position: fixed; inset: 0;
+          background: rgba(0,0,0,0.55); backdrop-filter: blur(6px);
+          z-index: 10000; align-items: center; justify-content: center; padding: 20px;
+          animation: fadeIn 0.2s ease;
+        }
+        .modal-overlay.open { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .modal-box {
+          background: var(--bg-card); border: 1px solid var(--border);
+          border-radius: 20px; width: 100%; max-width: 540px;
+          max-height: 90vh; overflow-y: auto; position: relative;
+          box-shadow: var(--shadow-lg);
+          animation: slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .modal-box--large { max-width: 720px; }
+        @keyframes slideUp {
+          from { transform: translateY(30px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+          background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+          padding: 20px 28px; border-radius: 20px 20px 0 0;
+          display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-header h2 { color: white; font-size: 18px; font-family: 'Playfair Display', serif; display: flex; align-items: center; gap: 10px; }
+        .modal-close {
+          width: 32px; height: 32px; background: rgba(255,255,255,0.2);
+          border: none; border-radius: 8px; color: white; font-size: 18px;
+          cursor: pointer; display: flex; align-items: center; justify-content: center;
+          transition: var(--t); line-height: 1;
+        }
+        .modal-close:hover { background: rgba(255,255,255,0.3); transform: rotate(90deg); }
+
+        .modal-body { padding: 28px; }
+
+        .form-field { margin-bottom: 18px; }
+        .form-field label { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7px; }
+        .form-field input, .form-field select, .form-field textarea {
+          width: 100%; padding: 11px 14px;
+          background: var(--bg-2); border: 1px solid var(--border);
+          border-radius: 10px; font-size: 14px; color: var(--text);
+          font-family: inherit; transition: var(--t); outline: none; resize: vertical;
+        }
+        .form-field input:focus, .form-field select:focus, .form-field textarea:focus {
+          border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); background: var(--bg-card);
+        }
+        .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .form-section-title {
+          font-size: 13px; font-weight: 700; color: var(--text);
+          margin: 22px 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+          display: flex; align-items: center; gap: 7px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .form-section-title i { color: var(--accent); }
+
+        .profile-photo-row {
+          display: flex; align-items: center; gap: 20px;
+          padding: 18px; background: var(--bg-2); border-radius: 14px; margin-bottom: 22px;
+        }
+        .photo-preview-circle {
+          width: 70px; height: 70px; border-radius: 50%;
+          background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+          display: flex; align-items: center; justify-content: center;
+          color: white; font-size: 24px; font-weight: 700; flex-shrink: 0; overflow: hidden;
+        }
+
+        .modal-actions {
+          display: flex; gap: 10px; padding-top: 18px; border-top: 1px solid var(--border);
+        }
+        .modal-actions .btn { flex: 1; justify-content: center; }
+
+        /* Prescription Detail */
+        .pres-detail-info {
+          background: var(--bg-2); border-radius: 12px; padding: 16px; margin-bottom: 20px;
+        }
+        .pres-detail-row {
+          display: flex; margin-bottom: 8px;
+        }
+        .pres-detail-label { font-weight: 600; font-size: 13px; min-width: 120px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.3px; }
+        .pres-detail-value { font-size: 13px; color: var(--text); }
+        .medications-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        .medications-table th {
+          text-align: left; padding: 10px 12px;
+          background: var(--accent-light); color: var(--accent);
+          font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .medications-table th:first-child { border-radius: 10px 0 0 0; }
+        .medications-table th:last-child { border-radius: 0 10px 0 0; }
+        .medications-table td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
+        .medications-table tr:last-child td { border-bottom: none; }
+        .dosage-badge {
+          background: var(--accent-light); color: var(--accent);
+          padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;
+        }
+
+        /* Toast */
+        .toast {
+          position: fixed; top: 20px; right: 20px;
+          padding: 14px 20px; background: var(--bg-card);
+          border: 1px solid var(--border); border-radius: 12px;
+          box-shadow: var(--shadow-md);
+          display: flex; align-items: center; gap: 10px; font-size: 14px;
+          z-index: 20000; animation: slideInRight 0.3s ease; color: var(--text);
+        }
+        .toast.success { border-left: 3px solid #10b981; }
+        .toast.success i { color: #10b981; }
+
+        /* =============================================
+           SETTINGS TABS & TOGGLE
+        ============================================= */
+        .settings-tab {
+          display: flex; align-items: center; gap: 10px;
+          padding: 10px 14px; border-radius: 10px; margin-bottom: 4px;
+          cursor: pointer; font-size: 13px; font-weight: 500;
+          color: var(--text-3); transition: var(--t);
+        }
+        .settings-tab:hover { background: var(--accent-light); color: var(--text); }
+        .settings-tab.active { background: var(--accent-light); color: var(--accent); font-weight: 600; }
+        .settings-tab i { width: 16px; text-align: center; font-size: 13px; }
+
+        .toggle-switch {
+          position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider {
+          position: absolute; cursor: pointer; inset: 0;
+          background: var(--border-strong); border-radius: 24px; transition: 0.3s;
+        }
+        .toggle-slider::before {
+          content: ''; position: absolute; height: 18px; width: 18px;
+          left: 3px; bottom: 3px; background: white;
+          border-radius: 50%; transition: 0.3s;
+        }
+        .toggle-switch input:checked + .toggle-slider { background: var(--accent); }
+        .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+        .settings-panel { animation: fadeIn 0.2s ease; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-2); }
+        ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+        /* =============================================
+           ANIMATIONS
+        ============================================= */
+        @keyframes slideInRight {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* =============================================
+           CALENDAR STYLES FOR PATIENT BOOKING
+        ============================================= */
+        .calendar-day-header {
+            text-align: center;
+            padding: 8px;
+            font-weight: 600;
+            font-size: 11px;
+            color: var(--text-3);
+            text-transform: uppercase;
+        }
+
+        .calendar-empty {
+            padding: 12px;
+            background: transparent;
+        }
+
+        .calendar-day {
+            padding: 12px 6px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+            position: relative;
+            width: 100%;
+            font-family: inherit;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .calendar-day.clickable:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(47, 163, 124, 0.3);
+            cursor: pointer;
+        }
+
+        .calendar-day:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .slot-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: white;
+            color: black;
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 9px;
+            font-weight: 700;
+            border: 1px solid currentColor;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        #slotsContainer {
+            padding: 20px;
+            background: var(--bg-2);
+            border-radius: 12px;
+            margin-top: 15px;
+        }
+
+        .slot-button {
+            padding: 10px;
+            background: #10b981;
+            border: 1px solid #059669;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .slot-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
+
+        /* =============================================
+           MOBILE MENU
+        ============================================= */
+        .mobile-menu-toggle {
+          display: none;
+          width: 40px;
+          height: 40px;
+          background: var(--bg-card);
+          border: 1px solid var(--border);
+          border-radius: 10px;
+          cursor: pointer;
+          align-items: center;
+          justify-content: center;
+          flex-direction: column;
+          gap: 5px;
+          padding: 10px;
+          transition: var(--t);
+        }
+        .mobile-menu-toggle:hover { border-color: var(--accent); }
+        .mobile-menu-toggle span {
+          display: block;
+          width: 100%;
+          height: 2px;
+          background: var(--text);
+          border-radius: 2px;
+          transition: var(--t);
+        }
+        .mobile-menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+        .mobile-menu-toggle.active span:nth-child(2) { opacity: 0; }
+        .mobile-menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+        .mobile-nav-overlay {
+          position: fixed;
+          inset: 0;
+          top: 70px;
+          background: var(--bg-card);
+          z-index: 999;
+          padding: 24px;
+          display: none;
+          flex-direction: column;
+          gap: 16px;
+        }
+        .mobile-nav-overlay.active { display: flex; }
+        .mobile-nav-overlay ul { display: flex; flex-direction: column; gap: 8px; }
+        .mobile-nav-overlay a {
+          display: block;
+          padding: 14px 18px;
+          font-size: 16px;
+          font-weight: 500;
+          color: var(--text);
+          background: var(--bg-2);
+          border-radius: 12px;
+          transition: var(--t);
+        }
+        .mobile-nav-overlay a:hover, .mobile-nav-overlay a.active {
+          background: var(--accent);
+          color: white;
+        }
+
+        /* =============================================
+           RESPONSIVE
+        ============================================= */
+        @media (max-width: 900px) {
+          header { padding: 0 20px; }
+          .main-content { padding: 20px; }
+          .main-nav { display: none; }
+          .mobile-menu-toggle { display: flex; }
+          .welcome-card { flex-direction: column; gap: 20px; }
+          .stats-quick { width: 100%; justify-content: space-between; }
+        }
+        @media (max-width: 768px) {
+          .stats-grid { grid-template-columns: 1fr 1fr; }
+          .modal-box { max-width: 95%; padding: 20px; }
+          #settingsModal .modal-body > div { flex-direction: column; }
+          #settingsModal .modal-body > div > div:first-child {
+            width: 100% !important; border-right: none !important;
+            border-bottom: 1px solid var(--border); padding-bottom: 12px !important;
+            border-radius: 0 !important; display: flex; flex-wrap: wrap; gap: 4px;
+          }
+        }
+        @media (max-width: 640px) {
+          header { padding: 0 16px; height: 60px; }
+          .mobile-nav-overlay { top: 60px; padding: 16px; }
+          .logo-text { font-size: 18px; }
+          .main-content { padding: 16px; }
+          .stats-grid { grid-template-columns: 1fr; }
+          .form-grid-2 { grid-template-columns: 1fr; }
+          .appointment-card, .prescription-card { flex-wrap: wrap; }
+          .doctors-grid { grid-template-columns: 1fr; }
+          .profile-name { display: none; }
+          .section-header h2 { font-size: 20px; }
+          .doctor-card { padding: 16px; }
+        }
+        @media (max-width: 480px) {
+          header { padding: 0 12px; }
+          .header-controls { gap: 8px; }
+          .theme-toggle { width: 48px; height: 26px; }
+          .theme-thumb { width: 20px; height: 20px; }
+          [data-theme="dark"] .theme-thumb { transform: translateX(22px); }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ======= HEADER ======= -->
+<header>
+    <div class="header-logo">
+        <div class="logo-icon"><i class="fa-solid fa-robot"></i></div>
+        <span class="logo-text">Parrot<em>Diag</em></span>
+    </div>
+
+    <nav class="main-nav">
+        <ul>
+            <li><a href="index.html">Accueil</a></li>
+            <li><a href="ia.html">Évaluer mes symptômes</a></li>
+            <li><a href="patients.html" class="active">Les activités</a></li>
+            <li><a href="apropos.html">À propos</a></li>
+        </ul>
+    </nav>
+
+    <div class="header-controls">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+            <span class="theme-icon light-icon">☀️</span>
+            <span class="theme-icon dark-icon">🌙</span>
+            <div class="theme-thumb"></div>
+        </button>
+
+        <button class="notif-btn" id="notificationBtn">
+            <i class="fas fa-bell"></i>
+            <span class="notif-badge" id="notificationBadge" style="display:none;">0</span>
+        </button>
+
+        <div class="profile-menu" id="userMenu">
+            <div class="profile-trigger" id="userTrigger">
+                <div class="profile-avatar" id="userAvatar">JD</div>
+                <span class="profile-name" id="userName">Patient</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="profile-dropdown" id="userDropdown">
+                <div class="dropdown-header">
+                    <div class="dropdown-avatar" id="dropdownAvatar">JD</div>
+                    <div>
+                        <div class="dropdown-name" id="dropdownName">Patient</div>
+                        <div class="dropdown-email" id="dropdownEmail">patient@email.com</div>
+                        <span class="dropdown-role">Patient</span>
+                    </div>
+                </div>
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-item" id="editProfileLink">
+                    <i class="fas fa-user-edit"></i> Modifier le profil
+                </div>
+                <div class="dropdown-item" id="settingsLink">
+                    <i class="fas fa-cog"></i> Paramètres
+                </div>
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-item logout" id="logoutLink">
+                    <i class="fas fa-sign-out-alt"></i> Déconnexion
+                </div>
+            </div>
+        </div>
+
+        <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </div>
+</header>
+
+<!-- Mobile Navigation Overlay -->
+<nav class="mobile-nav-overlay" id="mobileNavOverlay">
+    <ul>
+        <li><a href="index.html">Accueil</a></li>
+        <li><a href="ia.html">Évaluer mes symptômes</a></li>
+        <li><a href="patients.html" class="active">Les activités</a></li>
+        <li><a href="apropos.html">À propos</a></li>
+    </ul>
+</nav>
+
+<!-- ======= NOTIFICATIONS PANEL ======= -->
+<div id="notificationsPanel" class="notifications-panel">
+    <div class="notif-panel-header">
+        <h3><i class="fas fa-bell"></i> Notifications</h3>
+        <button class="mark-all-btn" onclick="markAllNotificationsRead()">Tout marquer lu</button>
+    </div>
+    <div id="notificationsList" class="notif-list"></div>
+</div>
+
+<!-- ======= MAIN CONTENT ======= -->
+<main class="main-content">
+
+    <!-- Welcome Card -->
+    <div class="welcome-card">
+        <div class="welcome-shapes">
+            <div class="welcome-shape ws1"></div>
+            <div class="welcome-shape ws2"></div>
+        </div>
+        <div class="welcome-left">
+            <div class="welcome-avatar" id="welcomeAvatar">JD</div>
+            <div class="welcome-text">
+                <h1>Bienvenue, <em id="welcomeName">Patient</em></h1>
+                <p><i class="fas fa-shield-alt"></i> Votre espace santé personnel sécurisé</p>
+            </div>
+        </div>
+        <div class="stats-quick">
+            <div class="stat-quick-item">
+                <div class="stat-quick-value" id="quickAppointments">0</div>
+                <div class="stat-quick-label">Rendez-vous</div>
+            </div>
+            <div class="stat-quick-item">
+                <div class="stat-quick-value" id="quickPrescriptions">0</div>
+                <div class="stat-quick-label">Ordonnances</div>
+            </div>
+            <div class="stat-quick-item">
+                <div class="stat-quick-value" id="quickActivePrescriptions">0</div>
+                <div class="stat-quick-label">En cours</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs-container">
+        <div class="tab active" data-tab="dashboard">
+            <i class="fas fa-home"></i> Accueil
+        </div>
+        <div class="tab" data-tab="appointments">
+            <i class="fas fa-calendar-check"></i> Rendez-vous
+        </div>
+        <div class="tab" data-tab="prescriptions">
+            <i class="fas fa-file-prescription"></i> Ordonnances
+        </div>
+        <div class="tab" data-tab="doctors">
+            <i class="fas fa-user-md"></i> Médecins
+        </div>
+    </div>
+
+    <!-- SECTION ACCUEIL -->
+    <div id="dashboardSection" class="section active">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+                <div class="stat-info"><h4>Rendez-vous</h4><p id="statAppointments">0</p></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-info"><h4>Confirmés</h4><p id="statConfirmed">0</p></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                <div class="stat-info"><h4>En attente</h4><p id="statPending">0</p></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-file-prescription"></i></div>
+                <div class="stat-info"><h4>Ordonnances actives</h4><p id="statActivePrescriptions">0</p></div>
+            </div>
+        </div>
+
+        <div class="sub-section-title"><i class="fas fa-calendar-alt"></i> Prochains rendez-vous</div>
+        <div id="upcomingAppointments" class="appointments-list"></div>
+
+        <div class="sub-section-title"><i class="fas fa-pills"></i> Dernières ordonnances</div>
+        <div id="recentPrescriptions" class="prescriptions-list"></div>
+    </div>
+
+    <!-- SECTION RENDEZ-VOUS -->
+    <div id="appointmentsSection" class="section">
+        <div class="section-header">
+            <h2><i class="fas fa-calendar-check"></i> Mes rendez-vous</h2>
+            <button class="btn btn-primary btn-sm" onclick="openNewAppointment()">
+                <i class="fas fa-plus"></i> Nouveau rendez-vous
+            </button>
+        </div>
+        <div class="filter-bar">
+            <button class="btn-filter active" onclick="filterAppointments('all')">Tous</button>
+            <button class="btn-filter" onclick="filterAppointments('pending')">En attente</button>
+            <button class="btn-filter" onclick="filterAppointments('confirmed')">Confirmés</button>
+            <button class="btn-filter" onclick="filterAppointments('completed')">Terminés</button>
+            <button class="btn-filter" onclick="filterAppointments('cancelled')">Annulés</button>
+        </div>
+        <div id="appointmentsList" class="appointments-list"></div>
+    </div>
+
+    <!-- SECTION ORDONNANCES -->
+    <div id="prescriptionsSection" class="section">
+        <div class="section-header">
+            <h2><i class="fas fa-file-prescription"></i> Mes ordonnances</h2>
+            <button class="btn btn-outline btn-sm" onclick="downloadAllPrescriptions()">
+                <i class="fas fa-download"></i> Tout télécharger
+            </button>
+        </div>
+        <div class="filter-bar">
+            <button class="btn-filter active" onclick="filterPrescriptions('all')">Toutes</button>
+            <button class="btn-filter" onclick="filterPrescriptions('active')">En cours</button>
+            <button class="btn-filter" onclick="filterPrescriptions('expired')">Expirées</button>
+        </div>
+        <div id="prescriptionsList" class="prescriptions-list"></div>
+    </div>
+
+    <!-- SECTION MÉDECINS -->
+    <div id="doctorsSection" class="section">
+        <div class="section-header">
+            <h2><i class="fas fa-user-md"></i> Nos médecins</h2>
+            <p style="color: var(--text-2);">Trouvez le spécialiste dont vous avez besoin</p>
+        </div>
+        <div id="doctorsList" class="doctors-grid"></div>
+    </div>
+
+</main>
+
+<!-- ======= MODAL PROFIL PATIENT ======= -->
+<div class="modal-overlay" id="patientProfileModal">
+    <div class="modal-box modal-box--large">
+        <div class="modal-header">
+            <h2><i class="fas fa-user-circle"></i> Modifier mon profil</h2>
+            <button class="modal-close" onclick="closeModal('patientProfileModal')">×</button>
+        </div>
+        <div class="modal-body">
+            <form id="patientProfileForm">
+                <div class="profile-photo-row">
+                    <div class="photo-preview-circle" id="patientPhotoPreview">
+                        <span id="patientPhotoInitials">JD</span>
+                    </div>
+                    <div>
+                        <label for="patientPhotoInput" class="btn btn-outline btn-sm" style="cursor:pointer; display:inline-flex;">
+                            <i class="fas fa-camera"></i> Changer la photo
+                        </label>
+                        <input type="file" id="patientPhotoInput" accept="image/*" style="display:none;" onchange="previewPatientPhoto(this);">
+                        <input type="hidden" id="patientPhotoBase64">
+                        <p style="font-size:12px; color:var(--text-3); margin-top:6px;">JPG, PNG (max 2MB)</p>
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-field">
+                        <label>Nom complet</label>
+                        <input type="text" id="patientFullName" readonly>
+                    </div>
+                    <div class="form-field">
+                        <label>Email</label>
+                        <input type="email" id="patientEmail" readonly>
+                    </div>
+                    <div class="form-field">
+                        <label>Date de naissance</label>
+                        <input type="date" id="patientBirthDate">
+                    </div>
+                    <div class="form-field">
+                        <label>Téléphone</label>
+                        <input type="tel" id="patientPhone">
+                    </div>
+                    <div class="form-field">
+                        <label>Sexe</label>
+                        <select id="patientSex">
+                            <option value="">Sélectionnez</option>
+                            <option value="male">Homme</option>
+                            <option value="female">Femme</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label>Groupe sanguin</label>
+                        <select id="patientBloodType">
+                            <option value="">Non renseigné</option>
+                            <option>A+</option><option>A-</option><option>B+</option>
+                            <option>B-</option><option>AB+</option><option>AB-</option>
+                            <option>O+</option><option>O-</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label>Ville</label>
+                        <input type="text" id="patientCity">
+                    </div>
+                    <div class="form-field">
+                        <label>Code postal</label>
+                        <input type="text" id="patientZipCode">
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label>Adresse</label>
+                    <input type="text" id="patientAddress">
+                </div>
+
+                <div class="form-section-title"><i class="fas fa-notes-medical"></i> Informations médicales</div>
+                
+                <div class="form-field">
+                    <label>Situation familiale</label>
+                    <select id="patientMaritalStatus">
+                        <option value="">Sélectionnez</option>
+                        <option value="celibataire">Célibataire</option>
+                        <option value="marie">Marié(e)</option>
+                        <option value="divorce">Divorcé(e)</option>
+                        <option value="veuf">Veuf(ve)</option>
+                    </select>
+                </div>
+
+                <div class="form-field">
+                    <label>Allergies connues</label>
+                    <textarea id="patientAllergies" rows="2" placeholder="Listez vos allergies..."></textarea>
+                </div>
+
+                <div class="form-field">
+                    <label>Traitements en cours</label>
+                    <textarea id="patientMedications" rows="2" placeholder="Médicaments que vous prenez actuellement..."></textarea>
+                </div>
+
+                <div class="form-field">
+                    <label>Antécédents médicaux</label>
+                    <textarea id="patientHistory" rows="3" placeholder="Historique médical important..."></textarea>
+                </div>
+
+                <div class="form-section-title"><i class="fas fa-phone-alt"></i> Contact d'urgence</div>
+                
+                <div class="form-grid-2">
+                    <div class="form-field">
+                        <label>Nom</label>
+                        <input type="text" id="emergencyName">
+                    </div>
+                    <div class="form-field">
+                        <label>Téléphone</label>
+                        <input type="tel" id="emergencyPhone">
+                    </div>
+                    <div class="form-field">
+                        <label>Lien de parenté</label>
+                        <input type="text" id="emergencyRelation" placeholder="Conjoint, parent, ami...">
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-outline" onclick="closeModal('patientProfileModal')">Annuler</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ======= MODAL PRISE DE RENDEZ-VOUS ======= -->
+<div class="modal-overlay" id="appointmentModal">
+    <div class="modal-box" style="max-width: 600px;">
+        <div class="modal-header">
+            <h2><i class="fas fa-calendar-plus"></i> Nouveau rendez-vous</h2>
+            <button class="modal-close" onclick="closeModal('appointmentModal')">×</button>
+        </div>
+        <div class="modal-body">
+            <div style="margin-bottom: 20px; padding: 15px; background: var(--bg-2); border-radius: 12px;">
+                <div id="appointmentDoctorName" style="font-weight: 600; font-size: 16px; color: var(--accent);"></div>
+                <div id="appointmentDoctorSpecialty" style="font-size: 14px; color: var(--text-2);"></div>
+            </div>
+            
+            <form id="appointmentForm">
+                <input type="hidden" id="appointmentDoctorId">
+                
+                <!-- Calendrier -->
+                <div style="margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <button type="button" class="btn btn-outline btn-sm" onclick="prevMonthCalendar()">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <h3 id="calendarMonth" style="font-size: 16px; font-weight: 600; color: var(--text);"></h3>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="nextMonthCalendar()">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Grille du calendrier -->
+                    <div id="appointmentCalendar" style="
+                        display: grid;
+                        grid-template-columns: repeat(7, 1fr);
+                        gap: 5px;
+                        margin-bottom: 15px;
+                    "></div>
+                    
+                    <!-- Légende -->
+                    <div style="display: flex; gap: 15px; justify-content: center; padding: 10px; background: var(--bg-2); border-radius: 10px;">
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <div style="width: 12px; height: 12px; border-radius: 4px; background: #10b981;"></div>
+                            <span style="font-size: 11px; color: var(--text-2);">Disponible</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <div style="width: 12px; height: 12px; border-radius: 4px; background: #f97316;"></div>
+                            <span style="font-size: 11px; color: var(--text-2);">Week-end</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <div style="width: 12px; height: 12px; border-radius: 4px; background: #ef4444;"></div>
+                            <span style="font-size: 11px; color: var(--text-2);">Complet/Fermé</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Créneaux horaires -->
+                <div id="slotsContainer" style="display: none; margin-bottom: 20px;">
+                    <label style="display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 10px;">
+                        <i class="fas fa-clock" style="color: var(--accent); margin-right: 5px;"></i> Créneaux disponibles
+                    </label>
+                    <div id="appointmentSlots" style="
+                        display: grid;
+                        grid-template-columns: repeat(4, 1fr);
+                        gap: 8px;
+                    "></div>
+                </div>
+                
+                <!-- Champs cachés pour les données sélectionnées -->
+                <input type="hidden" id="appointmentDate">
+                <input type="hidden" id="appointmentTime">
+                
+                <div class="form-field" style="margin-bottom: 18px;">
+                    <label style="display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7px;">
+                        <i class="fas fa-stethoscope"></i> Motif de la consultation
+                    </label>
+                    <textarea id="appointmentReason" rows="3" required placeholder="Décrivez brièvement votre motif..."></textarea>
+                </div>
+                
+                <div class="form-field" style="margin-bottom: 18px;">
+                    <label style="display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7px;">
+                        <i class="fas fa-tag"></i> Type de consultation
+                    </label>
+                    <select id="appointmentType">
+                        <option value="consultation">Consultation</option>
+                        <option value="followup">Suivi</option>
+                        <option value="emergency">Urgence</option>
+                        <option value="checkup">Bilan</option>
+                    </select>
+                </div>
+                
+                <div style="display: flex; gap: 10px; padding-top: 18px; border-top: 1px solid var(--border);">
+                    <button type="button" class="btn btn-outline" onclick="closeModal('appointmentModal')" style="flex: 1;">Annuler</button>
+                    <button type="submit" class="btn btn-primary" id="submitAppointmentBtn" disabled style="flex: 1;">
+                        <i class="fas fa-paper-plane"></i> Envoyer la demande
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ======= MODAL ORDONNANCE DETAIL ======= -->
+<div class="modal-overlay" id="prescriptionDetailModal">
+    <div class="modal-box modal-box--large">
+        <div class="modal-header">
+            <h2><i class="fas fa-file-prescription"></i> Détail de l'ordonnance</h2>
+            <button class="modal-close" onclick="closeModal('prescriptionDetailModal')">×</button>
+        </div>
+        <div class="modal-body" id="prescriptionDetailContent"></div>
+    </div>
+</div>
+
+<!-- ======= MODAL PARAMÈTRES ======= -->
+<div class="modal-overlay" id="settingsModal">
+    <div class="modal-box modal-box--large">
+        <div class="modal-header">
+            <h2><i class="fas fa-cog"></i> Paramètres</h2>
+            <button class="modal-close" onclick="closeModal('settingsModal')">×</button>
+        </div>
+        <div class="modal-body" style="padding:0;">
+            <div style="display:flex;min-height:420px;">
+                <!-- Sidebar tabs -->
+                <div style="width:200px;border-right:1px solid var(--border);padding:20px 12px;background:var(--bg-2);border-radius:0 0 0 20px;flex-shrink:0;">
+                    <div class="settings-tab active" data-settings-tab="account" onclick="switchPatientSettingsTab('account')">
+                        <i class="fas fa-user-circle"></i> Compte
+                    </div>
+                    <div class="settings-tab" data-settings-tab="notifications" onclick="switchPatientSettingsTab('notifications')">
+                        <i class="fas fa-bell"></i> Notifications
+                    </div>
+                    <div class="settings-tab" data-settings-tab="appearance" onclick="switchPatientSettingsTab('appearance')">
+                        <i class="fas fa-palette"></i> Apparence
+                    </div>
+                    <div class="settings-tab" data-settings-tab="privacy" onclick="switchPatientSettingsTab('privacy')">
+                        <i class="fas fa-shield-alt"></i> Confidentialité
+                    </div>
+                </div>
+                <!-- Tab content -->
+                <div style="flex:1;padding:24px;overflow-y:auto;max-height:500px;">
+                    <!-- COMPTE -->
+                    <div id="patientSettingsAccount" class="settings-panel active">
+                        <h3 style="font-size:16px;font-weight:700;margin-bottom:16px;color:var(--text);">Informations du compte</h3>
+                        <div class="form-field">
+                            <label>Email</label>
+                            <input type="email" id="settingsPatientEmail" readonly style="background:var(--bg-2);cursor:not-allowed;">
+                        </div>
+                        <div class="form-grid-2">
+                            <div class="form-field">
+                                <label>Téléphone</label>
+                                <input type="tel" id="settingsPatientPhone" placeholder="06 12 34 56 78">
+                            </div>
+                            <div class="form-field">
+                                <label>Ville</label>
+                                <input type="text" id="settingsPatientCity" placeholder="Votre ville">
+                            </div>
+                        </div>
+                        <div class="form-field">
+                            <label>Adresse</label>
+                            <input type="text" id="settingsPatientAddress" placeholder="Votre adresse complète">
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="savePatientSettings()" style="margin-top:8px;"><i class="fas fa-save"></i> Enregistrer</button>
+
+                        <hr style="margin:24px 0;border:none;border-top:1px solid var(--border);">
+                        <h3 style="font-size:16px;font-weight:700;margin-bottom:16px;color:var(--text);">Changer le mot de passe</h3>
+                        <div class="form-field">
+                            <label>Mot de passe actuel</label>
+                            <input type="password" id="settingsCurrentPassword">
+                        </div>
+                        <div class="form-grid-2">
+                            <div class="form-field">
+                                <label>Nouveau mot de passe</label>
+                                <input type="password" id="settingsNewPassword">
+                            </div>
+                            <div class="form-field">
+                                <label>Confirmer</label>
+                                <input type="password" id="settingsConfirmPassword">
+                            </div>
+                        </div>
+                        <button class="btn btn-outline btn-sm" onclick="changePatientPassword()" style="margin-top:8px;"><i class="fas fa-key"></i> Mettre à jour</button>
+                    </div>
+
+                    <!-- NOTIFICATIONS -->
+                    <div id="patientSettingsNotifications" class="settings-panel" style="display:none;">
+                        <h3 style="font-size:16px;font-weight:700;margin-bottom:16px;color:var(--text);">Préférences de notification</h3>
+                        <div style="background:var(--bg-2);border-radius:12px;padding:18px;">
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+                                <div>
+                                    <div style="font-weight:600;font-size:14px;color:var(--text);">Rendez-vous</div>
+                                    <div style="font-size:12px;color:var(--text-3);margin-top:2px;">Notifications pour les nouveaux RDV et rappels</div>
+                                </div>
+                                <label class="toggle-switch"><input type="checkbox" id="notifSettingsAppointments" checked><span class="toggle-slider"></span></label>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+                                <div>
+                                    <div style="font-weight:600;font-size:14px;color:var(--text);">Ordonnances</div>
+                                    <div style="font-size:12px;color:var(--text-3);margin-top:2px;">Notifications pour les nouvelles ordonnances</div>
+                                </div>
+                                <label class="toggle-switch"><input type="checkbox" id="notifSettingsPrescriptions" checked><span class="toggle-slider"></span></label>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+                                <div>
+                                    <div style="font-weight:600;font-size:14px;color:var(--text);">Messages</div>
+                                    <div style="font-size:12px;color:var(--text-3);margin-top:2px;">Messages de vos médecins</div>
+                                </div>
+                                <label class="toggle-switch"><input type="checkbox" id="notifSettingsMessages" checked><span class="toggle-slider"></span></label>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <div>
+                                    <div style="font-weight:600;font-size:14px;color:var(--text);">Email</div>
+                                    <div style="font-size:12px;color:var(--text-3);margin-top:2px;">Recevoir les notifications par email</div>
+                                </div>
+                                <label class="toggle-switch"><input type="checkbox" id="notifSettingsEmail"><span class="toggle-slider"></span></label>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="saveNotifSettings()" style="margin-top:16px;"><i class="fas fa-save"></i> Enregistrer</button>
+                    </div>
+
+                    <!-- APPARENCE -->
+                    <div id="patientSettingsAppearance" class="settings-panel" style="display:none;">
+                        <h3 style="font-size:16px;font-weight:700;margin-bottom:16px;color:var(--text);">Apparence</h3>
+                        <div style="background:var(--bg-2);border-radius:12px;padding:18px;">
+                            <div style="margin-bottom:20px;">
+                                <div style="font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-3);margin-bottom:12px;">Thème</div>
+                                <div style="display:flex;gap:14px;">
+                                    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--text-2);font-size:14px;">
+                                        <input type="radio" name="settingsTheme" value="light"> <i class="fas fa-sun" style="color:#f59e0b;"></i> Clair
+                                    </label>
+                                    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--text-2);font-size:14px;">
+                                        <input type="radio" name="settingsTheme" value="dark"> <i class="fas fa-moon" style="color:#6366f1;"></i> Sombre
+                                    </label>
+                                </div>
+                            </div>
+                            <div>
+                                <div style="font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-3);margin-bottom:12px;">Langue</div>
+                                <select id="settingsLanguage" style="width:200px;padding:9px 14px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;font-size:14px;color:var(--text);font-family:inherit;">
+                                    <option value="fr" selected>Français</option>
+                                    <option value="en">English</option>
+                                    <option value="ar">العربية</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="saveAppearanceSettings()" style="margin-top:16px;"><i class="fas fa-save"></i> Enregistrer</button>
+                    </div>
+
+                    <!-- CONFIDENTIALITÉ -->
+                    <div id="patientSettingsPrivacy" class="settings-panel" style="display:none;">
+                        <h3 style="font-size:16px;font-weight:700;margin-bottom:16px;color:var(--text);">Confidentialité</h3>
+                        <div style="background:var(--bg-2);border-radius:12px;padding:18px;margin-bottom:20px;">
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+                                <div>
+                                    <div style="font-weight:600;font-size:14px;color:var(--text);">Partager les données médicales</div>
+                                    <div style="font-size:12px;color:var(--text-3);margin-top:2px;">Autoriser le partage avec vos médecins traitants</div>
+                                </div>
+                                <label class="toggle-switch"><input type="checkbox" id="privacyShareData" checked><span class="toggle-slider"></span></label>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <div>
+                                    <div style="font-weight:600;font-size:14px;color:var(--text);">Amélioration de l'IA</div>
+                                    <div style="font-size:12px;color:var(--text-3);margin-top:2px;">Contribuer à l'amélioration du diagnostic IA</div>
+                                </div>
+                                <label class="toggle-switch"><input type="checkbox" id="privacyImproveAI" checked><span class="toggle-slider"></span></label>
+                            </div>
+                        </div>
+
+                        <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:12px;padding:18px;">
+                            <h4 style="color:#ef4444;margin-bottom:8px;font-size:14px;">Zone dangereuse</h4>
+                            <p style="color:#ef4444;margin-bottom:14px;font-size:12px;opacity:0.8;">Ces actions sont irréversibles.</p>
+                            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                                <button onclick="exportPatientData()" class="btn btn-outline btn-sm"><i class="fas fa-download"></i> Exporter mes données</button>
+                                <button onclick="requestAccountDeletion()" class="btn btn-sm" style="background:#ef4444;color:white;"><i class="fas fa-trash-alt"></i> Supprimer mon compte</button>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="savePrivacySettings()" style="margin-top:16px;"><i class="fas fa-save"></i> Enregistrer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="patient.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,1953 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ParrotDiag — À propos</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
+  <style>
+  :root {
+    --jade:           #2fa37c;
+    --jade-dark:      #1d7558;
+    --jade-deep:      #155c44;
+    --jade-light:     #e8f7f2;
+    --jade-soft:      #f0fdf8;
+    --jade-glow:      rgba(47,163,124,.18);
+    --jade-shadow:    rgba(47,163,124,.24);
+    --jade-shadow-lg: rgba(47,163,124,.36);
+    --bg:             #fafaf9;
+    --bg-warm:        #f5f3ef;
+    --bg-card:        #ffffff;
+    --text:           #1a2421;
+    --text-2:         #4a5d57;
+    --text-3:         #8a9e99;
+    --border:         rgba(0,0,0,.08);
+    --border-md:      rgba(0,0,0,.12);
+    --border-jade:    rgba(47,163,124,.26);
+    --shadow-sm:  0 2px 8px rgba(0,0,0,.06);
+    --shadow-md:  0 8px 24px rgba(0,0,0,.09);
+    --shadow-lg:  0 20px 50px rgba(0,0,0,.12);
+    --shadow-j:   0 6px 24px rgba(47,163,124,.24);
+    --shadow-jlg: 0 14px 42px rgba(47,163,124,.36);
+    --grad-jade:    linear-gradient(135deg,#2fa37c 0%,#1d7558 100%);
+    --grad-hero:    linear-gradient(160deg,#0c1510 0%,#142118 55%,#1a2b22 100%);
+    --grad-light:   linear-gradient(135deg,#e8f7f2 0%,#f0fdf8 100%);
+    --grad-text:    linear-gradient(135deg,#2fa37c,#155c44);
+    --grad-mint:    linear-gradient(135deg,#2fa37c,#7de0be);
+    --font-display: 'Playfair Display',Georgia,serif;
+    --font-body:    'DM Sans',sans-serif;
+    --r-sm:  8px; --r-md:  14px; --r-lg:  18px; --r-xl:  24px; --r-2xl: 32px; --r-full:9999px;
+    --hh: 72px;
+    --ease: cubic-bezier(.4,0,.2,1);
+    --spring: cubic-bezier(.34,1.56,.64,1);
+    --t:  all .24s var(--ease);
+    --ts: all .42s var(--spring);
+  }
+  [data-theme="dark"] {
+    --bg:       #0d1a15; --bg-warm:  #101e18; --bg-card:  #192820;
+    --text:     #e4ede9; --text-2:   #8bbfb4; --text-3:   #4d736a;
+    --border:   rgba(255,255,255,.07); --border-md:rgba(255,255,255,.11);
+    --shadow-sm:0 2px 8px rgba(0,0,0,.30); --shadow-md:0 8px 24px rgba(0,0,0,.40);
+  }
+  *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; -webkit-font-smoothing:antialiased; }
+  ::selection { background:var(--jade-light); color:var(--jade-dark); }
+  body { font-family:var(--font-body); background:var(--bg); color:var(--text); line-height:1.6; font-size:15px; overflow-x:hidden; transition:background .35s,color .35s; }
+  a { text-decoration:none; color:inherit; } ul { list-style:none; }
+  ::-webkit-scrollbar { width:5px; } ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:var(--border-jade); border-radius:99px; }
+  ::-webkit-scrollbar-thumb:hover { background:var(--jade); }
+
+  [dir="rtl"] { text-align:right; }
+  [dir="rtl"] .main-nav ul, [dir="rtl"] .header-controls { flex-direction:row-reverse; }
+  [dir="rtl"] .m-feat, [dir="rtl"] .t-item { flex-direction:row-reverse; }
+  [dir="rtl"] .m-feat:hover, [dir="rtl"] .t-item:hover { transform:translateX(-5px); }
+  [dir="rtl"] .road-line { padding-left:0; padding-right:40px; border-left:none; border-right:2px solid var(--border-jade); }
+  [dir="rtl"] .road-item { padding:28px 36px 28px 28px; }
+  [dir="rtl"] .road-item::before { left:auto; right:-49px; }
+  [dir="rtl"] .road-item:hover { transform:translateX(-6px); }
+  [dir="rtl"] .t3-author { flex-direction:row-reverse; }
+  [dir="rtl"] .footer-top { direction:rtl; }
+  [dir="rtl"] .how-steps::before { background:linear-gradient(270deg,var(--jade),rgba(47,163,124,.15)); }
+
+  /* ===== HEADER ===== */
+  #mainHeader { position:fixed; top:0; left:0; right:0; z-index:1000; height:var(--hh); padding:0 5vw; display:flex; align-items:center; justify-content:space-between; gap:20px; background:rgba(250,250,249,.93); backdrop-filter:blur(22px) saturate(160%); border-bottom:1px solid var(--border); box-shadow:var(--shadow-sm); transition:background .35s, box-shadow .24s; }
+  [data-theme="dark"] #mainHeader { background:rgba(13,26,21,.94); border-bottom-color:rgba(255,255,255,.06); }
+  .header-logo { display:flex; align-items:center; gap:10px; cursor:pointer; flex-shrink:0; }
+  .logo-icon { width:40px; height:40px; background:var(--grad-jade); border-radius:12px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:18px; box-shadow:var(--shadow-j); transition:var(--ts); }
+  .logo-icon.small { width:32px; height:32px; font-size:14px; border-radius:9px; }
+  .header-logo:hover .logo-icon { transform:scale(1.08) rotate(-4deg); }
+  .logo-text { font-family:var(--font-display); font-size:22px; font-weight:800; color:var(--text); letter-spacing:-.5px; }
+  .logo-text em { font-style:italic; color:var(--jade); }
+  .main-nav ul { display:flex; align-items:center; gap:4px; }
+  .main-nav a { display:block; padding:8px 16px; font-size:14px; font-weight:500; color:var(--text-2); border-radius:var(--r-full); border:1px solid transparent; transition:var(--t); }
+  .main-nav a:hover { color:var(--jade-dark); background:var(--jade-soft); border-color:var(--border-jade); }
+  .main-nav a.active { color:var(--jade-dark); background:var(--jade-light); border-color:var(--border-jade); font-weight:600; }
+  [data-theme="dark"] .main-nav a.active { background:rgba(47,163,124,.12); }
+  .header-controls { display:flex; align-items:center; gap:10px; flex-shrink:0; }
+  
+  /* ===== LANG SWITCHER ===== */
+  .lang-switcher { position:relative; }
+  .lang-btn { display:flex; align-items:center; gap:6px; padding:8px 12px; border-radius:var(--r-full); background:var(--bg-warm); border:1px solid var(--border-md); color:var(--text-2); font-size:13px; font-weight:600; cursor:pointer; transition:var(--t); font-family:var(--font-body); }
+  .lang-btn:hover { border-color:var(--border-jade); color:var(--jade); }
+  .lang-btn .fa-chevron-down { font-size:10px; transition:transform .2s; }
+  .lang-switcher.open .fa-chevron-down { transform:rotate(180deg); }
+  .lang-dropdown { display:none; position:absolute; top:calc(100% + 8px); right:0; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--r-md); box-shadow:var(--shadow-lg); overflow:hidden; min-width:152px; z-index:200; animation:dropIn .18s ease; }
+  .lang-switcher.open .lang-dropdown { display:block; }
+  @keyframes dropIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:none} }
+  .lang-option { padding:10px 14px; font-size:13.5px; font-weight:500; color:var(--text-2); cursor:pointer; transition:var(--t); }
+  .lang-option:hover { background:var(--jade-soft); color:var(--jade-dark); }
+  .lang-option.selected { color:var(--jade); font-weight:700; background:var(--jade-soft); }
+
+  /* ===== THEME TOGGLE ===== */
+  .theme-toggle { width:54px; height:28px; border-radius:14px; background:var(--bg-warm); border:1.5px solid var(--border-md); cursor:pointer; position:relative; display:flex; align-items:center; padding:2px 4px; transition:border-color .24s; overflow:hidden; }
+  .theme-toggle:hover { border-color:var(--jade); }
+  .theme-icon { font-size:13px; position:absolute; transition:opacity .25s; }
+  .light-icon { left:6px; } .dark-icon { right:6px; }
+  [data-theme="light"] .dark-icon { opacity:.3; } [data-theme="dark"] .light-icon { opacity:.3; }
+  .theme-thumb { width:20px; height:20px; border-radius:50%; background:var(--grad-jade); position:absolute; left:3px; transition:transform .3s var(--spring); box-shadow:0 2px 6px rgba(47,163,124,.4); }
+  [data-theme="dark"] .theme-thumb { transform:translateX(26px); }
+
+  /* ===== AUTH BUTTONS (logged out) ===== */
+  .auth-buttons { display:flex; align-items:center; gap:8px; }
+  .btn-outline { padding:8px 18px; border-radius:var(--r-full); border:1.5px solid var(--border-md); background:transparent; font-size:13.5px; font-weight:600; color:var(--text-2); cursor:pointer; transition:var(--t); font-family:var(--font-body); }
+  .btn-outline:hover { border-color:var(--jade); color:var(--jade); background:var(--jade-soft); }
+  .btn-primary { padding:8px 18px; border-radius:var(--r-full); border:none; background:var(--grad-jade); font-size:13.5px; font-weight:600; color:#fff; cursor:pointer; transition:var(--t); font-family:var(--font-body); box-shadow:var(--shadow-j); }
+  .btn-primary:hover { box-shadow:var(--shadow-jlg); transform:translateY(-1px); }
+
+  /* ===== USER PROFILE DROPDOWN (page-2 style) ===== */
+  .profile-menu { position:relative; }
+  
+  .profile-trigger {
+    display:flex; align-items:center; gap:8px;
+    padding:5px 14px 5px 5px;
+    background:var(--bg-warm); border:1.5px solid var(--border-md);
+    border-radius:var(--r-full); cursor:pointer;
+    transition:var(--t); font-family:var(--font-body);
+  }
+  .profile-trigger:hover { border-color:var(--border-jade); background:var(--jade-soft); }
+  
+  .profile-avatar {
+    width:34px; height:34px; border-radius:50%;
+    background:var(--grad-jade);
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-family:var(--font-display);
+    font-size:13px; font-weight:700; flex-shrink:0;
+    overflow:hidden; box-shadow:0 2px 8px var(--jade-shadow);
+    transition:var(--ts);
+  }
+  .profile-avatar img { width:100%; height:100%; border-radius:50%; object-fit:cover; }
+  
+  .profile-trigger-name {
+    font-size:13px; font-weight:600; color:var(--text);
+    max-width:110px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .profile-trigger .fa-chevron-down {
+    font-size:10px; color:var(--text-3);
+    transition:transform .2s var(--ease);
+  }
+  .profile-menu.open .fa-chevron-down { transform:rotate(180deg); }
+  .profile-trigger:hover .profile-avatar { transform:scale(1.06); }
+
+  .profile-dropdown {
+    display:none;
+    position:absolute; top:calc(100% + 10px); right:0;
+    background:var(--bg-card); border:1px solid var(--border);
+    border-radius:var(--r-lg); box-shadow:var(--shadow-lg);
+    overflow:hidden; min-width:240px; z-index:500;
+    animation:dropIn .18s ease;
+  }
+  .profile-menu.open .profile-dropdown { display:block; }
+  
+  .profile-dropdown-header {
+    padding:16px 18px;
+    background:var(--jade-soft);
+    border-bottom:1px solid var(--border-jade);
+    display:flex; align-items:center; gap:12px;
+  }
+  .pd-header-avatar {
+    width:46px; height:46px; border-radius:50%;
+    background:var(--grad-jade); flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-family:var(--font-display);
+    font-size:16px; font-weight:700; overflow:hidden;
+    box-shadow:var(--shadow-j);
+  }
+  .pd-header-avatar img { width:100%; height:100%; border-radius:50%; object-fit:cover; }
+  .pd-header-info { flex:1; min-width:0; }
+  .pd-name {
+    font-family:var(--font-display); font-size:15px; font-weight:700;
+    color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .pd-email {
+    font-size:12px; color:var(--text-3); margin:2px 0 6px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .pd-role-badge {
+    display:inline-block; padding:2px 10px;
+    border-radius:var(--r-full);
+    background:var(--jade-light); border:1px solid var(--border-jade);
+    color:var(--jade-dark); font-size:11px; font-weight:700;
+    text-transform:uppercase; letter-spacing:.5px;
+  }
+  
+  .pd-divider { height:1px; background:var(--border); }
+  
+  .pd-item {
+    display:flex; align-items:center; gap:11px;
+    padding:11px 16px; font-size:13.5px; font-weight:500;
+    color:var(--text-2); cursor:pointer; transition:var(--t);
+    border-bottom:1px solid var(--border); text-decoration:none;
+  }
+  .pd-item:last-child { border-bottom:none; }
+  .pd-item i { width:18px; text-align:center; color:var(--jade); font-size:14px; }
+  .pd-item:hover { background:var(--jade-soft); color:var(--jade-dark); }
+  .pd-item:hover i { color:var(--jade-dark); }
+  .pd-item.pd-logout { color:#e05555; }
+  .pd-item.pd-logout i { color:#e05555; }
+  .pd-item.pd-logout:hover { background:#fff5f5; color:#c03030; }
+  .pd-item.pd-logout:hover i { color:#c03030; }
+  [data-theme="dark"] .pd-item.pd-logout:hover { background:rgba(224,85,85,.08); }
+
+  /* ===== FOOTER ===== */
+  footer { background:#07100d; border-top:1px solid rgba(47,163,124,.12); padding:64px 5vw 28px; }
+  .footer-top { display:grid; grid-template-columns:1.5fr 1fr 1fr 1.4fr; gap:48px; margin-bottom:48px; }
+  .footer-brand .logo-text { color:#e4ede9; }
+  .footer-brand p { font-size:13.5px; color:rgba(228,237,233,.42); line-height:1.72; margin:14px 0 20px; }
+  .social-links { display:flex; gap:10px; }
+  .social-links a { width:34px; height:34px; background:rgba(47,163,124,.10); border:1px solid rgba(47,163,124,.20); border-radius:var(--r-sm); display:flex; align-items:center; justify-content:center; color:rgba(228,237,233,.50); font-size:13px; transition:var(--t); }
+  .social-links a:hover { background:var(--jade); color:#fff; border-color:var(--jade); transform:translateY(-2px); }
+  .footer-links-col h4 { font-family:var(--font-display); font-size:14px; font-weight:700; color:rgba(228,237,233,.78); margin-bottom:16px; }
+  .footer-links-col ul { display:flex; flex-direction:column; gap:9px; }
+  .footer-links-col a { font-size:13.5px; color:rgba(228,237,233,.38); transition:color .2s; }
+  .footer-links-col a:hover { color:var(--jade); }
+  .footer-links-col p { font-size:13px; color:rgba(228,237,233,.38); margin-bottom:9px; display:flex; align-items:center; gap:8px; }
+  .footer-links-col p i { color:var(--jade); font-size:12px; }
+  .footer-newsletter h4 { font-family:var(--font-display); font-size:14px; font-weight:700; color:rgba(228,237,233,.78); margin-bottom:10px; }
+  .footer-newsletter > p { font-size:13px; color:rgba(228,237,233,.38); margin-bottom:16px; line-height:1.65; }
+  .newsletter-input { display:flex; border-radius:var(--r-full); overflow:hidden; border:1px solid rgba(47,163,124,.24); }
+  .newsletter-input input { flex:1; padding:10px 16px; background:rgba(255,255,255,.04); border:none; outline:none; font-size:13px; color:#e4ede9; font-family:var(--font-body); }
+  .newsletter-input input::placeholder { color:rgba(228,237,233,.28); }
+  .newsletter-input button { padding:10px 16px; background:var(--grad-jade); border:none; color:#fff; cursor:pointer; font-size:13px; transition:var(--t); }
+  .newsletter-input button:hover { opacity:.88; }
+  .footer-bottom { padding-top:24px; border-top:1px solid rgba(255,255,255,.06); display:flex; justify-content:space-between; align-items:center; }
+  .footer-bottom p { font-size:13px; color:rgba(228,237,233,.26); }
+  .footer-bottom-links { display:flex; gap:20px; }
+  .footer-bottom-links a { font-size:12.5px; color:rgba(228,237,233,.30); transition:color .2s; }
+  .footer-bottom-links a:hover { color:var(--jade); }
+
+  /* ===== PAGE LAYOUT ===== */
+  .page-wrap { padding-top:var(--hh); }
+  .section { padding:100px 5vw; }
+  .section-inner { max-width:1200px; margin:0 auto; }
+  .eyebrow { display:inline-flex; align-items:center; gap:10px; font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:1.8px; color:var(--jade); margin-bottom:14px; }
+  .eyebrow::before,.eyebrow::after { content:''; height:1px; width:24px; background:var(--jade); opacity:.5; }
+  .s-title { font-family:var(--font-display); font-size:clamp(30px,4.5vw,54px); font-weight:900; line-height:1.1; letter-spacing:-1.5px; color:var(--text); margin-bottom:18px; }
+  .s-title .g { background:var(--grad-text); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .s-lead { font-size:17px; color:var(--text-2); line-height:1.78; max-width:600px; }
+  .rv { opacity:0; transform:translateY(26px); transition:opacity .7s,transform .7s; }
+  .rv.in { opacity:1; transform:none; }
+  .d1{transition-delay:.10s} .d2{transition-delay:.20s} .d3{transition-delay:.30s} .d4{transition-delay:.40s} .d5{transition-delay:.50s}
+
+  /* ===== HERO ===== */
+  .hero { min-height:100vh; padding:140px 5vw 90px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; background:var(--grad-hero); position:relative; overflow:hidden; }
+  .hero::before { content:''; position:absolute; inset:0; pointer-events:none; background-image:radial-gradient(rgba(47,163,124,.22) 1px,transparent 1px); background-size:36px 36px; opacity:.35; }
+  .h-orb { position:absolute; border-radius:50%; filter:blur(90px); pointer-events:none; }
+  .h-orb-1 { width:620px; height:620px; top:-240px; left:-200px; background:radial-gradient(circle,rgba(47,163,124,.22) 0%,transparent 70%); animation:hfloat 14s ease-in-out infinite; }
+  .h-orb-2 { width:480px; height:480px; bottom:-160px; right:-130px; background:radial-gradient(circle,rgba(47,163,124,.16) 0%,transparent 70%); animation:hfloat 18s ease-in-out infinite reverse; }
+  @keyframes hfloat{0%,100%{transform:translate(0,0)} 40%{transform:translate(22px,-18px)} 70%{transform:translate(-16px,20px)}}
+  .h-pill { display:inline-flex; align-items:center; gap:8px; padding:8px 20px; border-radius:var(--r-full); background:rgba(47,163,124,.14); border:1px solid rgba(47,163,124,.32); color:#7de0be; font-size:12.5px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; margin-bottom:28px; position:relative; z-index:1; animation:fup .6s ease both; }
+  .h-title { font-family:var(--font-display); font-size:clamp(44px,7.5vw,92px); font-weight:900; line-height:1.04; color:#e4ede9; letter-spacing:-3px; margin-bottom:22px; position:relative; z-index:1; animation:fup .6s .1s ease both; }
+  .h-title .mint { background:var(--grad-mint); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .h-title em { font-style:italic; color:rgba(228,237,233,.55); }
+  .h-sub { font-size:clamp(15px,2vw,18.5px); color:rgba(228,237,233,.58); max-width:560px; line-height:1.78; position:relative; z-index:1; margin-bottom:52px; animation:fup .6s .2s ease both; }
+  .h-kpis { display:flex; position:relative; z-index:1; border:1px solid rgba(47,163,124,.18); border-radius:var(--r-xl); overflow:hidden; background:rgba(255,255,255,.03); backdrop-filter:blur(14px); animation:fup .6s .3s ease both; }
+  .kpi { padding:28px 42px; text-align:center; border-right:1px solid rgba(47,163,124,.14); transition:var(--t); }
+  .kpi:last-child { border-right:none; }
+  .kpi:hover { background:rgba(47,163,124,.07); }
+  .kpi-v { font-family:var(--font-display); font-size:38px; font-weight:900; line-height:1; background:var(--grad-mint); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:6px; }
+  .kpi-l { font-size:11.5px; color:rgba(228,237,233,.45); text-transform:uppercase; letter-spacing:1.2px; font-weight:600; }
+  .h-scroll { position:absolute; bottom:30px; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:8px; color:rgba(228,237,233,.28); font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:1.4px; z-index:1; animation:fup 1s .8s ease both; }
+  .h-mouse { width:22px; height:36px; border:1.5px solid rgba(47,163,124,.30); border-radius:11px; display:flex; justify-content:center; padding-top:6px; }
+  .h-mouse::before { content:''; width:3px; height:7px; background:var(--jade); border-radius:2px; animation:mb 2.2s infinite; }
+  @keyframes mb{0%,100%{transform:translateY(0)} 50%{transform:translateY(11px)}}
+  @keyframes fup{from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:none}}
+
+  /* ===== MISSION ===== */
+  .mission-section { background:var(--bg); }
+  .mission-grid { display:grid; grid-template-columns:1fr 1.1fr; gap:80px; align-items:center; }
+  .m-features { display:flex; flex-direction:column; gap:16px; margin-top:32px; }
+  .m-feat { display:flex; gap:16px; align-items:flex-start; padding:18px 20px; background:var(--bg-warm); border:1px solid var(--border); border-radius:var(--r-lg); transition:var(--t); }
+  .m-feat:hover { border-color:var(--border-jade); background:var(--jade-soft); transform:translateX(5px); }
+  .m-feat-icon { width:42px; height:42px; flex-shrink:0; background:var(--jade-light); border:1.5px solid var(--border-jade); border-radius:var(--r-md); display:flex; align-items:center; justify-content:center; color:var(--jade); font-size:16px; transition:var(--ts); }
+  .m-feat:hover .m-feat-icon { background:var(--jade); color:#fff; transform:scale(1.1); }
+  .m-feat h4 { font-family:var(--font-display); font-size:15px; font-weight:700; color:var(--text); margin-bottom:4px; }
+  .m-feat p { font-size:13.5px; color:var(--text-2); line-height:1.66; }
+  .m-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--r-2xl); padding:36px; box-shadow:var(--shadow-md); position:relative; overflow:hidden; }
+  .m-card::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background:var(--grad-jade); border-radius:var(--r-2xl) var(--r-2xl) 0 0; }
+  .m-quote { font-family:var(--font-display); font-size:21px; font-weight:700; font-style:italic; color:var(--text); line-height:1.5; margin-bottom:24px; }
+  .m-quote span { background:var(--grad-text); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .m-hr { height:1px; background:var(--border); margin-bottom:22px; }
+  .m-stats { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .m-stat { padding:16px; text-align:center; background:var(--bg-warm); border:1px solid var(--border); border-radius:var(--r-lg); }
+  .m-stat-v { font-family:var(--font-display); font-size:28px; font-weight:900; background:var(--grad-jade); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:4px; }
+  .m-stat-l { font-size:11px; color:var(--text-3); text-transform:uppercase; letter-spacing:.8px; font-weight:600; }
+  .m-badge { position:absolute; bottom:-14px; right:26px; background:var(--grad-jade); color:#fff; padding:11px 18px; border-radius:var(--r-lg); box-shadow:var(--shadow-jlg); display:flex; align-items:center; gap:8px; font-size:12.5px; font-weight:700; animation:bfloat 4s ease-in-out infinite; }
+  @keyframes bfloat{0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)}}
+
+  /* ===== VALUES ===== */
+  .values-section { background:var(--bg-warm); }
+  .v-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  .v-card { padding:32px 26px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--r-xl); text-align:center; position:relative; overflow:hidden; transition:var(--t); cursor:default; }
+  .v-card::after { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; background:var(--grad-jade); transform:scaleX(0); transition:transform .4s ease; border-radius:0 0 var(--r-xl) var(--r-xl); }
+  .v-card:hover { transform:translateY(-6px); box-shadow:var(--shadow-j); border-color:var(--border-jade); }
+  .v-card:hover::after { transform:scaleX(1); }
+  .v-num { font-size:11px; font-weight:700; color:var(--jade); letter-spacing:1px; text-transform:uppercase; margin-bottom:14px; }
+  .v-icon { width:64px; height:64px; margin:0 auto 16px; background:var(--grad-light); border:1.5px solid var(--border-jade); border-radius:18px; display:flex; align-items:center; justify-content:center; font-size:25px; color:var(--jade); transition:var(--ts); }
+  .v-card:hover .v-icon { background:var(--grad-jade); color:#fff; transform:scale(1.1) rotate(-5deg); }
+  .v-title { font-family:var(--font-display); font-size:18px; font-weight:800; color:var(--text); margin-bottom:10px; }
+  .v-text { font-size:14px; color:var(--text-2); line-height:1.72; }
+
+  /* ===== HOW IT WORKS ===== */
+  .how-section { background:var(--bg); }
+  .how-intro { text-align:center; margin-bottom:64px; }
+  .how-intro .s-lead { margin:0 auto; }
+  .how-steps { display:grid; grid-template-columns:repeat(4,1fr); gap:0; position:relative; }
+  .how-steps::before { content:''; position:absolute; top:48px; left:12.5%; right:12.5%; height:2px; background:linear-gradient(90deg,var(--jade),rgba(47,163,124,.15)); pointer-events:none; }
+  .how-step { display:flex; flex-direction:column; align-items:center; text-align:center; padding:0 18px; position:relative; z-index:1; }
+  .step-bubble { width:96px; height:96px; border-radius:50%; background:var(--bg-card); border:2px solid var(--border-jade); display:flex; align-items:center; justify-content:center; font-size:30px; color:var(--jade); margin-bottom:24px; box-shadow:var(--shadow-sm); position:relative; transition:var(--ts); }
+  .step-bubble::after { content:attr(data-n); position:absolute; top:-8px; right:-8px; width:26px; height:26px; border-radius:50%; background:var(--grad-jade); color:#fff; font-family:var(--font-display); font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px var(--jade-shadow); }
+  .how-step:hover .step-bubble { background:var(--jade); color:#fff; transform:scale(1.07); box-shadow:var(--shadow-j); border-color:var(--jade); }
+  .step-title { font-family:var(--font-display); font-size:17px; font-weight:800; color:var(--text); margin-bottom:10px; }
+  .step-body { font-size:13.5px; color:var(--text-2); line-height:1.7; }
+  .step-tag { margin-top:14px; display:inline-block; padding:4px 12px; border-radius:var(--r-full); background:var(--jade-light); color:var(--jade-dark); font-size:11.5px; font-weight:700; border:1px solid var(--border-jade); }
+
+  /* ===== NUMBERS ===== */
+  .numbers-section { background:var(--grad-hero); position:relative; overflow:hidden; }
+  .numbers-section::before { content:''; position:absolute; inset:0; pointer-events:none; opacity:.04; background-image:linear-gradient(rgba(47,163,124,1) 1px,transparent 1px),linear-gradient(90deg,rgba(47,163,124,1) 1px,transparent 1px); background-size:60px 60px; }
+  .n-orb { position:absolute; border-radius:50%; filter:blur(80px); pointer-events:none; width:500px; height:500px; top:-100px; right:-80px; background:radial-gradient(circle,rgba(47,163,124,.15) 0%,transparent 70%); }
+  .n-grid { display:grid; grid-template-columns:repeat(4,1fr); border:1px solid rgba(47,163,124,.16); border-radius:var(--r-xl); overflow:hidden; position:relative; z-index:1; }
+  .n-item { padding:52px 24px; text-align:center; border-right:1px solid rgba(47,163,124,.12); transition:var(--t); }
+  .n-item:last-child { border-right:none; }
+  .n-item:hover { background:rgba(47,163,124,.06); }
+  .n-icon { font-size:20px; color:rgba(47,163,124,.45); margin-bottom:12px; display:block; }
+  .n-val { font-family:var(--font-display); font-size:50px; font-weight:900; line-height:1; background:var(--grad-mint); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:8px; letter-spacing:-2px; }
+  .n-lbl { font-size:12.5px; color:rgba(228,237,233,.50); font-weight:600; text-transform:uppercase; letter-spacing:1px; }
+  .n-sub { font-size:11.5px; color:rgba(228,237,233,.28); margin-top:5px; }
+
+  /* ===== TECH ===== */
+  .tech-section { background:var(--bg-warm); }
+  [data-theme="dark"] .tech-section { background:var(--bg); }
+  .tech-layout { display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center; }
+  .tech-list { display:flex; flex-direction:column; gap:18px; }
+  .t-item { display:flex; gap:18px; align-items:flex-start; padding:22px 24px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--r-lg); transition:var(--t); }
+  .t-item:hover { border-color:var(--border-jade); background:var(--jade-soft); transform:translateX(6px); }
+  .t-icon { width:48px; height:48px; flex-shrink:0; background:var(--jade-light); border:1.5px solid var(--border-jade); border-radius:var(--r-md); display:flex; align-items:center; justify-content:center; color:var(--jade); font-size:20px; transition:var(--ts); }
+  .t-item:hover .t-icon { background:var(--jade); color:#fff; transform:scale(1.08); }
+  .t-item h4 { font-family:var(--font-display); font-size:16px; font-weight:700; color:var(--text); margin-bottom:5px; }
+  .t-item p { font-size:13.5px; color:var(--text-2); line-height:1.65; }
+  .t-bar { margin-top:10px; height:4px; background:var(--border); border-radius:2px; overflow:hidden; }
+  .t-fill { height:100%; background:var(--grad-jade); border-radius:2px; transform:scaleX(0); transform-origin:left; transition:transform 1.3s var(--ease); }
+  .t-item.bar-on .t-fill { transform:scaleX(1); }
+  .t-visual { position:relative; height:440px; display:flex; align-items:center; justify-content:center; }
+  .t-ring { position:absolute; border-radius:50%; border:1.5px solid rgba(47,163,124,.16); animation:spin linear infinite; }
+  .t-ring-1 { width:380px; height:380px; animation-duration:28s; }
+  .t-ring-2 { width:270px; height:270px; animation-duration:20s; animation-direction:reverse; }
+  .t-ring-3 { width:170px; height:170px; animation-duration:14s; }
+  @keyframes spin{from{transform:rotate(0)} to{transform:rotate(360deg)}}
+  .t-dot { position:absolute; width:10px; height:10px; background:var(--jade); border-radius:50%; box-shadow:0 0 10px var(--jade),0 0 22px rgba(47,163,124,.4); }
+  .t-ring-1 .t-dot { top:-5px; left:calc(50% - 5px); }
+  .t-ring-2 .t-dot { bottom:-5px; left:calc(50% - 5px); }
+  .t-ring-3 .t-dot { top:calc(50% - 5px); right:-5px; }
+  .t-hub { position:relative; z-index:1; width:110px; height:110px; background:var(--grad-jade); border-radius:28px; display:flex; align-items:center; justify-content:center; font-size:44px; color:#fff; box-shadow:var(--shadow-jlg); animation:hpulse 3s ease-in-out infinite; }
+  @keyframes hpulse{0%,100%{box-shadow:var(--shadow-jlg)} 50%{box-shadow:0 0 50px rgba(47,163,124,.55)}}
+  .t-tags { position:absolute; pointer-events:none; inset:0; }
+  .t-tag { position:absolute; padding:7px 13px; background:var(--bg-card); backdrop-filter:blur(10px); border:1px solid var(--border-jade); border-radius:var(--r-full); font-size:12.5px; font-weight:600; color:var(--jade-dark); box-shadow:var(--shadow-sm); white-space:nowrap; display:flex; align-items:center; gap:6px; }
+  .t-tag i { color:var(--jade); }
+  .tt1{top:8%;left:1%} .tt2{top:12%;right:1%} .tt3{bottom:30%;left:0} .tt4{bottom:24%;right:1%} .tt5{bottom:9%;left:22%}
+
+  /* ===== TESTIMONIALS ===== */
+  .trust-section { background:var(--bg); }
+  .trust-intro { text-align:center; margin-bottom:52px; }
+  .trust-intro .s-lead { margin:0 auto; }
+  .t3-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-bottom:36px; }
+  .t3-card { padding:30px 26px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--r-xl); transition:var(--t); position:relative; overflow:hidden; }
+  .t3-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--grad-jade); transform:scaleX(0); transform-origin:left; transition:transform .4s ease; }
+  .t3-card:hover { transform:translateY(-5px); box-shadow:var(--shadow-j); border-color:var(--border-jade); }
+  .t3-card:hover::before { transform:scaleX(1); }
+  .t3-stars { color:#f59e0b; font-size:14px; margin-bottom:14px; letter-spacing:2px; }
+  .t3-quote { font-family:var(--font-display); font-size:15px; font-weight:600; font-style:italic; color:var(--text); line-height:1.62; margin-bottom:18px; }
+  .t3-author { display:flex; align-items:center; gap:12px; }
+  .t3-avi { width:42px; height:42px; border-radius:50%; background:var(--grad-jade); display:flex; align-items:center; justify-content:center; color:#fff; font-family:var(--font-display); font-size:15px; font-weight:700; box-shadow:var(--shadow-j); flex-shrink:0; }
+  .t3-name { font-weight:700; font-size:14px; color:var(--text); margin-bottom:2px; }
+  .t3-role { font-size:12px; color:var(--text-3); }
+  .partners-strip { display:flex; align-items:center; gap:16px; flex-wrap:wrap; padding:26px 30px; background:var(--bg-warm); border:1px solid var(--border); border-radius:var(--r-xl); }
+  .p-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1.4px; color:var(--text-3); flex-shrink:0; margin-right:8px; }
+  .p-pill { padding:9px 18px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--r-full); font-size:13px; font-weight:700; color:var(--text-2); display:flex; align-items:center; gap:8px; transition:var(--t); }
+  .p-pill i { color:var(--jade); }
+  .p-pill:hover { border-color:var(--border-jade); color:var(--jade-dark); background:var(--jade-soft); }
+
+  /* ===== ROADMAP ===== */
+  .road-section { background:var(--bg-warm); }
+  [data-theme="dark"] .road-section { background:var(--bg); }
+  .road-intro { text-align:center; margin-bottom:60px; }
+  .road-intro .s-lead { margin:0 auto; }
+  .road-line { position:relative; padding-left:40px; border-left:2px solid var(--border-jade); display:flex; flex-direction:column; gap:36px; }
+  .road-item { position:relative; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--r-xl); padding:28px 28px 28px 36px; transition:var(--t); }
+  .road-item::before { content:''; position:absolute; left:-49px; top:28px; width:18px; height:18px; border-radius:50%; background:var(--bg-card); border:2.5px solid var(--jade); box-shadow:0 0 0 4px var(--jade-glow); transition:var(--ts); }
+  .road-item:hover { border-color:var(--border-jade); box-shadow:var(--shadow-j); transform:translateX(6px); }
+  .road-item:hover::before { background:var(--jade); }
+  .road-header { display:flex; align-items:center; gap:14px; margin-bottom:10px; }
+  .road-year { font-family:var(--font-display); font-size:13px; font-weight:800; padding:4px 14px; border-radius:var(--r-full); background:var(--jade-light); color:var(--jade-dark); border:1px solid var(--border-jade); flex-shrink:0; }
+  .road-year.future { background:rgba(47,163,124,.10); color:var(--jade); }
+  .road-title { font-family:var(--font-display); font-size:18px; font-weight:800; color:var(--text); }
+  .road-body { font-size:14px; color:var(--text-2); line-height:1.72; }
+  .road-tags { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+  .road-tag { padding:3px 11px; border-radius:var(--r-full); font-size:11.5px; font-weight:600; background:var(--jade-soft); color:var(--jade-dark); border:1px solid var(--border-jade); }
+
+  /* ===== CTA ===== */
+  .cta-section { background:var(--grad-hero); padding:120px 5vw; text-align:center; position:relative; overflow:hidden; }
+  .cta-o { position:absolute; border-radius:50%; filter:blur(80px); pointer-events:none; background:radial-gradient(circle,rgba(47,163,124,.18) 0%,transparent 70%); }
+  .cta-o1 { width:520px; height:520px; top:-220px; left:-110px; }
+  .cta-o2 { width:420px; height:420px; bottom:-160px; right:-90px; }
+  .cta-inner { position:relative; z-index:1; max-width:680px; margin:0 auto; }
+  .cta-pill { display:inline-block; padding:6px 18px; border-radius:var(--r-full); background:rgba(47,163,124,.14); border:1px solid rgba(47,163,124,.30); color:#7de0be; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:1.2px; margin-bottom:24px; }
+  .cta-title { font-family:var(--font-display); font-size:clamp(34px,5vw,64px); font-weight:900; color:#e4ede9; letter-spacing:-2px; line-height:1.08; margin-bottom:18px; }
+  .cta-title .mint { background:var(--grad-mint); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .cta-sub { font-size:17px; color:rgba(228,237,233,.55); line-height:1.78; margin-bottom:46px; }
+  .cta-btns { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+  .cta-btn-p { padding:15px 34px; background:var(--grad-jade); color:#fff; font-size:15px; font-weight:700; border-radius:var(--r-full); box-shadow:var(--shadow-j); transition:var(--t); display:inline-flex; align-items:center; gap:9px; font-family:var(--font-body); }
+  .cta-btn-p:hover { box-shadow:var(--shadow-jlg); transform:translateY(-2px); }
+  .cta-btn-s { padding:15px 34px; background:rgba(255,255,255,.06); color:rgba(228,237,233,.78); font-size:15px; font-weight:600; border-radius:var(--r-full); border:1px solid rgba(255,255,255,.13); transition:var(--t); display:inline-flex; align-items:center; gap:9px; font-family:var(--font-body); backdrop-filter:blur(10px); }
+  .cta-btn-s:hover { background:rgba(255,255,255,.10); border-color:rgba(47,163,124,.42); color:#7de0be; }
+
+  /* ===== MOBILE MENU ===== */
+  .mobile-menu-toggle {
+    display: none;
+    width: 40px; height: 40px;
+    background: var(--bg-warm);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    align-items: center; justify-content: center;
+    flex-direction: column;
+    gap: 5px; padding: 10px;
+    transition: var(--t);
+  }
+  .mobile-menu-toggle:hover { border-color: var(--jade); }
+  .mobile-menu-toggle span {
+    display: block; width: 100%; height: 2px;
+    background: var(--text); border-radius: 2px;
+    transition: var(--t);
+  }
+  .mobile-menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+  .mobile-menu-toggle.active span:nth-child(2) { opacity: 0; }
+  .mobile-menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+  .mobile-nav-overlay {
+    position: fixed; inset: 0; top: var(--hh);
+    background: var(--bg-card); z-index: 999;
+    padding: 24px; display: none;
+    flex-direction: column; gap: 16px;
+  }
+  .mobile-nav-overlay.active { display: flex; }
+  .mobile-nav-overlay ul { display: flex; flex-direction: column; gap: 8px; }
+  .mobile-nav-overlay a {
+    display: block; padding: 14px 18px;
+    font-size: 16px; font-weight: 500;
+    color: var(--text); background: var(--bg-warm);
+    border-radius: 12px; transition: var(--t);
+  }
+  .mobile-nav-overlay a:hover, .mobile-nav-overlay a.active {
+    background: var(--jade); color: white;
+  }
+  .mobile-nav-overlay .auth-buttons {
+    flex-direction: column; margin-top: 16px;
+    padding-top: 16px; border-top: 1px solid var(--border);
+  }
+  .mobile-nav-overlay .auth-buttons .btn-primary,
+  .mobile-nav-overlay .auth-buttons .btn-outline {
+    width: 100%; justify-content: center; padding: 14px 20px;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media(max-width:1060px){
+    .mission-grid{grid-template-columns:1fr;gap:48px} .tech-layout{grid-template-columns:1fr;gap:48px} .t-visual{display:none}
+    .how-steps{grid-template-columns:1fr 1fr;gap:32px} .how-steps::before{display:none} .n-grid{grid-template-columns:1fr 1fr}
+    .n-item:nth-child(2){border-right:none} .t3-grid{grid-template-columns:1fr 1fr}
+  }
+  @media(max-width:900px){
+    .mobile-menu-toggle { display: flex; }
+    .main-nav { display: none; }
+    .auth-buttons { display: none; }
+  }
+  @media(max-width:768px){
+    .v-grid{grid-template-columns:1fr 1fr} .section{padding:72px 5vw} .hero{padding:120px 5vw 80px}
+    .h-kpis{flex-direction:column;width:100%} .kpi{border-right:none;border-bottom:1px solid rgba(47,163,124,.14)} .kpi:last-child{border-bottom:none}
+    .footer-top{grid-template-columns:1fr 1fr} .t3-grid{grid-template-columns:1fr}
+    .profile-trigger-name{display:none}
+    .mobile-nav-overlay { top: 64px; }
+  }
+  @media(max-width:640px){
+    #mainHeader { padding: 0 16px; height: 60px; }
+    .mobile-nav-overlay { top: 60px; padding: 16px; }
+    .logo-text { font-size: 18px; }
+    .h-title { font-size: 36px; }
+    .h-sub { font-size: 16px; }
+  }
+  @media(max-width:480px){
+    .v-grid{grid-template-columns:1fr} .how-steps{grid-template-columns:1fr} .n-grid{grid-template-columns:1fr}
+    .n-item{border-right:none;border-bottom:1px solid rgba(47,163,124,.12)} .n-item:last-child{border-bottom:none}
+    .footer-top{grid-template-columns:1fr} .h-title{letter-spacing:-1.5px}
+    .road-line{padding-left:24px} .road-item{padding:22px} .road-item::before{left:-33px}
+    #mainHeader { padding: 0 12px; }
+    .header-controls { gap: 8px; }
+    .lang-btn span:not(.fa-chevron-down):nth-child(2) { display: none; }
+  }
+
+  /* ===== MODALS ===== */
+  .modal-overlay {
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,.55); backdrop-filter:blur(6px);
+    z-index:10000; align-items:center; justify-content:center; padding:20px;
+    animation:fadeInModal .2s ease;
+  }
+  .modal-overlay.open { display:flex; }
+  @keyframes fadeInModal { from{opacity:0} to{opacity:1} }
+
+  .modal-box {
+    background:var(--bg-card); border:1px solid var(--border);
+    border-radius:20px; width:100%; max-width:560px;
+    max-height:90vh; overflow-y:auto; position:relative;
+    box-shadow:var(--shadow-lg);
+    animation:slideUpModal .3s var(--spring);
+  }
+  .modal-box--lg { max-width:720px; }
+  @keyframes slideUpModal {
+    from{transform:translateY(30px);opacity:0}
+    to{transform:translateY(0);opacity:1}
+  }
+
+  .modal-header {
+    background:var(--grad-jade);
+    padding:20px 28px; border-radius:20px 20px 0 0;
+    display:flex; justify-content:space-between; align-items:center;
+    position:sticky; top:0; z-index:1;
+  }
+  .modal-header h2 {
+    color:#fff; font-family:var(--font-display); font-size:18px; font-weight:800;
+    display:flex; align-items:center; gap:10px;
+  }
+  .modal-close {
+    width:32px; height:32px; background:rgba(255,255,255,.2);
+    border:none; border-radius:8px; color:#fff; font-size:20px;
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition:var(--t); line-height:1; font-family:monospace;
+  }
+  .modal-close:hover { background:rgba(255,255,255,.35); transform:rotate(90deg); }
+
+  .modal-body { padding:28px; }
+
+  .form-field { margin-bottom:18px; }
+  .form-field label {
+    display:block; font-size:13px; font-weight:600; color:var(--text);
+    margin-bottom:7px; display:flex; align-items:center; gap:6px;
+  }
+  .form-field label i { color:var(--jade); font-size:12px; }
+  .form-field input,
+  .form-field select,
+  .form-field textarea {
+    width:100%; padding:11px 14px;
+    background:var(--bg-warm); border:1.5px solid var(--border);
+    border-radius:var(--r-md); font-size:14px; color:var(--text);
+    font-family:var(--font-body); transition:var(--t); outline:none; resize:vertical;
+  }
+  .form-field input:focus,
+  .form-field select:focus,
+  .form-field textarea:focus {
+    border-color:var(--jade); box-shadow:0 0 0 3px var(--jade-glow); background:var(--bg-card);
+  }
+  .form-field input[readonly] { opacity:.65; cursor:default; }
+  .form-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media(max-width:560px){ .form-grid-2{grid-template-columns:1fr} }
+
+  .form-section-title {
+    font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.8px;
+    color:var(--text-3); margin:24px 0 14px; padding-bottom:8px;
+    border-bottom:1px solid var(--border);
+    display:flex; align-items:center; gap:7px;
+  }
+  .form-section-title i { color:var(--jade); }
+
+  .modal-photo-row {
+    display:flex; align-items:center; gap:20px;
+    padding:18px; background:var(--bg-warm); border-radius:var(--r-lg); margin-bottom:22px;
+    border:1px solid var(--border);
+  }
+  .photo-preview {
+    width:72px; height:72px; border-radius:50%; flex-shrink:0; overflow:hidden;
+    background:var(--grad-jade); display:flex; align-items:center; justify-content:center;
+    color:#fff; font-family:var(--font-display); font-size:26px; font-weight:700;
+    box-shadow:var(--shadow-j);
+  }
+  .photo-preview img { width:100%; height:100%; object-fit:cover; }
+
+  .modal-photo-upload-btn {
+    display:inline-flex; align-items:center; gap:7px;
+    padding:8px 16px; border-radius:var(--r-full);
+    border:1.5px solid var(--border-md); background:var(--bg-card);
+    font-size:13px; font-weight:600; color:var(--text-2);
+    cursor:pointer; transition:var(--t); font-family:var(--font-body);
+  }
+  .modal-photo-upload-btn:hover { border-color:var(--jade); color:var(--jade); background:var(--jade-soft); }
+
+  .modal-actions {
+    display:flex; gap:10px; padding-top:20px; border-top:1px solid var(--border); margin-top:4px;
+  }
+  .modal-actions .mbtn { flex:1; justify-content:center; }
+  .mbtn {
+    display:inline-flex; align-items:center; gap:7px;
+    padding:10px 20px; border-radius:var(--r-full);
+    font-size:14px; font-weight:600; cursor:pointer;
+    transition:var(--t); font-family:var(--font-body); border:none;
+  }
+  .mbtn-primary { background:var(--grad-jade); color:#fff; box-shadow:var(--shadow-j); }
+  .mbtn-primary:hover { box-shadow:var(--shadow-jlg); transform:translateY(-1px); }
+  .mbtn-outline {
+    background:transparent; color:var(--text-2);
+    border:1.5px solid var(--border-md);
+  }
+  .mbtn-outline:hover { border-color:var(--jade); color:var(--jade); background:var(--jade-soft); }
+
+  /* Settings tabs inside modal */
+  .settings-tabs { display:flex; gap:6px; margin-bottom:24px; flex-wrap:wrap; }
+  .stab {
+    padding:7px 16px; border-radius:var(--r-full);
+    font-size:13px; font-weight:600; color:var(--text-2);
+    cursor:pointer; transition:var(--t); border:1.5px solid var(--border);
+    background:var(--bg-warm); font-family:var(--font-body);
+    display:flex; align-items:center; gap:6px;
+  }
+  .stab:hover { border-color:var(--jade); color:var(--jade); background:var(--jade-soft); }
+  .stab.active { background:var(--jade); color:#fff; border-color:var(--jade); box-shadow:var(--shadow-j); }
+  .stab-panel { display:none; }
+  .stab-panel.active { display:block; animation:fadeInModal .2s; }
+
+  .toggle-row {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 16px; background:var(--bg-warm); border:1px solid var(--border);
+    border-radius:var(--r-lg); margin-bottom:10px; transition:var(--t);
+  }
+  .toggle-row:hover { border-color:var(--border-jade); }
+  .toggle-row-info h4 { font-size:14px; font-weight:600; color:var(--text); margin-bottom:2px; }
+  .toggle-row-info p { font-size:12px; color:var(--text-3); }
+  .toggle-switch { position:relative; width:44px; height:24px; cursor:pointer; flex-shrink:0; }
+  .toggle-switch input { opacity:0; width:0; height:0; position:absolute; }
+  .toggle-track {
+    position:absolute; inset:0; background:var(--border-md);
+    border-radius:12px; transition:var(--t);
+  }
+  .toggle-switch input:checked + .toggle-track { background:var(--jade); }
+  .toggle-knob {
+    position:absolute; top:3px; left:3px;
+    width:18px; height:18px; background:#fff;
+    border-radius:50%; box-shadow:var(--shadow-sm); transition:var(--t);
+  }
+  .toggle-switch input:checked ~ .toggle-knob { transform:translateX(20px); }
+
+  /* Toast */
+  .pd-toast {
+    position:fixed; top:88px; right:20px;
+    padding:13px 20px; background:var(--bg-card);
+    border:1px solid var(--border); border-radius:var(--r-lg);
+    box-shadow:var(--shadow-md);
+    display:flex; align-items:center; gap:10px; font-size:14px; color:var(--text);
+    z-index:20000; animation:slideInToast .3s var(--spring);
+    border-left:3px solid var(--jade);
+  }
+  .pd-toast i { color:var(--jade); }
+  @keyframes slideInToast {
+    from{transform:translateX(110%);opacity:0}
+    to{transform:translateX(0);opacity:1}
+  }
+  </style>
+</head>
+<body>
+
+<header id="mainHeader">
+  <div class="header-logo">
+    <div class="logo-icon"><i class="fa-solid fa-robot"></i></div>
+    <span class="logo-text">Parrot<em>Diag</em></span>
+  </div>
+  <nav class="main-nav">
+    <ul>
+      <li><a href="index.html"       data-key="nav_home">Accueil</a></li>
+      <li><a href="ia.html" data-key="nav_assess">Évaluer mes symptômes</a></li>
+      <li><a href="patients.html"       data-key="nav_reco">Les activités</a></li>
+      <li><a href="apropos.html"       class="active" data-key="nav_about">À propos</a></li>
+    </ul>
+  </nav>
+  <div class="header-controls">
+    <div class="lang-switcher" id="langSwitcher">
+      <button class="lang-btn" id="langBtn">
+        <span id="currentFlag">🇫🇷</span>
+        <span id="currentLangLabel">FR</span>
+        <i class="fas fa-chevron-down"></i>
+      </button>
+      <div class="lang-dropdown" id="langDropdown">
+        <div class="lang-option" data-lang="fr" data-flag="🇫🇷" data-label="FR">🇫🇷 Français</div>
+        <div class="lang-option" data-lang="en" data-flag="🇬🇧" data-label="EN">🇬🇧 English</div>
+        <div class="lang-option" data-lang="ar" data-flag="🇲🇦" data-label="AR">🇲🇦 العربية</div>
+        <div class="lang-option" data-lang="es" data-flag="🇪🇸" data-label="ES">🇪🇸 Español</div>
+      </div>
+    </div>
+    <button class="theme-toggle" id="themeToggle" aria-label="Changer de thème">
+      <span class="theme-icon light-icon">☀️</span>
+      <span class="theme-icon dark-icon">🌙</span>
+      <div class="theme-thumb"></div>
+    </button>
+    <!-- AUTH AREA -->
+    <div id="authArea">
+      <div class="auth-buttons" id="authButtons">
+        <a href="connexionpage.html"><button class="btn-outline" data-key="btn_signup">S'inscrire</button></a>
+        <a href="connexionpage.html"><button class="btn-primary"  data-key="btn_login">Connexion</button></a>
+      </div>
+    </div>
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+</header>
+
+<!-- Mobile Navigation Overlay -->
+<nav class="mobile-nav-overlay" id="mobileNavOverlay">
+  <ul>
+    <li><a href="index.html" data-key="nav_home">Accueil</a></li>
+    <li><a href="ia.html" data-key="nav_assess">Évaluer mes symptômes</a></li>
+    <li><a href="patients.html" data-key="nav_reco">Les activités</a></li>
+    <li><a href="apropos.html" class="active" data-key="nav_about">À propos</a></li>
+  </ul>
+  <div class="auth-buttons">
+    <a href="connexionpage.html"><button class="btn-outline" data-key="btn_signup">S'inscrire</button></a>
+    <a href="connexionpage.html"><button class="btn-primary" data-key="btn_login">Connexion</button></a>
+  </div>
+</nav>
+
+<!--═══════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalProfile">
+  <div class="modal-box modal-box--lg">
+    <div class="modal-header">
+      <h2><i class="fas fa-user-circle"></i> Mon profil</h2>
+      <button class="modal-close" onclick="closeModal('modalProfile')">×</button>
+    </div>
+    <div class="modal-body">
+      <form id="profileForm" onsubmit="saveProfile(event)">
+
+        <!-- Photo -->
+        <div class="modal-photo-row">
+          <div class="photo-preview" id="profilePhotoPreview">??</div>
+          <div>
+            <label for="profilePhotoInput" class="modal-photo-upload-btn">
+              <i class="fas fa-camera"></i> Changer la photo
+            </label>
+            <input type="file" id="profilePhotoInput" accept="image/*" style="display:none" onchange="previewPhoto(this)">
+            <input type="hidden" id="profilePhotoB64">
+            <p style="font-size:12px;color:var(--text-3);margin-top:6px;">JPG, PNG — max 2 MB</p>
+          </div>
+        </div>
+
+        <!-- Identité -->
+        <div class="form-section-title"><i class="fas fa-id-card"></i> Informations personnelles</div>
+        <div class="form-grid-2">
+          <div class="form-field">
+            <label><i class="fas fa-user"></i> Nom complet</label>
+            <input type="text" id="pFullName" readonly>
+          </div>
+          <div class="form-field">
+            <label><i class="fas fa-envelope"></i> Email</label>
+            <input type="email" id="pEmail" readonly>
+          </div>
+          <div class="form-field">
+            <label><i class="fas fa-phone"></i> Téléphone</label>
+            <input type="tel" id="pPhone" placeholder="+212 6XX XXX XXX">
+          </div>
+          <div class="form-field">
+            <label><i class="fas fa-birthday-cake"></i> Date de naissance</label>
+            <input type="date" id="pBirthDate">
+          </div>
+          <div class="form-field">
+            <label><i class="fas fa-venus-mars"></i> Sexe</label>
+            <select id="pSex">
+              <option value="">Sélectionnez</option>
+              <option value="male">Homme</option>
+              <option value="female">Femme</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label><i class="fas fa-tint"></i> Groupe sanguin</label>
+            <select id="pBloodType">
+              <option value="">Non renseigné</option>
+              <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+              <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label><i class="fas fa-city"></i> Ville</label>
+            <input type="text" id="pCity" placeholder="Casablanca">
+          </div>
+          <div class="form-field">
+            <label><i class="fas fa-map-pin"></i> Code postal</label>
+            <input type="text" id="pZip" placeholder="20000">
+          </div>
+        </div>
+        <div class="form-field">
+          <label><i class="fas fa-map-marker-alt"></i> Adresse</label>
+          <input type="text" id="pAddress" placeholder="123 rue exemple">
+        </div>
+
+        <!-- Médical -->
+        <div class="form-section-title"><i class="fas fa-notes-medical"></i> Informations médicales</div>
+        <div class="form-field">
+          <label><i class="fas fa-allergies"></i> Allergies connues</label>
+          <textarea id="pAllergies" rows="2" placeholder="Listez vos allergies..."></textarea>
+        </div>
+        <div class="form-field">
+          <label><i class="fas fa-pills"></i> Traitements en cours</label>
+          <textarea id="pMedications" rows="2" placeholder="Médicaments actuels..."></textarea>
+        </div>
+        <div class="form-field">
+          <label><i class="fas fa-history"></i> Antécédents médicaux</label>
+          <textarea id="pHistory" rows="3" placeholder="Historique médical important..."></textarea>
+        </div>
+
+        <!-- Urgence -->
+        <div class="form-section-title"><i class="fas fa-phone-alt"></i> Contact d'urgence</div>
+        <div class="form-grid-2">
+          <div class="form-field">
+            <label><i class="fas fa-user"></i> Nom</label>
+            <input type="text" id="pEmerName" placeholder="Prénom Nom">
+          </div>
+          <div class="form-field">
+            <label><i class="fas fa-phone"></i> Téléphone</label>
+            <input type="tel" id="pEmerPhone" placeholder="+212 6XX XXX XXX">
+          </div>
+          <div class="form-field">
+            <label><i class="fas fa-heart"></i> Lien</label>
+            <input type="text" id="pEmerRelation" placeholder="Conjoint, parent...">
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="mbtn mbtn-outline modal-actions mbtn" onclick="closeModal('modalProfile')">Annuler</button>
+          <button type="submit" class="mbtn mbtn-primary modal-actions mbtn"><i class="fas fa-save"></i> Enregistrer</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     MODALE — PARAMÈTRES
+════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalSettings">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2><i class="fas fa-gear"></i> Paramètres</h2>
+      <button class="modal-close" onclick="closeModal('modalSettings')">×</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="settings-tabs">
+        <button class="stab active" onclick="switchTab('tabNotif',this)"><i class="fas fa-bell"></i> Notifications</button>
+        <button class="stab" onclick="switchTab('tabSecurity',this)"><i class="fas fa-lock"></i> Sécurité</button>
+        <button class="stab" onclick="switchTab('tabAppearance',this)"><i class="fas fa-palette"></i> Apparence</button>
+      </div>
+
+      <!-- Notifications -->
+      <div class="stab-panel active" id="tabNotif">
+        <div class="toggle-row">
+          <div class="toggle-row-info">
+            <h4>Rappels de rendez-vous</h4>
+            <p>Recevoir une notification 24h avant chaque rendez-vous</p>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="notifAppt" checked>
+            <div class="toggle-track"></div>
+            <div class="toggle-knob"></div>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-row-info">
+            <h4>Nouvelles ordonnances</h4>
+            <p>Être notifié quand une ordonnance est disponible</p>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="notifPres" checked>
+            <div class="toggle-track"></div>
+            <div class="toggle-knob"></div>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-row-info">
+            <h4>Newsletter santé</h4>
+            <p>Recevoir des conseils et actualités médicales</p>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="notifNews">
+            <div class="toggle-track"></div>
+            <div class="toggle-knob"></div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Sécurité -->
+      <div class="stab-panel" id="tabSecurity">
+        <div class="form-section-title"><i class="fas fa-key"></i> Changer le mot de passe</div>
+        <div class="form-field">
+          <label><i class="fas fa-lock"></i> Mot de passe actuel</label>
+          <input type="password" id="pwCurrent" placeholder="••••••••">
+        </div>
+        <div class="form-field">
+          <label><i class="fas fa-lock"></i> Nouveau mot de passe</label>
+          <input type="password" id="pwNew" placeholder="••••••••">
+        </div>
+        <div class="form-field">
+          <label><i class="fas fa-lock"></i> Confirmer</label>
+          <input type="password" id="pwConfirm" placeholder="••••••••">
+        </div>
+        <div class="form-section-title" style="margin-top:20px;"><i class="fas fa-shield-halved"></i> Double authentification</div>
+        <div class="toggle-row">
+          <div class="toggle-row-info">
+            <h4>Activer le 2FA</h4>
+            <p>Sécurisez votre compte avec une vérification en deux étapes</p>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle2fa">
+            <div class="toggle-track"></div>
+            <div class="toggle-knob"></div>
+          </label>
+        </div>
+        <div style="margin-top:18px;">
+          <button class="mbtn mbtn-primary" onclick="savePassword()"><i class="fas fa-save"></i> Mettre à jour</button>
+        </div>
+      </div>
+
+      <!-- Apparence -->
+      <div class="stab-panel" id="tabAppearance">
+        <div class="form-section-title"><i class="fas fa-moon"></i> Thème</div>
+        <div class="toggle-row">
+          <div class="toggle-row-info">
+            <h4>Mode sombre</h4>
+            <p>Basculer entre le thème clair et sombre</p>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode(this)">
+            <div class="toggle-track"></div>
+            <div class="toggle-knob"></div>
+          </label>
+        </div>
+        <div class="form-section-title"><i class="fas fa-language"></i> Langue de l'interface</div>
+        <div class="form-field">
+          <label><i class="fas fa-globe"></i> Langue</label>
+          <select id="settingsLang" onchange="applyLangFromSettings(this.value)">
+            <option value="fr">🇫🇷 Français</option>
+            <option value="en">🇬🇧 English</option>
+            <option value="ar">🇲🇦 العربية</option>
+            <option value="es">🇪🇸 Español</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-actions" style="margin-top:8px;">
+        <button class="mbtn mbtn-outline modal-actions mbtn" onclick="closeModal('modalSettings')">Fermer</button>
+        <button class="mbtn mbtn-primary modal-actions mbtn" onclick="saveSettings()"><i class="fas fa-check"></i> Sauvegarder</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</div>
+</header>
+
+<div class="page-wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="h-orb h-orb-1"></div>
+    <div class="h-orb h-orb-2"></div>
+    <div class="h-pill"><i class="fas fa-shield-heart"></i> <span data-key="hero_pill">Santé augmentée par l'IA, pour tous</span></div>
+    <h1 class="h-title">
+      <span data-key="hero_title_1">Nous rendons la santé</span><br>
+      <span class="mint" data-key="hero_title_2">intelligente</span><br>
+      <em data-key="hero_title_3">et accessible.</em>
+    </h1>
+    <p class="h-sub" data-key="hero_sub">ParrotDiag réunit médecins, ingénieurs IA et designers UX pour créer l'assistant médical le plus fiable — disponible pour tous, partout, toujours.</p>
+    <div class="h-kpis">
+      <div class="kpi">
+        <div class="kpi-v" data-t="48" data-s="k+">0</div>
+        <div class="kpi-l" data-key="kpi_patients">Patients accompagnés</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-v" data-t="97" data-s="%">0</div>
+        <div class="kpi-l" data-key="kpi_satis">Taux de satisfaction</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-v" data-t="280" data-s="+">0</div>
+        <div class="kpi-l" data-key="kpi_doctors">Médecins partenaires</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-v" data-t="4.9" data-s="★">0</div>
+        <div class="kpi-l" data-key="kpi_rating">Note moyenne</div>
+      </div>
+    </div>
+    <div class="h-scroll"><div class="h-mouse"></div><span data-key="scroll_label">Défiler pour explorer</span></div>
+  </section>
+
+  <!-- MISSION -->
+  <section class="section mission-section" id="mission">
+    <div class="section-inner">
+      <div class="mission-grid">
+        <div>
+          <div class="eyebrow rv" data-key="mission_eyebrow">Notre mission</div>
+          <h2 class="s-title rv d1"><span data-key="mission_title_1">Rendre les soins de qualité</span><br><span class="g" data-key="mission_title_2">accessibles à tous</span></h2>
+          <p class="s-lead rv d2" data-key="mission_lead">Nous croyons que chaque personne mérite un accès immédiat à des conseils médicaux fiables, quelle que soit sa localisation, ses revenus ou ses compétences numériques.</p>
+          <div class="m-features">
+            <div class="m-feat rv d2">
+              <div class="m-feat-icon"><i class="fas fa-brain"></i></div>
+              <div>
+                <h4 data-key="feat1_title">Diagnostic assisté par IA</h4>
+                <p data-key="feat1_body">Entraîné sur plus de 2 millions de cas cliniques en 4 langues, pour des évaluations préliminaires nuancées et fiables en moins de 3 secondes.</p>
+              </div>
+            </div>
+            <div class="m-feat rv d3">
+              <div class="m-feat-icon"><i class="fas fa-user-md"></i></div>
+              <div>
+                <h4 data-key="feat2_title">Réseau médical vérifié</h4>
+                <p data-key="feat2_body">Chaque médecin est accrédité et audité. Plus de 280 spécialistes dans 15 disciplines, disponibles pour téléconsultation.</p>
+              </div>
+            </div>
+            <div class="m-feat rv d4">
+              <div class="m-feat-icon"><i class="fas fa-globe"></i></div>
+              <div>
+                <h4 data-key="feat3_title">Disponible en permanence</h4>
+                <p data-key="feat3_body">Assistance multilingue 24h/24, 7j/7. Sans salle d'attente, sans assurance requise — juste des réponses quand vous en avez besoin.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="rv d2" style="position:relative;padding-bottom:28px">
+          <div class="m-card">
+            <p class="m-quote" data-key="mission_quote">« Nous ne remplaçons pas les médecins — nous aidons chaque patient à être <span>mieux préparé</span> pour les consulter. »</p>
+            <div class="m-hr"></div>
+            <div class="m-stats">
+              <div class="m-stat"><div class="m-stat-v">48k+</div><div class="m-stat-l" data-key="stat_active">Patients actifs</div></div>
+              <div class="m-stat"><div class="m-stat-v">1,2M</div><div class="m-stat-l" data-key="stat_consult">Consultations IA</div></div>
+              <div class="m-stat"><div class="m-stat-v">97%</div><div class="m-stat-l" data-key="stat_satis2">Satisfaction</div></div>
+              <div class="m-stat"><div class="m-stat-v">15</div><div class="m-stat-l" data-key="stat_spec">Spécialités</div></div>
+            </div>
+            <div class="m-badge"><i class="fas fa-shield-check"></i> <span data-key="badge_text">Validé cliniquement · Conforme RGPD</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VALEURS -->
+  <section class="section values-section" id="values">
+    <div class="section-inner">
+      <div style="text-align:center;margin-bottom:54px">
+        <div class="eyebrow rv" data-key="values_eyebrow">Ce qui nous anime</div>
+        <h2 class="s-title rv d1"><span data-key="values_title_1">Nos </span><span class="g" data-key="values_title_2">valeurs fondamentales</span></h2>
+        <p class="s-lead rv d2" style="margin:0 auto" data-key="values_lead">Six principes qui guident chacune de nos décisions.</p>
+      </div>
+      <div class="v-grid">
+        <div class="v-card rv"><div class="v-num">01</div><div class="v-icon"><i class="fas fa-shield-halved"></i></div><div class="v-title" data-key="val1_title">Confidentialité absolue</div><div class="v-text" data-key="val1_body">Chiffrement de bout en bout, conformité RGPD et architecture zéro connaissance. Vos données vous appartiennent, toujours.</div></div>
+        <div class="v-card rv d1"><div class="v-num">02</div><div class="v-icon"><i class="fas fa-magnifying-glass-chart"></i></div><div class="v-title" data-key="val2_title">Rigueur scientifique</div><div class="v-text" data-key="val2_body">Chaque suggestion diagnostique repose sur des recherches évaluées par des pairs et validées par notre comité médical consultatif.</div></div>
+        <div class="v-card rv d2"><div class="v-num">03</div><div class="v-icon"><i class="fas fa-hands-holding-heart"></i></div><div class="v-title" data-key="val3_title">Accès universel</div><div class="v-text" data-key="val3_body">Multilingue, disponible 24h/24. Conçu pour tous, quel que soit le niveau de littératie numérique ou médicale.</div></div>
+        <div class="v-card rv d1"><div class="v-num">04</div><div class="v-icon"><i class="fas fa-lightbulb"></i></div><div class="v-title" data-key="val4_title">Innovation continue</div><div class="v-text" data-key="val4_body">Notre équipe R&D livre des améliorations chaque semaine, intégrant les dernières avancées en IA médicale et NLP clinique.</div></div>
+        <div class="v-card rv d2"><div class="v-num">05</div><div class="v-icon"><i class="fas fa-scale-balanced"></i></div><div class="v-title" data-key="val5_title">IA éthique</div><div class="v-text" data-key="val5_body">Algorithmes transparents, biais surveillés et comité d'éthique indépendant qui audite nos modèles chaque trimestre.</div></div>
+        <div class="v-card rv d3"><div class="v-num">06</div><div class="v-icon"><i class="fas fa-leaf"></i></div><div class="v-title" data-key="val6_title">Impact positif</div><div class="v-text" data-key="val6_body">Nous mesurons le succès par les résultats en santé publique. La santé est un droit, pas un privilège — sans exception.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMMENT ÇA MARCHE -->
+  <section class="section how-section" id="how">
+    <div class="section-inner">
+      <div class="how-intro">
+        <div class="eyebrow rv" data-key="how_eyebrow">Étape par étape</div>
+        <h2 class="s-title rv d1"><span data-key="how_title_1">Comment fonctionne </span><span class="g" data-key="how_title_2">ParrotDiag</span></h2>
+        <p class="s-lead rv d2" data-key="how_lead">De la description des symptômes à la consultation d'un spécialiste certifié — quatre étapes simples.</p>
+      </div>
+      <div class="how-steps">
+        <div class="how-step rv"><div class="step-bubble" data-n="1"><i class="fas fa-comment-medical"></i></div><div class="step-title" data-key="step1_title">Décrivez vos symptômes</div><div class="step-body" data-key="step1_body">Saisissez ou dictez vos symptômes dans n'importe quelle langue. Notre moteur NLP comprend les nuances médicales et le contexte.</div><span class="step-tag" data-key="step1_tag">Langage naturel</span></div>
+        <div class="how-step rv d1"><div class="step-bubble" data-n="2"><i class="fas fa-brain"></i></div><div class="step-title" data-key="step2_title">Analyse IA</div><div class="step-body" data-key="step2_body">Notre modèle, entraîné sur 2M+ de cas cliniques, génère un diagnostic différentiel classé avec des scores de probabilité.</div><span class="step-tag" data-key="step2_tag">Moins de 3 secondes</span></div>
+        <div class="how-step rv d2"><div class="step-bubble" data-n="3"><i class="fas fa-stethoscope"></i></div><div class="step-title" data-key="step3_title">Recevez des recommandations</div><div class="step-body" data-key="step3_body">Obtenez des recommandations de soins personnalisées, des conseils d'urgence et une liste de spécialistes correspondants.</div><span class="step-tag" data-key="step3_tag">Validé cliniquement</span></div>
+        <div class="how-step rv d3"><div class="step-bubble" data-n="4"><i class="fas fa-calendar-check"></i></div><div class="step-title" data-key="step4_title">Consultez un médecin</div><div class="step-body" data-key="step4_body">Connectez-vous directement à un médecin vérifié, prenez rendez-vous ou démarrez une téléconsultation en un seul clic.</div><span class="step-tag" data-key="step4_tag">280+ spécialistes</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHIFFRES -->
+  <section class="section numbers-section" id="numbers">
+    <div class="section-inner">
+      <div style="text-align:center;margin-bottom:54px;position:relative;z-index:1">
+        <div class="eyebrow rv" style="color:#7de0be" data-key="numbers_eyebrow">En chiffres</div>
+        <h2 class="s-title rv d1" style="color:#e4ede9"><span data-key="numbers_title_1">Une croissance fondée sur la </span><span style="background:var(--grad-mint);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text" data-key="numbers_title_2">confiance</span></h2>
+      </div>
+      <div class="n-orb"></div>
+      <div class="n-grid rv">
+        <div class="n-item"><i class="fas fa-users n-icon"></i><div class="n-val">48k+</div><div class="n-lbl" data-key="n1_lbl">Patients actifs</div><div class="n-sub" data-key="n1_sub">+220% en 12 mois</div></div>
+        <div class="n-item"><i class="fas fa-user-md n-icon"></i><div class="n-val">280+</div><div class="n-lbl" data-key="n2_lbl">Médecins partenaires</div><div class="n-sub" data-key="n2_sub">15 spécialités couvertes</div></div>
+        <div class="n-item"><i class="fas fa-robot n-icon"></i><div class="n-val">1,2M</div><div class="n-lbl" data-key="n3_lbl">Consultations IA</div><div class="n-sub" data-key="n3_sub">Depuis notre lancement</div></div>
+        <div class="n-item"><i class="fas fa-star n-icon"></i><div class="n-val">4,9★</div><div class="n-lbl" data-key="n4_lbl">Note moyenne</div><div class="n-sub" data-key="n4_sub">8 400+ avis vérifiés</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TECHNOLOGIE -->
+  <section class="section tech-section" id="technology">
+    <div class="section-inner">
+      <div class="tech-layout">
+        <div>
+          <div class="eyebrow rv" data-key="tech_eyebrow">Sous le capot</div>
+          <h2 class="s-title rv d1"><span data-key="tech_title_1">IA médicale</span><br><span class="g" data-key="tech_title_2">à la pointe</span></h2>
+          <p class="s-lead rv d2" style="max-width:100%;margin-bottom:34px" data-key="tech_lead">Notre stack combine des modèles de langage de pointe avec des bases de données cliniques propriétaires pour une précision diagnostique inégalée.</p>
+          <ul class="tech-list">
+            <li class="t-item rv d1"><div class="t-icon"><i class="fas fa-brain"></i></div><div style="flex:1"><h4 data-key="tech1_title">Moteur NLP médical</h4><p data-key="tech1_body">Affiné sur 2M+ de cas cliniques en français, arabe, anglais et espagnol pour une compréhension profonde et nuancée des symptômes.</p><div class="t-bar"><div class="t-fill" style="width:94%"></div></div></div></li>
+            <li class="t-item rv d2"><div class="t-icon"><i class="fas fa-shield-halved"></i></div><div style="flex:1"><h4 data-key="tech2_title">Infrastructure sécurisée</h4><p data-key="tech2_body">Chiffrement AES-256, hébergement HDS souverain et audits de sécurité trimestriels par des tiers indépendants.</p><div class="t-bar"><div class="t-fill" style="width:100%"></div></div></div></li>
+            <li class="t-item rv d3"><div class="t-icon"><i class="fas fa-chart-line"></i></div><div style="flex:1"><h4 data-key="tech3_title">Apprentissage continu</h4><p data-key="tech3_body">Les modèles s'améliorent continuellement à partir des retours anonymisés des partenaires — de façon éthique, transparente et sécurisée.</p><div class="t-bar"><div class="t-fill" style="width:88%"></div></div></div></li>
+          </ul>
+        </div>
+        <div class="t-visual rv d2">
+          <div class="t-ring t-ring-1"><div class="t-dot"></div></div>
+          <div class="t-ring t-ring-2"><div class="t-dot"></div></div>
+          <div class="t-ring t-ring-3"><div class="t-dot"></div></div>
+          <div class="t-hub"><i class="fas fa-robot"></i></div>
+          <div class="t-tags">
+            <span class="t-tag tt1"><i class="fas fa-shield-halved"></i> RGPD</span>
+            <span class="t-tag tt2"><i class="fas fa-brain"></i> Deep Learning</span>
+            <span class="t-tag tt3"><i class="fas fa-lock"></i> AES-256</span>
+            <span class="t-tag tt4"><i class="fas fa-stethoscope"></i> Validé cliniquement</span>
+            <span class="t-tag tt5"><i class="fas fa-globe"></i> Multilingue</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TÉMOIGNAGES -->
+  <section class="section trust-section" id="trust">
+    <div class="section-inner">
+      <div class="trust-intro">
+        <div class="eyebrow rv" data-key="trust_eyebrow">Preuve sociale</div>
+        <h2 class="s-title rv d1"><span data-key="trust_title_1">La confiance des </span><span class="g" data-key="trust_title_2">patients et des médecins</span></h2>
+        <p class="s-lead rv d2" data-key="trust_lead">Des expériences réelles de notre communauté grandissante au Maroc et au-delà.</p>
+      </div>
+      <div class="t3-grid">
+        <div class="t3-card rv"><div class="t3-stars">★★★★★</div><div class="t3-quote" data-key="test1_quote">« ParrotDiag a identifié mon problème avec précision avant même que je voie un spécialiste. Cela m'a évité des semaines d'incertitude. »</div><div class="t3-author"><div class="t3-avi">SR</div><div><div class="t3-name">Sara R.</div><div class="t3-role" data-key="test1_role">Patiente · Casablanca</div></div></div></div>
+        <div class="t3-card rv d1"><div class="t3-stars">★★★★★</div><div class="t3-quote" data-key="test2_quote">« En tant que médecin généraliste, je recommande ParrotDiag entre les consultations. Les recommandations s'alignent parfaitement avec les directives cliniques. »</div><div class="t3-author"><div class="t3-avi">KA</div><div><div class="t3-name">Dr. K. Alaoui</div><div class="t3-role" data-key="test2_role">Médecin généraliste · Rabat</div></div></div></div>
+        <div class="t3-card rv d2"><div class="t3-stars">★★★★★</div><div class="t3-quote" data-key="test3_quote">« Le support multilingue est incroyable. Ma grand-mère l'utilise en darija et il la comprend parfaitement à chaque fois. »</div><div class="t3-author"><div class="t3-avi">YM</div><div><div class="t3-name">Youssef M.</div><div class="t3-role" data-key="test3_role">Patient · Fès</div></div></div></div>
+      </div>
+      <div class="partners-strip rv">
+        <span class="p-label" data-key="partners_label">Reconnu et approuvé par</span>
+        <div class="p-pill"><i class="fas fa-hospital"></i> CHU Fès</div>
+        <div class="p-pill"><i class="fas fa-flask"></i> UM6P Health</div>
+        <div class="p-pill"><i class="fas fa-award"></i> <span data-key="partner_ministry">Ministère de la Santé</span></div>
+        <div class="p-pill"><i class="fas fa-shield-halved"></i> <span data-key="partner_cndp">Certifié CNDP</span></div>
+        <div class="p-pill"><i class="fas fa-star"></i> TechMed Award 2024</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEUILLE DE ROUTE -->
+  <section class="section road-section" id="roadmap">
+    <div class="section-inner">
+      <div class="road-intro">
+        <div class="eyebrow rv" data-key="road_eyebrow">Notre parcours</div>
+        <h2 class="s-title rv d1"><span data-key="road_title_1">De l'idée à </span><span class="g" data-key="road_title_2">l'impact</span></h2>
+        <p class="s-lead rv d2" style="margin:0 auto" data-key="road_lead">Les étapes clés qui ont façonné ParrotDiag — et ce que nous construisons pour demain.</p>
+      </div>
+      <div class="road-line">
+        <div class="road-item rv"><div class="road-header"><span class="road-year">2022</span><span class="road-title" data-key="road1_title">Fondé à Fès</span></div><p class="road-body" data-key="road1_body">Le Dr Amine Kettani et Sofia Wahbi cofondent ParrotDiag avec une conviction : l'IA peut combler le fossé d'accessibilité aux soins dans les régions sous-desservies.</p><div class="road-tags"><span class="road-tag" data-key="road1_tag1">Création</span><span class="road-tag">Fès, Maroc</span></div></div>
+        <div class="road-item rv d1"><div class="road-header"><span class="road-year">2023 T1</span><span class="road-title" data-key="road2_title">Lancement bêta</span></div><p class="road-body" data-key="road2_body">Première version publique avec 500 patients et 30 médecins partenaires. Précision diagnostique de 94% sur notre benchmark clinique en français et en arabe.</p><div class="road-tags"><span class="road-tag">Bêta</span><span class="road-tag" data-key="road2_tag2">2 langues</span><span class="road-tag" data-key="road2_tag3">30 médecins</span></div></div>
+        <div class="road-item rv d2"><div class="road-header"><span class="road-year">2023 T4</span><span class="road-title" data-key="road3_title">Série A · 4,2M $</span></div><p class="road-body" data-key="road3_body">Clôture d'un financement Série A pour développer le réseau médical, lancer la téléconsultation et démarrer des partenariats de validation clinique avec le CHU Fès et UM6P Health.</p><div class="road-tags"><span class="road-tag" data-key="road3_tag1">Financement</span><span class="road-tag" data-key="road3_tag2">Téléconsultation</span><span class="road-tag" data-key="road3_tag3">Partenariats cliniques</span></div></div>
+        <div class="road-item rv d3"><div class="road-header"><span class="road-year">2024</span><span class="road-title" data-key="road4_title">48k Patients · Prix TechMed</span></div><p class="road-body" data-key="road4_body">Franchissement des 48 000 utilisateurs actifs, expansion en espagnol, victoire au Prix TechMed Africa Innovation et lancement du cadre de confidentialité certifié CNDP.</p><div class="road-tags"><span class="road-tag" data-key="road4_tag1">Croissance</span><span class="road-tag" data-key="road4_tag2">4 langues</span><span class="road-tag" data-key="road4_tag3">Prix</span></div></div>
+        <div class="road-item rv d4"><div class="road-header"><span class="road-year future">2025 →</span><span class="road-title" data-key="road5_title">Expansion régionale</span></div><p class="road-body" data-key="road5_body">Déploiement dans 10 pays MENA, lancement des intégrations wearables, mode diagnostic hors ligne pour les zones à faible connectivité, et objectif de 500 000 patients.</p><div class="road-tags"><span class="road-tag" data-key="road5_tag1">Expansion</span><span class="road-tag">Wearables</span><span class="road-tag" data-key="road5_tag3">IA hors ligne</span><span class="road-tag" data-key="road5_tag4">500k patients</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="cta-o cta-o1"></div>
+    <div class="cta-o cta-o2"></div>
+    <div class="cta-inner rv">
+      <div class="cta-pill"><i class="fas fa-rocket"></i> <span data-key="cta_pill">Commencez aujourd'hui</span></div>
+      <h2 class="cta-title"><span data-key="cta_title_1">Votre santé mérite</span><br><span data-key="cta_title_2">le meilleur de l'</span><span class="mint" data-key="cta_title_3">intelligence.</span></h2>
+      <p class="cta-sub" data-key="cta_sub">Des milliers de patients font confiance à ParrotDiag chaque jour. Commencez gratuitement — aucune carte bancaire requise.</p>
+      <div class="cta-btns">
+        <a href="connexionpage.html" class="cta-btn-p"><i class="fas fa-rocket"></i> <span data-key="cta_btn1">Créer mon compte</span></a>
+        <a href="ia.html"            class="cta-btn-s"><i class="fas fa-play"></i> <span data-key="cta_btn2">Essayer l'assistant</span></a>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:2px">
+        <div class="logo-icon small"><i class="fa-solid fa-robot"></i></div>
+        <span class="logo-text">Parrot<em>Diag</em></span>
+      </div>
+      <p data-key="footer_tagline">Révolutionner la santé grâce au diagnostic préliminaire assisté par IA.</p>
+      <div class="social-links">
+        <a href="#"><i class="fab fa-facebook-f"></i></a>
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+        <a href="#"><i class="fab fa-instagram"></i></a>
+      </div>
+    </div>
+    <div class="footer-links-col">
+      <h4 data-key="footer_quick">Liens rapides</h4>
+      <ul>
+        <li><a href="#" data-key="nav_home">Accueil</a></li>
+        <li><a href="#" data-key="nav_assess">Évaluer mes symptômes</a></li>
+        <li><a href="#" data-key="nav_reco">Recommandations</a></li>
+        <li><a href="#" data-key="nav_about">À propos</a></li>
+      </ul>
+    </div>
+    <div class="footer-links-col">
+      <h4 data-key="footer_contact">Contact</h4>
+      <p><i class="fas fa-envelope"></i> support@parrotdiag.com</p>
+      <p><i class="fas fa-phone"></i> +212 600 000 000</p>
+      <p><i class="fas fa-map-marker-alt"></i> Fès, Maroc</p>
+    </div>
+    <div class="footer-newsletter">
+      <h4 data-key="footer_newsletter">Newsletter</h4>
+      <p data-key="footer_news_sub">Restez informé avec des conseils santé et actualités.</p>
+      <div class="newsletter-input">
+        <input type="email" placeholder="votre@email.com" id="newsletterInput">
+        <button><i class="fas fa-paper-plane"></i></button>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p data-key="footer_copy">© 2025 ParrotDiag. Tous droits réservés.</p>
+    <div class="footer-bottom-links">
+      <a href="#" data-key="privacy">Politique de confidentialité</a>
+      <a href="#" data-key="terms">Conditions d'utilisation</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ══════════════════════════════════════════════════════
+   TRANSLATIONS (identiques à la version originale)
+══════════════════════════════════════════════════════ */
+const translations = {
+  fr: {
+    nav_home:"Accueil", nav_assess:"Évaluer mes symptômes", nav_reco:"Les activités", nav_about:"À propos",
+    btn_signup:"S'inscrire", btn_login:"Connexion",
+    hero_pill:"Santé augmentée par l'IA, pour tous",
+    hero_title_1:"Nous rendons la santé", hero_title_2:"intelligente", hero_title_3:"et accessible.",
+    hero_sub:"ParrotDiag réunit médecins, ingénieurs IA et designers UX pour créer l'assistant médical le plus fiable — disponible pour tous, partout, toujours.",
+    kpi_patients:"Patients accompagnés", kpi_satis:"Taux de satisfaction", kpi_doctors:"Médecins partenaires", kpi_rating:"Note moyenne",
+    scroll_label:"Défiler pour explorer",
+    mission_eyebrow:"Notre mission", mission_title_1:"Rendre les soins de qualité", mission_title_2:"accessibles à tous",
+    mission_lead:"Nous croyons que chaque personne mérite un accès immédiat à des conseils médicaux fiables, quelle que soit sa localisation, ses revenus ou ses compétences numériques.",
+    feat1_title:"Diagnostic assisté par IA", feat1_body:"Entraîné sur plus de 2 millions de cas cliniques en 4 langues, pour des évaluations préliminaires nuancées et fiables en moins de 3 secondes.",
+    feat2_title:"Réseau médical vérifié", feat2_body:"Chaque médecin est accrédité et audité. Plus de 280 spécialistes dans 15 disciplines, disponibles pour téléconsultation.",
+    feat3_title:"Disponible en permanence", feat3_body:"Assistance multilingue 24h/24, 7j/7. Sans salle d'attente, sans assurance requise — juste des réponses quand vous en avez besoin.",
+    mission_quote:"« Nous ne remplaçons pas les médecins — nous aidons chaque patient à être <span>mieux préparé</span> pour les consulter. »",
+    stat_active:"Patients actifs", stat_consult:"Consultations IA", stat_satis2:"Satisfaction", stat_spec:"Spécialités",
+    badge_text:"Validé cliniquement · Conforme RGPD",
+    values_eyebrow:"Ce qui nous anime", values_title_1:"Nos ", values_title_2:"valeurs fondamentales", values_lead:"Six principes qui guident chacune de nos décisions.",
+    val1_title:"Confidentialité absolue", val1_body:"Chiffrement de bout en bout, conformité RGPD et architecture zéro connaissance. Vos données vous appartiennent, toujours.",
+    val2_title:"Rigueur scientifique", val2_body:"Chaque suggestion diagnostique repose sur des recherches évaluées par des pairs et validées par notre comité médical consultatif.",
+    val3_title:"Accès universel", val3_body:"Multilingue, disponible 24h/24. Conçu pour tous, quel que soit le niveau de littératie numérique ou médicale.",
+    val4_title:"Innovation continue", val4_body:"Notre équipe R&D livre des améliorations chaque semaine, intégrant les dernières avancées en IA médicale et NLP clinique.",
+    val5_title:"IA éthique", val5_body:"Algorithmes transparents, biais surveillés et comité d'éthique indépendant qui audite nos modèles chaque trimestre.",
+    val6_title:"Impact positif", val6_body:"Nous mesurons le succès par les résultats en santé publique. La santé est un droit, pas un privilège — sans exception.",
+    how_eyebrow:"Étape par étape", how_title_1:"Comment fonctionne ", how_title_2:"ParrotDiag",
+    how_lead:"De la description des symptômes à la consultation d'un spécialiste certifié — quatre étapes simples.",
+    step1_title:"Décrivez vos symptômes", step1_body:"Saisissez ou dictez vos symptômes dans n'importe quelle langue. Notre moteur NLP comprend les nuances médicales et le contexte.", step1_tag:"Langage naturel",
+    step2_title:"Analyse IA", step2_body:"Notre modèle, entraîné sur 2M+ de cas cliniques, génère un diagnostic différentiel classé avec des scores de probabilité.", step2_tag:"Moins de 3 secondes",
+    step3_title:"Recevez des recommandations", step3_body:"Obtenez des recommandations de soins personnalisées, des conseils d'urgence et une liste de spécialistes correspondants.", step3_tag:"Validé cliniquement",
+    step4_title:"Consultez un médecin", step4_body:"Connectez-vous directement à un médecin vérifié, prenez rendez-vous ou démarrez une téléconsultation en un seul clic.", step4_tag:"280+ spécialistes",
+    numbers_eyebrow:"En chiffres", numbers_title_1:"Une croissance fondée sur la ", numbers_title_2:"confiance",
+    n1_lbl:"Patients actifs", n1_sub:"+220% en 12 mois", n2_lbl:"Médecins partenaires", n2_sub:"15 spécialités couvertes",
+    n3_lbl:"Consultations IA", n3_sub:"Depuis notre lancement", n4_lbl:"Note moyenne", n4_sub:"8 400+ avis vérifiés",
+    tech_eyebrow:"Sous le capot", tech_title_1:"IA médicale", tech_title_2:"à la pointe",
+    tech_lead:"Notre stack combine des modèles de langage de pointe avec des bases de données cliniques propriétaires pour une précision diagnostique inégalée.",
+    tech1_title:"Moteur NLP médical", tech1_body:"Affiné sur 2M+ de cas cliniques en français, arabe, anglais et espagnol pour une compréhension profonde et nuancée des symptômes.",
+    tech2_title:"Infrastructure sécurisée", tech2_body:"Chiffrement AES-256, hébergement HDS souverain et audits de sécurité trimestriels par des tiers indépendants.",
+    tech3_title:"Apprentissage continu", tech3_body:"Les modèles s'améliorent continuellement à partir des retours anonymisés des partenaires — de façon éthique, transparente et sécurisée.",
+    trust_eyebrow:"Preuve sociale", trust_title_1:"La confiance des ", trust_title_2:"patients et des médecins",
+    trust_lead:"Des expériences réelles de notre communauté grandissante au Maroc et au-delà.",
+    test1_quote:"« ParrotDiag a identifié mon problème avec précision avant même que je voie un spécialiste. Cela m'a évité des semaines d'incertitude. »", test1_role:"Patiente · Casablanca",
+    test2_quote:"« En tant que médecin généraliste, je recommande ParrotDiag entre les consultations. Les recommandations s'alignent parfaitement avec les directives cliniques. »", test2_role:"Médecin généraliste · Rabat",
+    test3_quote:"« Le support multilingue est incroyable. Ma grand-mère l'utilise en darija et il la comprend parfaitement à chaque fois. »", test3_role:"Patient · Fès",
+    partners_label:"Reconnu et approuvé par", partner_ministry:"Ministère de la Santé", partner_cndp:"Certifié CNDP",
+    road_eyebrow:"Notre parcours", road_title_1:"De l'idée à ", road_title_2:"l'impact",
+    road_lead:"Les étapes clés qui ont façonné ParrotDiag — et ce que nous construisons pour demain.",
+    road1_title:"Fondé à Fès", road1_body:"Le Dr Amine Kettani et Sofia Wahbi cofondent ParrotDiag avec une conviction : l'IA peut combler le fossé d'accessibilité aux soins dans les régions sous-desservies.", road1_tag1:"Création",
+    road2_title:"Lancement bêta", road2_body:"Première version publique avec 500 patients et 30 médecins partenaires. Précision diagnostique de 94% sur notre benchmark clinique en français et en arabe.", road2_tag2:"2 langues", road2_tag3:"30 médecins",
+    road3_title:"Série A · 4,2M $", road3_body:"Clôture d'un financement Série A pour développer le réseau médical, lancer la téléconsultation et démarrer des partenariats de validation clinique avec le CHU Fès et UM6P Health.", road3_tag1:"Financement", road3_tag2:"Téléconsultation", road3_tag3:"Partenariats cliniques",
+    road4_title:"48k Patients · Prix TechMed", road4_body:"Franchissement des 48 000 utilisateurs actifs, expansion en espagnol, victoire au Prix TechMed Africa Innovation et lancement du cadre de confidentialité certifié CNDP.", road4_tag1:"Croissance", road4_tag2:"4 langues", road4_tag3:"Prix",
+    road5_title:"Expansion régionale", road5_body:"Déploiement dans 10 pays MENA, lancement des intégrations wearables, mode diagnostic hors ligne pour les zones à faible connectivité, et objectif de 500 000 patients.", road5_tag1:"Expansion", road5_tag3:"IA hors ligne", road5_tag4:"500k patients",
+    cta_pill:"Commencez aujourd'hui", cta_title_1:"Votre santé mérite", cta_title_2:"le meilleur de l'", cta_title_3:"intelligence.",
+    cta_sub:"Des milliers de patients font confiance à ParrotDiag chaque jour. Commencez gratuitement — aucune carte bancaire requise.",
+    cta_btn1:"Créer mon compte", cta_btn2:"Essayer l'assistant",
+    footer_tagline:"Révolutionner la santé grâce au diagnostic préliminaire assisté par IA.",
+    footer_quick:"Liens rapides", footer_contact:"Contact", footer_newsletter:"Newsletter",
+    footer_news_sub:"Restez informé avec des conseils santé et actualités.",
+    footer_copy:"© 2025 ParrotDiag. Tous droits réservés.", privacy:"Politique de confidentialité", terms:"Conditions d'utilisation",
+    email_ph:"votre@email.com"
+  },
+  en: {
+    nav_home:"Home", nav_assess:"Assess My Symptoms", nav_reco:"Activity", nav_about:"About",
+    btn_signup:"Sign up", btn_login:"Login",
+    hero_pill:"AI-powered healthcare, built for everyone",
+    hero_title_1:"We make health", hero_title_2:"intelligent", hero_title_3:"and accessible.",
+    hero_sub:"ParrotDiag unites physicians, AI engineers and UX designers to build the most trusted medical assistant — available to everyone, everywhere, always.",
+    kpi_patients:"Patients helped", kpi_satis:"Satisfaction rate", kpi_doctors:"Partner doctors", kpi_rating:"Average rating",
+    scroll_label:"Scroll to explore",
+    mission_eyebrow:"Our mission", mission_title_1:"Making quality care", mission_title_2:"accessible to all",
+    mission_lead:"We believe every person deserves instant access to reliable medical guidance, regardless of location, income or digital literacy.",
+    feat1_title:"AI-Assisted Diagnosis", feat1_body:"Trained on 2M+ clinical cases in 4 languages, delivering nuanced, reliable preliminary assessments in under 3 seconds.",
+    feat2_title:"Verified Medical Network", feat2_body:"Every doctor is credentialed and audited. 280+ specialists across 15 disciplines, available for teleconsultation.",
+    feat3_title:"Always Available", feat3_body:"24/7 multilingual support. No waiting rooms, no insurance required — just answers when you need them.",
+    mission_quote:"\"We don't replace doctors — we make every patient <span>better prepared</span> to see one.\"",
+    stat_active:"Active patients", stat_consult:"AI consultations", stat_satis2:"Satisfaction", stat_spec:"Specialties",
+    badge_text:"Clinically validated · GDPR compliant",
+    values_eyebrow:"What drives us", values_title_1:"Our ", values_title_2:"core values", values_lead:"Six principles that shape every decision we make.",
+    val1_title:"Absolute Privacy", val1_body:"End-to-end encryption, GDPR compliance and zero-knowledge architecture. Your data belongs to you, always.",
+    val2_title:"Scientific Rigour", val2_body:"Every diagnostic suggestion is grounded in peer-reviewed research and validated by our medical advisory board.",
+    val3_title:"Universal Access", val3_body:"Multi-language, 24/7 availability. Designed for anyone regardless of digital or medical literacy level.",
+    val4_title:"Continuous Innovation", val4_body:"Our R&D team ships weekly improvements, integrating the latest breakthroughs in medical AI and clinical NLP.",
+    val5_title:"Ethical AI", val5_body:"Transparent algorithms, monitored biases, and an independent ethics committee auditing our models quarterly.",
+    val6_title:"Positive Impact", val6_body:"We measure success by public health outcomes. Healthcare is a right, not a privilege — full stop.",
+    how_eyebrow:"Step by step", how_title_1:"How ", how_title_2:"ParrotDiag works",
+    how_lead:"From describing symptoms to speaking with a certified specialist — four seamless steps.",
+    step1_title:"Describe Symptoms", step1_body:"Type or speak your symptoms in any language. Our NLP engine understands medical nuance and context.", step1_tag:"Natural language",
+    step2_title:"AI Analysis", step2_body:"Our model, trained on 2M+ clinical cases, generates a ranked differential diagnosis with probability scores.", step2_tag:"Under 3 seconds",
+    step3_title:"Get Recommendations", step3_body:"Receive personalised care recommendations, urgency guidance and a curated list of matching specialists.", step3_tag:"Clinically validated",
+    step4_title:"Book a Doctor", step4_body:"Connect directly with a verified doctor, book an appointment or start a teleconsultation in one tap.", step4_tag:"280+ specialists",
+    numbers_eyebrow:"By the numbers", numbers_title_1:"Growth built on ", numbers_title_2:"trust",
+    n1_lbl:"Active patients", n1_sub:"+220% in 12 months", n2_lbl:"Partner doctors", n2_sub:"15 specialties covered",
+    n3_lbl:"AI consultations", n3_sub:"Since our launch", n4_lbl:"Average rating", n4_sub:"8,400+ verified reviews",
+    tech_eyebrow:"Under the hood", tech_title_1:"Medical AI", tech_title_2:"at the frontier",
+    tech_lead:"Our stack combines state-of-the-art language models with proprietary clinical databases for unmatched diagnostic accuracy.",
+    tech1_title:"Medical NLP Engine", tech1_body:"Fine-tuned on 2M+ clinical cases in French, Arabic, English and Spanish for deep, nuanced symptom understanding.",
+    tech2_title:"Secure Infrastructure", tech2_body:"AES-256 encryption, sovereign HDS-compliant hosting and quarterly third-party security audits.",
+    tech3_title:"Continuous Learning", tech3_body:"Models improve continuously from anonymised partner feedback — ethically, transparently and safely.",
+    trust_eyebrow:"Social proof", trust_title_1:"Trusted by ", trust_title_2:"patients & doctors",
+    trust_lead:"Real experiences from our growing community across Morocco and beyond.",
+    test1_quote:"\"ParrotDiag identified my condition accurately before I even visited a specialist. It saved me weeks of uncertainty.\"", test1_role:"Patient · Casablanca",
+    test2_quote:"\"As a GP, I recommend ParrotDiag between appointments. The recommendations align perfectly with clinical guidelines.\"", test2_role:"General Practitioner · Rabat",
+    test3_quote:"\"The multilingual support is incredible. My grandmother uses it in Darija and it understands her perfectly every time.\"", test3_role:"Patient · Fès",
+    partners_label:"Trusted & recognised by", partner_ministry:"Ministry of Health", partner_cndp:"CNDP Certified",
+    road_eyebrow:"Our journey", road_title_1:"From idea to ", road_title_2:"impact",
+    road_lead:"Key milestones that shaped ParrotDiag — and what we're building next.",
+    road1_title:"Founded in Fès", road1_body:"Dr. Amine Kettani and Sofia Wahbi co-found ParrotDiag with a single conviction: AI can close the healthcare accessibility gap in underserved regions.", road1_tag1:"Founding",
+    road2_title:"Beta Launch", road2_body:"First public beta with 500 patients and 30 partner doctors. Achieved 94% diagnostic accuracy on our initial clinical benchmark suite in French and Arabic.", road2_tag2:"2 languages", road2_tag3:"30 doctors",
+    road3_title:"Series A · $4.2M", road3_body:"Closed Series A funding to expand the medical network, launch teleconsultation features and begin clinical validation partnerships with CHU Fès and UM6P Health.", road3_tag1:"Funding", road3_tag2:"Teleconsultation", road3_tag3:"Clinical partnerships",
+    road4_title:"48k Patients · TechMed Award", road4_body:"Crossed 48,000 active users, expanded to Spanish, won the TechMed Africa Innovation Award and launched the CNDP-certified data privacy framework.", road4_tag1:"Scale", road4_tag2:"4 languages", road4_tag3:"Award",
+    road5_title:"Regional Expansion", road5_body:"Scaling to 10 MENA countries, launching wearable integrations, building offline diagnostic mode for low-connectivity regions, and targeting 500k patients.", road5_tag1:"Expansion", road5_tag3:"Offline AI", road5_tag4:"500k patients",
+    cta_pill:"Get started today", cta_title_1:"Your health deserves", cta_title_2:"the best of ", cta_title_3:"intelligence.",
+    cta_sub:"Thousands of patients trust ParrotDiag every day. Start free — no credit card required.",
+    cta_btn1:"Create my account", cta_btn2:"Try the assistant",
+    footer_tagline:"Revolutionizing healthcare with AI-powered preliminary diagnosis.",
+    footer_quick:"Quick Links", footer_contact:"Contact", footer_newsletter:"Newsletter",
+    footer_news_sub:"Stay updated with health tips and news.",
+    footer_copy:"© 2025 ParrotDiag. All rights reserved.", privacy:"Privacy Policy", terms:"Terms of Service",
+    email_ph:"your@email.com"
+  },
+  ar: {
+    nav_home:"الرئيسية", nav_assess:"تقييم الأعراض", nav_reco:"التوصيات", nav_about:"من نحن",
+    btn_signup:"إنشاء حساب", btn_login:"تسجيل الدخول",
+    hero_pill:"رعاية صحية مدعومة بالذكاء الاصطناعي، للجميع",
+    hero_title_1:"نجعل الصحة", hero_title_2:"ذكية", hero_title_3:"وفي متناول الجميع.",
+    hero_sub:"تجمع ParrotDiag بين الأطباء ومهندسي الذكاء الاصطناعي ومصممي تجربة المستخدم لبناء أفضل مساعد طبي — متاح للجميع، في كل مكان، دائمًا.",
+    kpi_patients:"مريض مُساعَد", kpi_satis:"معدل الرضا", kpi_doctors:"طبيب شريك", kpi_rating:"متوسط التقييم",
+    scroll_label:"مرّر للاستكشاف",
+    mission_eyebrow:"مهمتنا", mission_title_1:"توفير رعاية صحية عالية الجودة", mission_title_2:"للجميع",
+    mission_lead:"نؤمن بأن كل شخص يستحق الوصول الفوري إلى إرشادات طبية موثوقة، بغض النظر عن الموقع أو الدخل أو المستوى الرقمي.",
+    feat1_title:"تشخيص بمساعدة الذكاء الاصطناعي", feat1_body:"مدرَّب على أكثر من 2 مليون حالة سريرية بـ4 لغات، يقدم تقييمات أولية دقيقة في أقل من 3 ثوانٍ.",
+    feat2_title:"شبكة طبية موثقة", feat2_body:"كل طبيب معتمد ومدقق. أكثر من 280 متخصصًا في 15 تخصصًا، متاحون للاستشارة عن بعد.",
+    feat3_title:"متاح دائمًا", feat3_body:"دعم متعدد اللغات على مدار الساعة. لا غرف انتظار، لا تأمين مطلوب — فقط إجابات حين تحتاجها.",
+    mission_quote:"«نحن لا نستبدل الأطباء — نجعل كل مريض <span>أكثر استعدادًا</span> لرؤيتهم.»",
+    stat_active:"مريض نشط", stat_consult:"استشارة ذكاء اصطناعي", stat_satis2:"رضا", stat_spec:"تخصصات",
+    badge_text:"مُصادَق سريريًا · متوافق مع RGPD",
+    values_eyebrow:"ما يحركنا", values_title_1:"", values_title_2:"قيمنا الأساسية", values_lead:"ستة مبادئ تُشكّل كل قرار نتخذه.",
+    val1_title:"الخصوصية المطلقة", val1_body:"تشفير شامل، امتثال لـ RGPD وبنية معمارية صفر معرفة. بياناتك تعود لك دائمًا.",
+    val2_title:"الدقة العلمية", val2_body:"كل اقتراح تشخيصي مبني على أبحاث محكّمة ومعتمدة من مجلسنا الطبي الاستشاري.",
+    val3_title:"الوصول الشامل", val3_body:"متعدد اللغات، متاح 24/7. مصمم للجميع بصرف النظر عن مستوى الثقافة الرقمية أو الطبية.",
+    val4_title:"الابتكار المستمر", val4_body:"يُقدم فريق البحث والتطوير تحسينات أسبوعية، مدمجًا أحدث التطورات في الذكاء الاصطناعي الطبي.",
+    val5_title:"الذكاء الاصطناعي الأخلاقي", val5_body:"خوارزميات شفافة، تحيزات مُراقَبة، ولجنة أخلاقيات مستقلة تدقق نماذجنا كل ربع سنة.",
+    val6_title:"أثر إيجابي", val6_body:"نقيس نجاحنا بنتائج الصحة العامة. الصحة حق وليست امتيازًا — بلا استثناء.",
+    how_eyebrow:"خطوة بخطوة", how_title_1:"كيف يعمل ", how_title_2:"ParrotDiag",
+    how_lead:"من وصف الأعراض إلى التحدث مع متخصص معتمد — أربع خطوات سلسة.",
+    step1_title:"صف أعراضك", step1_body:"اكتب أو تحدث عن أعراضك بأي لغة. محركنا النصي يفهم الدقة الطبية والسياق.", step1_tag:"لغة طبيعية",
+    step2_title:"تحليل بالذكاء الاصطناعي", step2_body:"نموذجنا المدرَّب على أكثر من 2 مليون حالة سريرية يولّد تشخيصًا تفاضليًا مرتبًا مع نسب احتمالية.", step2_tag:"أقل من 3 ثوانٍ",
+    step3_title:"احصل على توصيات", step3_body:"تلقَّ توصيات رعاية شخصية، وإرشادات الطوارئ، وقائمة متخصصين مناسبين لحالتك.", step3_tag:"مُصادَق سريريًا",
+    step4_title:"احجز طبيبًا", step4_body:"تواصل مباشرة مع طبيب موثق، احجز موعدًا أو ابدأ استشارة عن بعد بنقرة واحدة.", step4_tag:"+280 متخصص",
+    numbers_eyebrow:"بالأرقام", numbers_title_1:"نمو مبني على ", numbers_title_2:"الثقة",
+    n1_lbl:"مريض نشط", n1_sub:"+220% خلال 12 شهرًا", n2_lbl:"طبيب شريك", n2_sub:"15 تخصصًا مشمولًا",
+    n3_lbl:"استشارات ذكاء اصطناعي", n3_sub:"منذ إطلاقنا", n4_lbl:"متوسط التقييم", n4_sub:"+8400 تقييم موثق",
+    tech_eyebrow:"تحت الغطاء", tech_title_1:"ذكاء اصطناعي طبي", tech_title_2:"في الطليعة",
+    tech_lead:"يجمع نظامنا نماذج لغوية متطورة مع قواعد بيانات سريرية خاصة لدقة تشخيصية لا مثيل لها.",
+    tech1_title:"محرك NLP الطبي", tech1_body:"مُضبَّط على أكثر من 2 مليون حالة سريرية بالعربية والفرنسية والإنجليزية والإسبانية.",
+    tech2_title:"بنية تحتية آمنة", tech2_body:"تشفير AES-256، استضافة HDS سيادية وعمليات تدقيق أمني ربع سنوية من جهات مستقلة.",
+    tech3_title:"التعلم المستمر", tech3_body:"تتحسن النماذج باستمرار من الملاحظات المُجهَّلة للشركاء — بطريقة أخلاقية وشفافة وآمنة.",
+    trust_eyebrow:"شهادات اجتماعية", trust_title_1:"ثقة ", trust_title_2:"المرضى والأطباء",
+    trust_lead:"تجارب حقيقية من مجتمعنا المتنامي في المغرب وخارجه.",
+    test1_quote:"«حدد ParrotDiag حالتي بدقة قبل أن أرى أي متخصص. وفّر عليّ أسابيع من الغموض.»", test1_role:"مريضة · الدار البيضاء",
+    test2_quote:"«كطبيب عام، أوصي بـ ParrotDiag بين الاستشارات. التوصيات تتوافق تمامًا مع الإرشادات السريرية.»", test2_role:"طبيب عام · الرباط",
+    test3_quote:"«الدعم متعدد اللغات رائع. جدتي تستخدمه بالدارجة وهو يفهمها تمامًا في كل مرة.»", test3_role:"مريض · فاس",
+    partners_label:"موثوق به ومعترف به من قبل", partner_ministry:"وزارة الصحة", partner_cndp:"معتمد CNDP",
+    road_eyebrow:"مسيرتنا", road_title_1:"من فكرة إلى ", road_title_2:"أثر",
+    road_lead:"المحطات الرئيسية التي شكّلت ParrotDiag — وما نبنيه للمستقبل.",
+    road1_title:"التأسيس في فاس", road1_body:"يشارك الدكتور أمين قطاني وصوفيا وهبي في تأسيس ParrotDiag بقناعة واحدة: يمكن للذكاء الاصطناعي سدّ الفجوة في الوصول إلى الرعاية الصحية.", road1_tag1:"التأسيس",
+    road2_title:"الإطلاق التجريبي", road2_body:"أول نسخة عامة مع 500 مريض و30 طبيبًا شريكًا. دقة تشخيص 94% على الاختبار السريري الأولي.", road2_tag2:"لغتان", road2_tag3:"30 طبيبًا",
+    road3_title:"الجولة الأولى · 4.2 مليون $", road3_body:"إغلاق تمويل السلسلة A لتوسيع الشبكة الطبية وإطلاق الاستشارة عن بعد.", road3_tag1:"تمويل", road3_tag2:"استشارة عن بعد", road3_tag3:"شراكات سريرية",
+    road4_title:"48 ألف مريض · جائزة TechMed", road4_body:"تجاوز 48,000 مستخدم نشط، التوسع للغة الإسبانية، الفوز بجائزة TechMed Africa.", road4_tag1:"توسع", road4_tag2:"4 لغات", road4_tag3:"جائزة",
+    road5_title:"التوسع الإقليمي", road5_body:"الانتشار في 10 دول بمنطقة الشرق الأوسط وشمال أفريقيا، ودمج الأجهزة القابلة للارتداء، ووضع الذكاء الاصطناعي دون اتصال، والوصول إلى 500 ألف مريض.", road5_tag1:"توسع", road5_tag3:"ذكاء اصطناعي دون إنترنت", road5_tag4:"500 ألف مريض",
+    cta_pill:"ابدأ اليوم", cta_title_1:"صحتك تستحق", cta_title_2:"أفضل ", cta_title_3:"الذكاء.",
+    cta_sub:"آلاف المرضى يثقون بـ ParrotDiag كل يوم. ابدأ مجانًا — لا بطاقة بنكية مطلوبة.",
+    cta_btn1:"إنشاء حسابي", cta_btn2:"تجربة المساعد",
+    footer_tagline:"ثورة في الرعاية الصحية من خلال التشخيص الأولي بالذكاء الاصطناعي.",
+    footer_quick:"روابط سريعة", footer_contact:"تواصل معنا", footer_newsletter:"النشرة الإخبارية",
+    footer_news_sub:"ابق على اطلاع بنصائح صحية وأخبار.",
+    footer_copy:"© 2025 ParrotDiag. جميع الحقوق محفوظة.", privacy:"سياسة الخصوصية", terms:"شروط الاستخدام",
+    email_ph:"بريدك@الإلكتروني.com"
+  },
+  es: {
+    nav_home:"Inicio", nav_assess:"Evaluar síntomas", nav_reco:"Recomendaciones", nav_about:"Nosotros",
+    btn_signup:"Registrarse", btn_login:"Iniciar sesión",
+    hero_pill:"Atención médica con IA, para todos",
+    hero_title_1:"Hacemos la salud", hero_title_2:"inteligente", hero_title_3:"y accesible.",
+    hero_sub:"ParrotDiag reúne médicos, ingenieros de IA y diseñadores UX para crear el asistente médico más confiable — disponible para todos, en cualquier lugar, siempre.",
+    kpi_patients:"Pacientes atendidos", kpi_satis:"Tasa de satisfacción", kpi_doctors:"Médicos asociados", kpi_rating:"Calificación promedio",
+    scroll_label:"Desplaza para explorar",
+    mission_eyebrow:"Nuestra misión", mission_title_1:"Hacer la atención de calidad", mission_title_2:"accesible para todos",
+    mission_lead:"Creemos que cada persona merece acceso instantáneo a orientación médica fiable, independientemente de su ubicación, ingresos o alfabetización digital.",
+    feat1_title:"Diagnóstico asistido por IA", feat1_body:"Entrenado con más de 2 millones de casos clínicos en 4 idiomas, ofreciendo evaluaciones preliminares precisas en menos de 3 segundos.",
+    feat2_title:"Red médica verificada", feat2_body:"Cada médico está acreditado y auditado. Más de 280 especialistas en 15 disciplinas, disponibles para teleconsulta.",
+    feat3_title:"Siempre disponible", feat3_body:"Asistencia multilingüe 24/7. Sin salas de espera, sin seguro requerido — solo respuestas cuando las necesitas.",
+    mission_quote:"«No reemplazamos médicos — hacemos que cada paciente esté <span>mejor preparado</span> para verlos.»",
+    stat_active:"Pacientes activos", stat_consult:"Consultas IA", stat_satis2:"Satisfacción", stat_spec:"Especialidades",
+    badge_text:"Validado clínicamente · Conforme al RGPD",
+    values_eyebrow:"Lo que nos impulsa", values_title_1:"Nuestros ", values_title_2:"valores fundamentales", values_lead:"Seis principios que guían cada decisión que tomamos.",
+    val1_title:"Privacidad absoluta", val1_body:"Cifrado de extremo a extremo, cumplimiento del RGPD y arquitectura de conocimiento cero. Tus datos te pertenecen, siempre.",
+    val2_title:"Rigor científico", val2_body:"Cada sugerencia diagnóstica está respaldada por investigación revisada por pares y validada por nuestro consejo médico asesor.",
+    val3_title:"Acceso universal", val3_body:"Multilingüe, disponible 24/7. Diseñado para todos independientemente del nivel de alfabetización digital o médica.",
+    val4_title:"Innovación continua", val4_body:"Nuestro equipo de I+D lanza mejoras semanales, integrando los últimos avances en IA médica y PNL clínica.",
+    val5_title:"IA ética", val5_body:"Algoritmos transparentes, sesgos monitoreados y un comité de ética independiente que audita nuestros modelos trimestralmente.",
+    val6_title:"Impacto positivo", val6_body:"Medimos el éxito por los resultados en salud pública. La salud es un derecho, no un privilegio — punto final.",
+    how_eyebrow:"Paso a paso", how_title_1:"Cómo funciona ", how_title_2:"ParrotDiag",
+    how_lead:"Desde describir síntomas hasta hablar con un especialista certificado — cuatro pasos sencillos.",
+    step1_title:"Describe tus síntomas", step1_body:"Escribe o habla sobre tus síntomas en cualquier idioma. Nuestro motor NLP comprende el matiz médico y el contexto.", step1_tag:"Lenguaje natural",
+    step2_title:"Análisis IA", step2_body:"Nuestro modelo, entrenado con 2M+ casos clínicos, genera un diagnóstico diferencial ordenado con puntuaciones de probabilidad.", step2_tag:"En menos de 3 segundos",
+    step3_title:"Recibe recomendaciones", step3_body:"Obtén recomendaciones de atención personalizadas, orientación de urgencia y una lista de especialistas adecuados.", step3_tag:"Validado clínicamente",
+    step4_title:"Consulta un médico", step4_body:"Conéctate directamente con un médico verificado, reserva una cita o inicia una teleconsulta con un solo toque.", step4_tag:"280+ especialistas",
+    numbers_eyebrow:"En cifras", numbers_title_1:"Crecimiento basado en la ", numbers_title_2:"confianza",
+    n1_lbl:"Pacientes activos", n1_sub:"+220% en 12 meses", n2_lbl:"Médicos asociados", n2_sub:"15 especialidades cubiertas",
+    n3_lbl:"Consultas IA", n3_sub:"Desde nuestro lanzamiento", n4_lbl:"Calificación promedio", n4_sub:"8.400+ reseñas verificadas",
+    tech_eyebrow:"Bajo el capó", tech_title_1:"IA médica", tech_title_2:"de vanguardia",
+    tech_lead:"Nuestro stack combina modelos de lenguaje de última generación con bases de datos clínicas propietarias para una precisión diagnóstica inigualable.",
+    tech1_title:"Motor NLP médico", tech1_body:"Ajustado con 2M+ casos clínicos en francés, árabe, inglés y español para una comprensión profunda y matizada de los síntomas.",
+    tech2_title:"Infraestructura segura", tech2_body:"Cifrado AES-256, alojamiento HDS soberano y auditorías de seguridad trimestrales por terceros independientes.",
+    tech3_title:"Aprendizaje continuo", tech3_body:"Los modelos mejoran continuamente a partir de comentarios anonimizados de socios — de forma ética, transparente y segura.",
+    trust_eyebrow:"Prueba social", trust_title_1:"La confianza de ", trust_title_2:"pacientes y médicos",
+    trust_lead:"Experiencias reales de nuestra creciente comunidad en Marruecos y más allá.",
+    test1_quote:"«ParrotDiag identificó mi afección con precisión antes de que visitara a un especialista. Me ahorró semanas de incertidumbre.»", test1_role:"Paciente · Casablanca",
+    test2_quote:"«Como médico de cabecera, recomiendo ParrotDiag entre citas. Las recomendaciones se alinean perfectamente con las guías clínicas.»", test2_role:"Médico de cabecera · Rabat",
+    test3_quote:"«El soporte multilingüe es increíble. Mi abuela lo usa en darija y la entiende perfectamente cada vez.»", test3_role:"Paciente · Fès",
+    partners_label:"Reconocido y avalado por", partner_ministry:"Ministerio de Salud", partner_cndp:"Certificado CNDP",
+    road_eyebrow:"Nuestro recorrido", road_title_1:"De la idea al ", road_title_2:"impacto",
+    road_lead:"Hitos clave que dieron forma a ParrotDiag — y lo que estamos construyendo a continuación.",
+    road1_title:"Fundado en Fès", road1_body:"El Dr. Amine Kettani y Sofia Wahbi cofundan ParrotDiag con una convicción: la IA puede cerrar la brecha de accesibilidad a la atención médica en regiones desatendidas.", road1_tag1:"Fundación",
+    road2_title:"Lanzamiento beta", road2_body:"Primera beta pública con 500 pacientes y 30 médicos asociados. Se logró una precisión diagnóstica del 94% en nuestro primer benchmark clínico.", road2_tag2:"2 idiomas", road2_tag3:"30 médicos",
+    road3_title:"Serie A · 4,2M $", road3_body:"Cierre de financiación Serie A para expandir la red médica, lanzar funciones de teleconsulta e iniciar asociaciones de validación clínica con CHU Fès y UM6P Health.", road3_tag1:"Financiación", road3_tag2:"Teleconsulta", road3_tag3:"Asociaciones clínicas",
+    road4_title:"48k Pacientes · Premio TechMed", road4_body:"Superamos los 48.000 usuarios activos, ampliamos al español, ganamos el Premio de Innovación TechMed Africa y lanzamos el marco de privacidad de datos certificado CNDP.", road4_tag1:"Escala", road4_tag2:"4 idiomas", road4_tag3:"Premio",
+    road5_title:"Expansión regional", road5_body:"Escalando a 10 países MENA, lanzando integraciones con wearables, construyendo modo diagnóstico sin conexión para regiones de baja conectividad y apuntando a 500k pacientes.", road5_tag1:"Expansión", road5_tag3:"IA sin conexión", road5_tag4:"500k pacientes",
+    cta_pill:"Comienza hoy", cta_title_1:"Tu salud merece", cta_title_2:"lo mejor de la ", cta_title_3:"inteligencia.",
+    cta_sub:"Miles de pacientes confían en ParrotDiag cada día. Comienza gratis — sin tarjeta de crédito.",
+    cta_btn1:"Crear mi cuenta", cta_btn2:"Probar el asistente",
+    footer_tagline:"Revolucionando la atención médica con diagnóstico preliminar asistido por IA.",
+    footer_quick:"Enlaces rápidos", footer_contact:"Contacto", footer_newsletter:"Boletín",
+    footer_news_sub:"Mantente informado con consejos de salud y novedades.",
+    footer_copy:"© 2025 ParrotDiag. Todos los derechos reservados.", privacy:"Política de privacidad", terms:"Términos de servicio",
+    email_ph:"tu@correo.com"
+  }
+};
+
+/* ══════════════════════════════════════════════════════
+   APPLY LANGUAGE
+══════════════════════════════════════════════════════ */
+function applyLang(lang) {
+  const t = translations[lang];
+  if (!t) return;
+  const isRtl = lang === 'ar';
+  document.documentElement.setAttribute('lang', lang);
+  document.documentElement.setAttribute('dir', isRtl ? 'rtl' : 'ltr');
+  document.querySelectorAll('[data-key]').forEach(el => {
+    const key = el.dataset.key;
+    if (t[key] !== undefined) el.innerHTML = t[key];
+  });
+  const inp = document.getElementById('newsletterInput');
+  if (inp && t.email_ph) inp.placeholder = t.email_ph;
+  const titles = {fr:'À propos', en:'About Us', ar:'من نحن', es:'Nosotros'};
+  document.title = 'ParrotDiag — ' + (titles[lang] || 'À propos');
+  document.querySelectorAll('.lang-option').forEach(o => {
+    o.classList.toggle('selected', o.dataset.lang === lang);
+  });
+  localStorage.setItem('pd-lang', lang);
+}
+
+/* ══════════════════════════════════════════════════════
+   LANGUAGE SWITCHER
+══════════════════════════════════════════════════════ */
+const sw     = document.getElementById('langSwitcher');
+const lbtn   = document.getElementById('langBtn');
+const flagEl  = document.getElementById('currentFlag');
+const labelEl = document.getElementById('currentLangLabel');
+const savedLang = localStorage.getItem('pd-lang') || 'fr';
+const savedOption = document.querySelector(`.lang-option[data-lang="${savedLang}"]`);
+if (savedOption) { flagEl.textContent = savedOption.dataset.flag; labelEl.textContent = savedOption.dataset.label; }
+applyLang(savedLang);
+lbtn.addEventListener('click', e => { e.stopPropagation(); sw.classList.toggle('open'); });
+document.addEventListener('click', () => sw.classList.remove('open'));
+document.querySelectorAll('.lang-option').forEach(o => {
+  o.addEventListener('click', () => {
+    const lang = o.dataset.lang;
+    flagEl.textContent  = o.dataset.flag;
+    labelEl.textContent = o.dataset.label;
+    sw.classList.remove('open');
+    applyLang(lang);
+  });
+});
+
+/* ══════════════════════════════════════════════════════
+   THEME
+══════════════════════════════════════════════════════ */
+const html   = document.documentElement;
+const toggle = document.getElementById('themeToggle');
+html.setAttribute('data-theme', localStorage.getItem('pd-theme') || 'light');
+toggle.addEventListener('click', () => {
+  const next = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('pd-theme', next);
+});
+
+/* ══════════════════════════════════════════════════════
+   SCROLL REVEAL
+══════════════════════════════════════════════════════ */
+const revObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); revObs.unobserve(e.target); } });
+}, { threshold:.10, rootMargin:'0px 0px -28px 0px' });
+document.querySelectorAll('.rv').forEach(el => revObs.observe(el));
+
+/* ══════════════════════════════════════════════════════
+   TECH BAR ANIMATION
+══════════════════════════════════════════════════════ */
+const barObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('bar-on'); });
+}, { threshold:.4 });
+document.querySelectorAll('.t-item').forEach(el => barObs.observe(el));
+
+/* ══════════════════════════════════════════════════════
+   KPI COUNTER
+══════════════════════════════════════════════════════ */
+const kpiObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(e.isIntersecting && !e.target.dataset.done){
+      e.target.dataset.done = '1';
+      const target = parseFloat(e.target.dataset.t);
+      const suffix = e.target.dataset.s || '';
+      const dec    = target % 1 !== 0;
+      let ts = null;
+      const step = t => {
+        if(!ts) ts = t;
+        const prog = Math.min((t - ts)/1600, 1);
+        const ease = 1 - Math.pow(1 - prog, 3);
+        const cur  = ease * target;
+        e.target.textContent = (dec ? cur.toFixed(1) : Math.floor(cur)) + suffix;
+        if(prog < 1) requestAnimationFrame(step);
+        else e.target.textContent = (dec ? target.toFixed(1) : target) + suffix;
+      };
+      requestAnimationFrame(step);
+    }
+  });
+}, { threshold:.5 });
+document.querySelectorAll('.kpi-v[data-t]').forEach(el => kpiObs.observe(el));
+
+/* ══════════════════════════════════════════════════════
+   HEADER SHADOW
+══════════════════════════════════════════════════════ */
+window.addEventListener('scroll', () => {
+  document.getElementById('mainHeader').style.boxShadow =
+    window.scrollY > 20 ? '0 4px 28px rgba(0,0,0,.14)' : '0 2px 20px rgba(0,0,0,.05)';
+}, { passive:true });
+
+/* ══════════════════════════════════════════════════════
+   UTILITIES
+══════════════════════════════════════════════════════ */
+function getInitials(name) {
+  if (!name) return '??';
+  return name.trim().split(/\s+/).map(n => n[0] || '').join('').toUpperCase().slice(0, 2);
+}
+
+function showToast(msg, icon = 'check-circle') {
+  document.querySelectorAll('.pd-toast').forEach(t => t.remove());
+  const t = document.createElement('div');
+  t.className = 'pd-toast';
+  t.innerHTML = `<i class="fas fa-${icon}"></i> ${msg}`;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3200);
+}
+
+/* ══════════════════════════════════════════════════════
+   MODALS
+══════════════════════════════════════════════════════ */
+function openModal(id) {
+  const m = document.getElementById(id);
+  if (!m) return;
+  m.style.display = 'flex';
+  requestAnimationFrame(() => m.classList.add('open'));
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(id) {
+  const m = document.getElementById(id);
+  if (!m) return;
+  m.classList.remove('open');
+  m.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+// Close on overlay click or Escape
+document.addEventListener('click', e => {
+  document.querySelectorAll('.modal-overlay.open').forEach(m => {
+    if (e.target === m) closeModal(m.id);
+  });
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.open').forEach(m => closeModal(m.id));
+  }
+});
+
+/* ══════════════════════════════════════════════════════
+   SETTINGS TABS
+══════════════════════════════════════════════════════ */
+function switchTab(panelId, btn) {
+  document.querySelectorAll('.stab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.stab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(panelId)?.classList.add('active');
+}
+
+function toggleDarkMode(checkbox) {
+  const next = checkbox.checked ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('pd-theme', next);
+}
+
+function applyLangFromSettings(lang) {
+  const opt = document.querySelector(`.lang-option[data-lang="${lang}"]`);
+  if (opt) {
+    document.getElementById('currentFlag').textContent  = opt.dataset.flag;
+    document.getElementById('currentLangLabel').textContent = opt.dataset.label;
+  }
+  applyLang(lang);
+}
+
+function savePassword() {
+  const cur = document.getElementById('pwCurrent')?.value;
+  const nw  = document.getElementById('pwNew')?.value;
+  const cf  = document.getElementById('pwConfirm')?.value;
+  if (!cur || !nw || !cf) { showToast('Veuillez remplir tous les champs', 'exclamation-circle'); return; }
+  if (nw !== cf) { showToast('Les mots de passe ne correspondent pas', 'times-circle'); return; }
+  showToast('Mot de passe mis à jour avec succès ✓');
+  ['pwCurrent','pwNew','pwConfirm'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+}
+
+function saveSettings() {
+  showToast('Paramètres enregistrés ✓');
+  closeModal('modalSettings');
+}
+
+/* ══════════════════════════════════════════════════════
+   PROFILE MODAL — fill & save
+══════════════════════════════════════════════════════ */
+let _currentUser = null;
+
+function fillProfileModal(user) {
+  const fields = {
+    pFullName:   user.full_name,
+    pEmail:      user.email,
+    pPhone:      user.phone,
+    pBirthDate:  user.birth_date,
+    pSex:        user.sex,
+    pBloodType:  user.blood_type,
+    pCity:       user.city,
+    pZip:        user.zip_code,
+    pAddress:    user.address,
+    pAllergies:  user.allergies,
+    pMedications:user.current_medications,
+    pHistory:    user.medical_history,
+    pEmerName:   user.emergency_contact?.name,
+    pEmerPhone:  user.emergency_contact?.phone,
+    pEmerRelation:user.emergency_contact?.relation
+  };
+  Object.entries(fields).forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    if (el) el.value = val || '';
+  });
+
+  // Avatar preview in modal
+  const preview = document.getElementById('profilePhotoPreview');
+  if (preview) {
+    if (user.profile_photo) {
+      preview.innerHTML = `<img src="${user.profile_photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    } else {
+      preview.textContent = getInitials(user.full_name || user.name);
+    }
+  }
+  document.getElementById('profilePhotoB64').value = '';
+}
+
+function previewPhoto(input) {
+  if (!input.files?.[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const preview = document.getElementById('profilePhotoPreview');
+    if (preview) preview.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    document.getElementById('profilePhotoB64').value = e.target.result;
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function saveProfile(e) {
+  e.preventDefault();
+  if (!_currentUser) return;
+
+  const updated = {
+    ..._currentUser,
+    phone:               document.getElementById('pPhone')?.value || '',
+    birth_date:          document.getElementById('pBirthDate')?.value || '',
+    sex:                 document.getElementById('pSex')?.value || '',
+    blood_type:          document.getElementById('pBloodType')?.value || '',
+    city:                document.getElementById('pCity')?.value || '',
+    zip_code:            document.getElementById('pZip')?.value || '',
+    address:             document.getElementById('pAddress')?.value || '',
+    allergies:           document.getElementById('pAllergies')?.value || '',
+    current_medications: document.getElementById('pMedications')?.value || '',
+    medical_history:     document.getElementById('pHistory')?.value || '',
+    emergency_contact: {
+      name:     document.getElementById('pEmerName')?.value || '',
+      phone:    document.getElementById('pEmerPhone')?.value || '',
+      relation: document.getElementById('pEmerRelation')?.value || ''
+    }
+  };
+
+  const b64 = document.getElementById('profilePhotoB64')?.value;
+  if (b64) updated.profile_photo = b64;
+
+  // Persist
+  _currentUser = updated;
+  const storageKey = ['parrotdiag_user','user','currentUser','loggedUser'].find(k => localStorage.getItem(k));
+  if (storageKey) localStorage.setItem(storageKey, JSON.stringify(updated));
+
+  // Refresh avatar everywhere
+  refreshAvatars(updated);
+
+  showToast('Profil mis à jour avec succès ✓');
+  closeModal('modalProfile');
+}
+
+function refreshAvatars(user) {
+  const initials = getInitials(user.full_name || user.name);
+  const photo    = user.profile_photo;
+
+  // Small avatar in trigger
+  const smallAvatar = document.querySelector('#profileMenuWrapper .profile-avatar');
+  if (smallAvatar) {
+    smallAvatar.innerHTML = photo ? `<img src="${photo}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : initials;
+  }
+  // Large avatar in dropdown header
+  const largeAvatar = document.querySelector('#profileMenuWrapper .pd-header-avatar');
+  if (largeAvatar) {
+    largeAvatar.innerHTML = photo ? `<img src="${photo}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : initials;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   USER PROFILE DROPDOWN — render
+══════════════════════════════════════════════════════ */
+function renderAuthArea() {
+  const authArea = document.getElementById('authArea');
+  if (!authArea) return;
+
+  let user = null;
+  const keys = ['parrotdiag_user', 'user', 'currentUser', 'loggedUser'];
+  for (const k of keys) {
+    try {
+      const val = localStorage.getItem(k);
+      if (val) { user = JSON.parse(val); break; }
+    } catch(e) {}
+  }
+
+  if (!user) return; // non connecté → boutons par défaut
+  _currentUser = user;
+
+  const initials    = getInitials(user.full_name || user.name);
+  const displayName = user.full_name || user.name || 'Mon compte';
+  const email       = user.email || '';
+
+  const roleLabels = { doctor:'Médecin', patient:'Patient', admin:'Admin' };
+  const roleLabel  = roleLabels[user.role] || (user.role || 'Utilisateur');
+
+  const dashLink = user.role === 'doctor' ? 'doctor-dashboard.html'
+                 : user.role === 'admin'  ? 'admin.html'
+                 : 'patient-dashboard.html';
+
+  const avatarSmall = user.profile_photo
+    ? `<div class="profile-avatar"><img src="${user.profile_photo}" alt="avatar" style="width:100%;height:100%;border-radius:50%;object-fit:cover;"></div>`
+    : `<div class="profile-avatar">${initials}</div>`;
+
+  const avatarLarge = user.profile_photo
+    ? `<div class="pd-header-avatar"><img src="${user.profile_photo}" alt="avatar" style="width:100%;height:100%;border-radius:50%;object-fit:cover;"></div>`
+    : `<div class="pd-header-avatar">${initials}</div>`;
+
+  authArea.innerHTML = `
+    <div class="profile-menu" id="profileMenuWrapper">
+      <div class="profile-trigger" id="profileTrigger" role="button" tabindex="0" aria-haspopup="true" aria-expanded="false">
+        ${avatarSmall}
+        <span class="profile-trigger-name">${displayName}</span>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+
+      <div class="profile-dropdown" id="profileDropdown" role="menu">
+        <div class="profile-dropdown-header">
+          ${avatarLarge}
+          <div class="pd-header-info">
+            <div class="pd-name">${displayName}</div>
+            <div class="pd-email">${email}</div>
+            <span class="pd-role-badge">${roleLabel}</span>
+          </div>
+        </div>
+
+        <div class="pd-divider"></div>
+
+        <a href="${dashLink}" class="pd-item" role="menuitem">
+          <i class="fas fa-gauge-high"></i> Tableau de bord
+        </a>
+        <div class="pd-item" id="openProfileBtn" role="menuitem">
+          <i class="fas fa-user-circle"></i> Mon profil
+        </div>
+        <div class="pd-item" id="openSettingsBtn" role="menuitem">
+          <i class="fas fa-gear"></i> Paramètres
+        </div>
+
+        <div class="pd-divider"></div>
+
+        <div class="pd-item pd-logout" id="profileLogoutBtn" role="menuitem">
+          <i class="fas fa-right-from-bracket"></i> Se déconnecter
+        </div>
+      </div>
+    </div>`;
+
+  // ── Toggle dropdown ──
+  const wrapper = document.getElementById('profileMenuWrapper');
+  const trigger = document.getElementById('profileTrigger');
+
+  const openMenu  = () => { wrapper.classList.add('open');    trigger.setAttribute('aria-expanded','true'); };
+  const closeMenu = () => { wrapper.classList.remove('open'); trigger.setAttribute('aria-expanded','false'); };
+
+  trigger.addEventListener('click', e => { e.stopPropagation(); wrapper.classList.contains('open') ? closeMenu() : openMenu(); });
+  trigger.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); wrapper.classList.contains('open') ? closeMenu() : openMenu(); }
+    if (e.key === 'Escape') closeMenu();
+  });
+  document.addEventListener('click', closeMenu);
+  document.getElementById('profileDropdown')?.addEventListener('click', e => e.stopPropagation());
+
+  // ── Mon profil → modale ──
+  document.getElementById('openProfileBtn')?.addEventListener('click', () => {
+    closeMenu();
+    fillProfileModal(_currentUser);
+    openModal('modalProfile');
+  });
+
+  // ── Paramètres → modale ──
+  document.getElementById('openSettingsBtn')?.addEventListener('click', () => {
+    closeMenu();
+    // Sync dark mode toggle
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const dmToggle = document.getElementById('darkModeToggle');
+    if (dmToggle) dmToggle.checked = isDark;
+    // Sync lang select
+    const langSelect = document.getElementById('settingsLang');
+    if (langSelect) langSelect.value = localStorage.getItem('pd-lang') || 'fr';
+    openModal('modalSettings');
+  });
+
+  // ── Déconnexion ──
+  document.getElementById('profileLogoutBtn')?.addEventListener('click', () => {
+    ['parrotdiag_user','user','currentUser','loggedUser','parrotdiag_token','token','authToken'].forEach(k => localStorage.removeItem(k));
+    window.location.href = 'connexionpage.html';
+  });
+}
+
+// Init
+renderAuthArea();
+
+// ══════════════════════════════════════════════════════
+//   MOBILE MENU
+// ══════════════════════════════════════════════════════
+(function initMobileMenu() {
+  const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+  const mobileNavOverlay = document.getElementById('mobileNavOverlay');
+  
+  if (mobileMenuToggle && mobileNavOverlay) {
+    mobileMenuToggle.addEventListener('click', () => {
+      mobileMenuToggle.classList.toggle('active');
+      mobileNavOverlay.classList.toggle('active');
+      document.body.style.overflow = mobileNavOverlay.classList.contains('active') ? 'hidden' : '';
+    });
+    
+    // Close mobile menu when clicking on a link
+    const mobileNavLinks = mobileNavOverlay.querySelectorAll('a');
+    mobileNavLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenuToggle.classList.remove('active');
+        mobileNavOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+      });
+    });
+    
+    // Close mobile menu on window resize
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 900) {
+        mobileMenuToggle.classList.remove('active');
+        mobileNavOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    });
+  }
+})();
+</script>
+</body>
+</html>

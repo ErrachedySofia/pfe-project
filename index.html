@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParrotDiag — Assistant Santé IA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Calendar booking styles */
+        .cal-day-header {
+            text-align: center;
+            padding: 8px;
+            font-weight: 600;
+            font-size: 11px;
+            color: var(--text-muted, #888);
+            text-transform: uppercase;
+        }
+        .cal-empty {
+            padding: 12px;
+            background: transparent;
+        }
+        .cal-day {
+            padding: 12px 6px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+            position: relative;
+            width: 100%;
+            font-family: inherit;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        .cal-day.clickable:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(47, 163, 124, 0.3);
+            cursor: pointer;
+        }
+        .cal-day:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .cal-slot-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: white;
+            color: black;
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 9px;
+            font-weight: 700;
+            border: 1px solid currentColor;
+            min-width: 20px;
+            text-align: center;
+        }
+        .cal-slot-btn {
+            font-family: inherit;
+        }
+        .cal-slot-btn:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 8px rgba(16, 185, 129, 0.25) !important;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ======= HEADER ======= -->
+<header id="mainHeader">
+    <div class="header-logo">
+        <div class="logo-icon"><i class="fa-solid fa-robot"></i></div>
+        <span class="logo-text">Parrot<em>Diag</em></span>
+    </div>
+
+    <nav class="main-nav">
+        <ul>
+            <li><a href="index.html" class="active" data-i18n="nav_home">Accueil</a></li>
+            <li><a href="ia.html" data-i18n="nav_assess">Évaluer mes symptômes</a></li>
+            <li><a href="patients.html" data-i18n="nav_reco">Les activités</a></li>
+            <li><a href="apropos.html" data-i18n="nav_about">À propos</a></li>
+        </ul>
+    </nav>
+    <div class="header-controls">
+        <!-- Language Switcher -->
+        <div class="lang-switcher" id="langSwitcher">
+            <button class="lang-btn" id="langBtn">
+                <span class="lang-flag" id="currentFlag">🇫🇷</span>
+                <span id="currentLangLabel">FR</span>
+                <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="lang-dropdown" id="langDropdown">
+                <div class="lang-option" data-lang="en" data-flag="🇬🇧" data-label="EN">🇬🇧 English</div>
+                <div class="lang-option" data-lang="fr" data-flag="🇫🇷" data-label="FR">🇫🇷 Français</div>
+                <div class="lang-option" data-lang="ar" data-flag="🇲🇦" data-label="AR">🇲🇦 العربية</div>
+                <div class="lang-option" data-lang="es" data-flag="🇪🇸" data-label="ES">🇪🇸 Español</div>
+            </div>
+        </div>
+
+        <!-- Theme Toggle -->
+        <button class="theme-toggle" id="themeToggle" aria-label="Changer le thème">
+            <span class="theme-icon light-icon">☀️</span>
+            <span class="theme-icon dark-icon">🌙</span>
+            <div class="theme-thumb"></div>
+        </button>
+
+        <!-- Auth Buttons -->
+        <div id="authButtons" class="auth-buttons">
+            <a href="connexionpage.html"><button class="btn-outline" data-i18n="btn_signup">S'inscrire</button></a>
+            <a href="connexionpage.html"><button class="btn-primary" data-i18n="btn_login">Connexion</button></a>
+        </div>
+
+        <div id="userProfile"></div>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </div>
+</header>
+
+<!-- Mobile Navigation Overlay -->
+<nav class="mobile-nav-overlay" id="mobileNavOverlay">
+    <ul>
+        <li><a href="index.html" class="active" data-i18n="nav_home">Accueil</a></li>
+        <li><a href="ia.html" data-i18n="nav_assess">Évaluer mes symptômes</a></li>
+        <li><a href="patients.html" data-i18n="nav_reco">Les activités</a></li>
+        <li><a href="apropos.html" data-i18n="nav_about">À propos</a></li>
+    </ul>
+    <div class="auth-buttons">
+        <a href="connexionpage.html"><button class="btn-outline" data-i18n="btn_signup">S'inscrire</button></a>
+        <a href="connexionpage.html"><button class="btn-primary" data-i18n="btn_login">Connexion</button></a>
+    </div>
+</nav>
+
+<!-- ======= HERO ======= -->
+<section class="hero">
+    <div class="hero-bg-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+
+    <div class="hero-content">
+        <div class="hero-badge">
+            <span class="pulse-dot"></span>
+            <span data-i18n="hero_badge">Plateforme de santé propulsée par l'IA</span>
+        </div>
+        <h1 data-i18n="hero_title">Évaluez vos <em>symptômes</em><br>en quelques secondes.</h1>
+        <p data-i18n="hero_sub">Notre plateforme intelligente vous aide à comprendre votre santé instantanément. Obtenez des recommandations personnalisées et prenez le contrôle de votre bien-être depuis chez vous.</p>
+
+        <ul class="hero-features">
+            <li><i class="fas fa-bolt"></i> <span data-i18n="feat_1">Analyse rapide des symptômes en quelques secondes</span></li>
+            <li><i class="fas fa-user-check"></i> <span data-i18n="feat_2">Recommandations de santé personnalisées</span></li>
+            <li><i class="fas fa-history"></i> <span data-i18n="feat_3">Suivez votre historique de santé</span></li>
+            <li><i class="fas fa-lock"></i> <span data-i18n="feat_4">Gestion sécurisée et privée des données</span></li>
+        </ul>
+
+        <div class="hero-actions">
+            <a href="ia.html" class="cta-primary" data-i18n="cta_start">Commencer maintenant</a>
+            <a href="#how-works" class="cta-secondary" data-i18n="cta_learn">Comment ça fonctionne</a>
+        </div>
+    </div>
+
+    <div class="hero-visual">
+        <div class="hero-card-float card-tl">
+            <i class="fas fa-heartbeat"></i>
+            <div><strong data-i18n="card_heart">Fréquence cardiaque</strong><span>72 bpm ↑</span></div>
+        </div>
+        <div class="hero-card-float card-tr">
+            <i class="fas fa-user-md"></i>
+            <div><strong data-i18n="card_track">Historique</strong><span data-i18n="card_track_sub">12 consultations</span></div>
+        </div>
+        <div class="hero-card-float card-br">
+            <i class="fas fa-stethoscope"></i>
+            <div><strong data-i18n="card_ai">Médecin IA</strong><span data-i18n="card_ai_sub">En ligne</span></div>
+        </div>
+        <div class="hero-image-wrap">
+            <img src="img/Robotic Surgery 3_0.jpeg" alt="IA Médicale" onerror="this.src='https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=500&q=80'">
+            <div class="hero-img-overlay"></div>
+        </div>
+    </div>
+</section>
+
+<!-- ======= FEATURES ======= -->
+<section class="features-section">
+    <div class="section-label" data-i18n="feat_label">Ce que nous faisons</div>
+    <h2 data-i18n="feat_heading">Des outils intelligents pour <em>votre santé</em></h2>
+    <p class="section-sub" data-i18n="feat_sub">Conçus pour vous aider à comprendre votre santé rapidement, de manière fiable et en toute confidentialité.</p>
+
+    <div class="features-grid">
+        <div class="feat-card feat-card--large">
+            <div class="feat-icon"><i class="fas fa-brain"></i></div>
+            <h3 data-i18n="fc_title1">Analyse intelligente des symptômes</h3>
+            <p data-i18n="fc_desc1">Analyse propulsée par l'IA pour identifier les problèmes de santé potentiels en quelques secondes avec une précision clinique.</p>
+            <div class="feat-tag" data-i18n="fc_tag1">Analyse IA</div>
+        </div>
+
+        <div class="feat-card feat-card--keywords">
+            <div class="feat-icon"><i class="fas fa-stethoscope"></i></div>
+            <h3 data-i18n="fc_title2">Hypothèses médicales fiables</h3>
+            <div class="keywords-cloud">
+                <span>IA</span><span>Symptômes</span><span>Précision</span>
+                <span>Données</span><span>Conseils</span><span>Santé</span>
+                <span>Diagnostic</span><span>Soins</span>
+            </div>
+        </div>
+
+        <div class="feat-card feat-card--flex">
+            <div class="feat-text">
+                <div class="feat-icon"><i class="fas fa-history"></i></div>
+                <h3 data-i18n="fc_title3">Historique des consultations</h3>
+                <p data-i18n="fc_desc3">Suivez vos consultations précédentes et assurez facilement la continuité des soins.</p>
+            </div>
+            <div class="feat-visual">
+                <div class="mini-chart">
+                    <div class="bar" style="--h:60%"></div>
+                    <div class="bar" style="--h:80%"></div>
+                    <div class="bar" style="--h:45%"></div>
+                    <div class="bar" style="--h:90%"></div>
+                    <div class="bar" style="--h:70%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ======= DOCTORS ======= -->
+<section class="doctors-section">
+    <div class="section-label" data-i18n="doc_label">Notre réseau</div>
+    <h2 data-i18n="doc_heading">Recommandés par <em>notre IA</em></h2>
+    <p class="section-sub" data-i18n="doc_sub">Des médecins qualifiés, évalués par la communauté</p>
+
+    <div id="doctorsGrid" class="doctors-grid">
+        <div class="loading-state">
+            <div class="spinner"></div>
+            <p data-i18n="loading_docs">Chargement des médecins...</p>
+        </div>
+    </div>
+</section>
+
+<!-- ======= HOW IT WORKS ======= -->
+<section class="how-section" id="how-works">
+    <div class="how-left">
+        <div class="section-label" data-i18n="how_label">Processus</div>
+        <h2 data-i18n="how_heading">Comment ça <em>fonctionne</em></h2>
+        <p data-i18n="how_sub">Un processus simple, rapide et intelligent propulsé par une IA de qualité médicale. Quatre étapes pour comprendre votre santé.</p>
+
+        <div class="how-stat-grid">
+            <div class="how-stat"><span>98%</span><p data-i18n="stat1">Taux de précision</p></div>
+            <div class="how-stat"><span>2s</span><p data-i18n="stat2">Diagnostic moyen</p></div>
+        </div>
+    </div>
+
+    <div class="how-steps">
+        <div class="step">
+            <div class="step-number">01</div>
+            <div class="step-content">
+                <h3 data-i18n="step1_title">Entrez vos symptômes</h3>
+                <p data-i18n="step1_desc">Décrivez ce que vous ressentez en langage naturel — aucun jargon médical requis.</p>
+            </div>
+            <div class="step-connector"></div>
+        </div>
+        <div class="step">
+            <div class="step-number">02</div>
+            <div class="step-content">
+                <h3 data-i18n="step2_title">L'IA analyse instantanément</h3>
+                <p data-i18n="step2_desc">Le système interprète vos symptômes grâce à une IA médicale avancée entraînée sur des millions de cas.</p>
+            </div>
+            <div class="step-connector"></div>
+        </div>
+        <div class="step">
+            <div class="step-number">03</div>
+            <div class="step-content">
+                <h3 data-i18n="step3_title">Recevez des hypothèses</h3>
+                <p data-i18n="step3_desc">Obtenez les conditions possibles et les prochaines étapes clairement expliquées et adaptées à votre situation.</p>
+            </div>
+            <div class="step-connector"></div>
+        </div>
+        <div class="step">
+            <div class="step-number">04</div>
+            <div class="step-content">
+                <h3 data-i18n="step4_title">Consultez un spécialiste</h3>
+                <p data-i18n="step4_desc">L'IA vous oriente vers le bon médecin ou la bonne spécialité selon vos besoins.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ======= REVIEWS ======= -->
+<section class="reviews-section">
+    <div class="reviews-left">
+        <div class="section-label" data-i18n="rev_label">Témoignages</div>
+        <h2 data-i18n="rev_heading">Retours sincères de <em>nos clients</em></h2>
+        <p data-i18n="rev_sub">Partagez votre expérience avec notre communauté. Vos commentaires aident les autres à faire le meilleur choix.</p>
+
+        <button class="cta-primary" id="openModal">
+            <i class="fa fa-pen"></i> <span data-i18n="btn_review">Ajouter votre avis</span>
+        </button>
+
+        <div class="reviews-stats">
+            <div class="stat-item"><span class="stat-num">6+</span><span data-i18n="stat_reviews">Avis clients</span></div>
+            <div class="stat-divider"></div>
+            <div class="stat-item"><span class="stat-num">4.8</span><span data-i18n="stat_rating">Note moyenne</span></div>
+        </div>
+    </div>
+
+    <div class="reviews-carousel-wrap">
+        <div class="reviews-carousel" id="reviewsCarousel">
+            <div class="review-card">
+                <div class="review-stars">★★★★★</div>
+                <p class="review-body">« Service exceptionnel ! L'équipe est très professionnelle et attentionnée. Je le recommande vivement à quiconque recherche un service de qualité supérieure. »</p>
+                <div class="review-author">
+                    <div class="review-avatar">M</div>
+                    <div><strong>Marie Dupont</strong><span>15 novembre 2024</span></div>
+                </div>
+            </div>
+            <div class="review-card">
+                <div class="review-stars">★★★★★</div>
+                <p class="review-body">« Très satisfait de mon expérience. Le personnel est accueillant et compétent. Les installations sont modernes et propres. Merci ! »</p>
+                <div class="review-author">
+                    <div class="review-avatar">J</div>
+                    <div><strong>Jean Martin</strong><span>12 novembre 2024</span></div>
+                </div>
+            </div>
+            <div class="review-card">
+                <div class="review-stars">★★★★★</div>
+                <p class="review-body">« Très bonne expérience globale. Service de haute qualité et atmosphère agréable qui m'a mis à l'aise immédiatement. »</p>
+                <div class="review-author">
+                    <div class="review-avatar">S</div>
+                    <div><strong>Sofia Karim</strong><span>10 novembre 2024</span></div>
+                </div>
+            </div>
+            <div class="review-card">
+                <div class="review-stars">★★★★☆</div>
+                <p class="review-body">« Le diagnostic IA était étonnamment précis. Cela m'a fait gagner beaucoup de temps avant de consulter mon médecin. Plateforme fortement recommandée. »</p>
+                <div class="review-author">
+                    <div class="review-avatar">A</div>
+                    <div><strong>Ahmed Benali</strong><span>28 octobre 2024</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ======= FOOTER ======= -->
+<footer>
+    <div class="footer-top">
+        <div class="footer-brand">
+            <div class="logo-icon small"><i class="fa-solid fa-robot"></i></div>
+            <span class="logo-text">Parrot<em>Diag</em></span>
+            <p data-i18n="footer_tagline">Révolutionner la santé grâce au diagnostic préliminaire propulsé par l'IA.</p>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+
+        <div class="footer-links-col">
+            <h4 data-i18n="footer_quick">Liens rapides</h4>
+            <ul>
+                <li><a href="#" data-i18n="nav_home">Accueil</a></li>
+                <li><a href="#" data-i18n="nav_assess">Évaluer mes symptômes</a></li>
+                <li><a href="#" data-i18n="nav_reco">Recommandations</a></li>
+                <li><a href="#" data-i18n="nav_about">À propos</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-links-col">
+            <h4 data-i18n="footer_contact">Contact</h4>
+            <p><i class="fas fa-envelope"></i> support@parrotdiag.com</p>
+            <p><i class="fas fa-phone"></i> +212 600 000 000</p>
+            <p><i class="fas fa-map-marker-alt"></i> Fès, Maroc</p>
+        </div>
+
+        <div class="footer-newsletter">
+            <h4 data-i18n="footer_newsletter">Newsletter</h4>
+            <p data-i18n="footer_news_sub">Restez informé avec des conseils santé et des actualités.</p>
+            <div class="newsletter-input">
+                <input type="email" placeholder="votre@email.com" data-i18n-ph="email_ph">
+                <button><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p data-i18n="footer_copy">© 2025 ParrotDiag. Tous droits réservés.</p>
+        <div class="footer-bottom-links">
+            <a href="#" data-i18n="privacy">Politique de confidentialité</a>
+            <a href="#" data-i18n="terms">Conditions d'utilisation</a>
+        </div>
+    </div>
+</footer>
+
+<!-- ======= REVIEW MODAL ======= -->
+<div id="reviewModal" class="modal-overlay" style="display:none;">
+    <div class="modal-box">
+        <button class="modal-close" onclick="document.getElementById('reviewModal').style.display='none'">&times;</button>
+        <h2><i class="fas fa-star"></i> <span data-i18n="modal_review_title">Ajouter votre avis</span></h2>
+
+        <form id="reviewForm">
+            <div class="avatar-preview-wrap">
+                <div class="avatar-preview-circle" id="reviewAvatarPreview">JD</div>
+            </div>
+
+            <div class="form-field">
+                <label data-i18n="form_name">Votre nom *</label>
+                <input type="text" id="reviewName" required oninput="updateReviewInitials(this.value)">
+            </div>
+            <div class="form-field">
+                <label data-i18n="form_email">E-mail (facultatif)</label>
+                <input type="email" id="reviewEmail">
+            </div>
+
+            <div class="form-field">
+                <label data-i18n="form_rating">Note *</label>
+                <div class="star-picker" id="starPicker">
+                    <span data-v="5">★</span><span data-v="4">★</span>
+                    <span data-v="3">★</span><span data-v="2">★</span><span data-v="1">★</span>
+                </div>
+                <input type="hidden" id="ratingValue">
+            </div>
+
+            <div class="form-field">
+                <label data-i18n="form_comment">Commentaire *</label>
+                <textarea id="reviewText" rows="4" required maxlength="500"></textarea>
+                <div class="char-count"><span id="charCount">0</span>/500</div>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-outline" onclick="document.getElementById('reviewModal').style.display='none'" data-i18n="btn_cancel">Annuler</button>
+                <button type="submit" class="btn-primary" id="submitReviewBtn">
+                    <i class="fas fa-paper-plane"></i> <span data-i18n="btn_publish">Publier</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ======= PATIENT PROFILE MODAL ======= -->
+<div id="patientProfileModal" class="modal-overlay" style="display:none;">
+    <div class="modal-box modal-box--large">
+        <button class="modal-close" onclick="closeModal('patientProfileModal')">&times;</button>
+        <h2><i class="fas fa-user-circle"></i> <span data-i18n="modal_profile_title">Compléter mon profil</span></h2>
+
+        <form id="patientProfileForm">
+            <div class="profile-photo-row">
+                <div class="photo-preview-circle" id="patientPhotoPreview">
+                    <div id="patientPhotoInitials">JD</div>
+                </div>
+                <div>
+                    <label for="patientPhoto" class="btn-outline" style="cursor:pointer; display:inline-block; margin-bottom:8px;">
+                        <i class="fas fa-camera"></i> <span data-i18n="upload_photo">Choisir une photo</span>
+                    </label>
+                    <input type="file" id="patientPhoto" accept="image/*" onchange="previewPatientPhoto(this)" style="display:none;">
+                    <input type="hidden" id="patientPhotoBase64">
+                    <p style="font-size:12px; opacity:0.6;" data-i18n="photo_hint">JPG, PNG (max 2 Mo)</p>
+                </div>
+            </div>
+
+            <div class="form-grid-2">
+                <div class="form-field"><label data-i18n="full_name">Nom complet *</label><input type="text" id="patientFullName" required></div>
+                <div class="form-field"><label data-i18n="email">E-mail *</label><input type="email" id="patientEmail" required></div>
+                <div class="form-field"><label data-i18n="phone">Téléphone *</label><input type="tel" id="patientPhone" required></div>
+                <div class="form-field"><label data-i18n="birthdate">Date de naissance *</label><input type="date" id="patientBirthDate" required></div>
+                <div class="form-field">
+                    <label data-i18n="sex">Sexe *</label>
+                    <select id="patientSex" required>
+                        <option value="">— Sélectionner —</option>
+                        <option value="M" data-i18n="male">Masculin</option>
+                        <option value="F" data-i18n="female">Féminin</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label data-i18n="blood_type">Groupe sanguin</label>
+                    <select id="patientBloodType">
+                        <option value="">—</option>
+                        <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+                        <option>O+</option><option>O-</option><option>AB+</option><option>AB-</option>
+                    </select>
+                </div>
+                <div class="form-field"><label data-i18n="city">Ville *</label><input type="text" id="patientCity" required></div>
+                <div class="form-field"><label data-i18n="zip">Code postal</label><input type="text" id="patientZipCode"></div>
+            </div>
+            <div class="form-field"><label data-i18n="address">Adresse *</label><textarea id="patientAddress" rows="2" required></textarea></div>
+
+            <div class="form-section-title"><i class="fas fa-notes-medical"></i> <span data-i18n="medical_info">Informations médicales</span></div>
+            <div class="form-field"><label data-i18n="allergies">Allergies connues</label><textarea id="patientAllergies" rows="2"></textarea></div>
+            <div class="form-field"><label data-i18n="medications">Médicaments actuels</label><textarea id="patientMedications" rows="2"></textarea></div>
+            <div class="form-field"><label data-i18n="history">Antécédents médicaux</label><textarea id="patientHistory" rows="2"></textarea></div>
+
+            <div class="consent-check">
+                <input type="checkbox" id="dataConsent" required>
+                <label for="dataConsent" data-i18n="consent">J'accepte que mes données médicales soient stockées de manière sécurisée et utilisées uniquement pour les consultations.</label>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-outline" onclick="closeModal('patientProfileModal')" data-i18n="btn_cancel">Annuler</button>
+                <button type="submit" class="btn-primary" id="savePatientProfileBtn">
+                    <i class="fas fa-save"></i> <span data-i18n="btn_save">Enregistrer le profil</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

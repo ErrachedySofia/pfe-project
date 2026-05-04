@@ -1,0 +1,1291 @@
+﻿<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ParrotDiag — Évaluation Médicale Intelligente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+/* =============================================
+   CSS VARIABLES — same as style.css
+============================================= */
+:root {
+  --accent: #2fa37c;
+  --accent-dark: #1d7558;
+  --accent-glow: rgba(47,163,124,0.2);
+  --accent-light: #e8f7f2;
+
+  --bg: #fafaf9;
+  --bg-2: #f3f1ed;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f8f7f5;
+  --bg-glass: rgba(255,255,255,0.75);
+
+  --text: #1a2421;
+  --text-2: #4a5d57;
+  --text-3: #8a9e99;
+
+  --border: rgba(0,0,0,0.08);
+  --border-strong: rgba(0,0,0,0.15);
+
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-md: 0 8px 24px rgba(0,0,0,0.1);
+  --shadow-lg: 0 20px 48px rgba(0,0,0,0.14);
+  --shadow-accent: 0 8px 24px rgba(47,163,124,0.25);
+
+  --header-bg: rgba(250,250,249,0.9);
+  --nav-link: #4a5d57;
+
+  --t: all 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+
+[data-theme="dark"] {
+  --bg: #0f1a17;
+  --bg-2: #162019;
+  --bg-card: #1c2b25;
+  --bg-card-hover: #223329;
+  --bg-glass: rgba(28,43,37,0.85);
+  --text: #e8f0ed;
+  --text-2: #93b3a8;
+  --text-3: #566f67;
+  --border: rgba(255,255,255,0.07);
+  --border-strong: rgba(255,255,255,0.14);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+  --shadow-md: 0 8px 24px rgba(0,0,0,0.4);
+  --shadow-lg: 0 20px 48px rgba(0,0,0,0.5);
+  --header-bg: rgba(15,26,23,0.92);
+  --nav-link: #93b3a8;
+  --accent-light: rgba(47,163,124,0.12);
+}
+
+/* =============================================
+   RESET & BASE
+============================================= */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  transition:background 0.35s ease,color 0.35s ease;
+  overflow-x:hidden;
+  min-height:100vh;
+}
+a{text-decoration:none;color:inherit;}
+ul{list-style:none;}
+
+/* =============================================
+   HEADER
+============================================= */
+header{
+  position:sticky;top:0;z-index:1000;
+  background:var(--header-bg);
+  backdrop-filter:blur(16px) saturate(160%);
+  border-bottom:1px solid var(--border);
+  padding:0 64px;height:70px;
+  display:flex;align-items:center;justify-content:space-between;gap:24px;
+  transition:var(--t);
+}
+
+.header-logo{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.logo-icon{
+  width:38px;height:38px;background:var(--accent);
+  border-radius:10px;display:flex;align-items:center;justify-content:center;
+  color:white;font-size:16px;
+}
+.logo-text{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--text);}
+.logo-text em{color:var(--accent);font-style:normal;}
+
+.main-nav ul{display:flex;gap:4px;}
+.main-nav a{
+  padding:6px 14px;font-size:14px;font-weight:500;
+  color:var(--nav-link);border-radius:8px;transition:var(--t);
+}
+.main-nav a:hover,.main-nav a.active{background:var(--accent-light);color:var(--accent);}
+
+.header-controls{display:flex;align-items:center;gap:12px;flex-shrink:0;}
+
+/* Theme Toggle */
+.theme-toggle{
+  position:relative;width:56px;height:30px;
+  background:var(--bg-2);border:1px solid var(--border);
+  border-radius:30px;cursor:pointer;padding:0;
+  display:flex;align-items:center;transition:var(--t);overflow:hidden;
+}
+.theme-toggle:hover{border-color:var(--accent);}
+.theme-icon{position:absolute;font-size:13px;transition:var(--t);pointer-events:none;}
+.light-icon{left:6px;opacity:1;}
+.dark-icon{right:6px;opacity:0.4;}
+[data-theme="dark"] .light-icon{opacity:0.4;}
+[data-theme="dark"] .dark-icon{opacity:1;}
+.theme-thumb{
+  position:absolute;left:3px;width:24px;height:24px;
+  background:white;border-radius:50%;box-shadow:var(--shadow-sm);
+  transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+[data-theme="dark"] .theme-thumb{transform:translateX(26px);background:var(--accent);}
+
+/* Profile Menu */
+.profile-menu{position:relative;}
+.profile-trigger{
+  display:flex;align-items:center;gap:8px;
+  padding:5px 12px 5px 5px;
+  background:var(--bg-2);border:1px solid var(--border);
+  border-radius:40px;cursor:pointer;transition:var(--t);
+}
+.profile-trigger:hover{border-color:var(--accent);}
+.profile-avatar{
+  width:32px;height:32px;
+  background:linear-gradient(135deg,var(--accent),var(--accent-dark));
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  color:white;font-size:13px;font-weight:700;overflow:hidden;
+}
+.profile-name{font-size:14px;font-weight:600;color:var(--text);}
+.profile-trigger .fa-chevron-down{font-size:10px;color:var(--text-3);transition:transform 0.2s;}
+.profile-menu.open .fa-chevron-down{transform:rotate(180deg);}
+
+.profile-dropdown{
+  position:absolute;top:calc(100% + 8px);right:0;
+  width:260px;background:var(--bg-card);
+  border:1px solid var(--border);border-radius:14px;
+  box-shadow:var(--shadow-lg);overflow:hidden;
+  opacity:0;visibility:hidden;transform:translateY(-6px);
+  transition:var(--t);z-index:1000;
+}
+.profile-menu.open .profile-dropdown{opacity:1;visibility:visible;transform:translateY(0);}
+.dropdown-header{
+  padding:18px;background:var(--bg-2);
+  display:flex;align-items:center;gap:12px;
+}
+.dropdown-avatar{
+  width:42px;height:42px;
+  background:linear-gradient(135deg,var(--accent),var(--accent-dark));
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  color:white;font-size:16px;font-weight:700;overflow:hidden;
+}
+.dropdown-name{font-size:14px;font-weight:600;color:var(--text);}
+.dropdown-email{font-size:12px;color:var(--text-3);margin:2px 0 4px;}
+.dropdown-role{
+  display:inline-block;padding:2px 8px;
+  background:var(--accent);color:white;
+  border-radius:20px;font-size:10px;font-weight:700;
+}
+.dropdown-divider{height:1px;background:var(--border);margin:4px 0;}
+.dropdown-item{
+  display:flex;align-items:center;gap:10px;
+  padding:11px 18px;font-size:14px;color:var(--text-2);
+  cursor:pointer;transition:background 0.15s;
+}
+.dropdown-item i{width:18px;color:var(--accent);}
+.dropdown-item:hover{background:var(--accent-light);color:var(--text);}
+.dropdown-item.logout{color:#ef4444;}
+.dropdown-item.logout i{color:#ef4444;}
+.dropdown-item.logout:hover{background:rgba(239,68,68,0.08);}
+
+/* Mobile toggle */
+.mobile-menu-toggle{
+  display:none;width:40px;height:40px;
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:10px;cursor:pointer;
+  align-items:center;justify-content:center;
+  flex-direction:column;gap:5px;padding:10px;transition:var(--t);
+}
+.mobile-menu-toggle:hover{border-color:var(--accent);}
+.mobile-menu-toggle span{display:block;width:100%;height:2px;background:var(--text);border-radius:2px;transition:var(--t);}
+
+/* =============================================
+   MAIN LAYOUT
+============================================= */
+.ia-main{
+  max-width:1200px;margin:0 auto;
+  padding:40px 64px 80px;
+}
+
+/* Page Header */
+.ia-page-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:36px;flex-wrap:wrap;gap:16px;
+}
+.ia-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:5px 14px;
+  background:var(--accent-light);border:1px solid var(--accent-glow);
+  border-radius:30px;font-size:11px;font-weight:700;
+  color:var(--accent);letter-spacing:0.5px;text-transform:uppercase;
+  margin-bottom:10px;
+}
+.pulse-dot{
+  width:7px;height:7px;background:var(--accent);
+  border-radius:50%;animation:pulse 2s ease-in-out infinite;
+}
+@keyframes pulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(47,163,124,0.5);}
+  50%{box-shadow:0 0 0 6px transparent;}
+}
+.ia-page-header h1{
+  font-family:'Playfair Display',serif;
+  font-size:32px;font-weight:900;color:var(--text);line-height:1.2;
+}
+.ia-page-header h1 em{color:var(--accent);font-style:italic;}
+.ia-page-header p{font-size:14px;color:var(--text-2);margin-top:6px;}
+
+/* Nav tabs */
+.ia-nav-tabs{display:flex;gap:4px;}
+.nav-tab{
+  padding:8px 18px;border-radius:10px;
+  background:none;border:1px solid var(--border);
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;
+  color:var(--text-2);cursor:pointer;transition:var(--t);
+  display:flex;align-items:center;gap:6px;
+}
+.nav-tab:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light);}
+.nav-tab.active{background:var(--accent);color:white;border-color:var(--accent);}
+
+/* =============================================
+   PAGES
+============================================= */
+.page{display:none;animation:fadeUp 0.4s ease;}
+.page.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+
+/* =============================================
+   ASSESSMENT GRID
+============================================= */
+.assessment-grid{
+  display:grid;grid-template-columns:1fr 320px;gap:20px;
+}
+@media(max-width:900px){.assessment-grid{grid-template-columns:1fr;}}
+
+/* =============================================
+   CARDS
+============================================= */
+.card{
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:18px;padding:28px;box-shadow:var(--shadow-sm);
+  transition:var(--t);
+}
+.card:hover{box-shadow:var(--shadow-md);}
+
+.card-header{
+  display:flex;align-items:center;gap:10px;margin-bottom:22px;
+}
+.card-icon{
+  width:36px;height:36px;background:var(--accent-light);
+  border-radius:10px;display:flex;align-items:center;justify-content:center;
+  color:var(--accent);font-size:15px;
+}
+.card-title{
+  font-family:'Playfair Display',serif;
+  font-size:18px;font-weight:700;color:var(--text);
+}
+
+/* =============================================
+   FORM ELEMENTS
+============================================= */
+.form-group{margin-bottom:18px;}
+.form-label{
+  display:block;font-size:12px;font-weight:600;
+  color:var(--text-2);margin-bottom:7px;
+  text-transform:uppercase;letter-spacing:0.5px;
+}
+
+/* Tag Input */
+.tag-container{
+  min-height:50px;padding:8px 12px;
+  background:var(--bg-2);border:1.5px solid var(--border);
+  border-radius:12px;display:flex;flex-wrap:wrap;gap:6px;
+  cursor:text;transition:var(--t);
+}
+.tag-container:focus-within{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px var(--accent-glow);
+  background:var(--bg-card);
+}
+.tag{
+  display:inline-flex;align-items:center;gap:5px;
+  background:var(--accent);color:white;
+  padding:4px 10px;border-radius:20px;
+  font-size:12px;font-weight:500;
+}
+.tag button{
+  background:none;border:none;cursor:pointer;
+  color:white;font-size:14px;line-height:1;padding:0 2px;opacity:0.7;
+}
+.tag button:hover{opacity:1;}
+.tag-input{
+  border:none;background:none;outline:none;
+  font-family:'DM Sans',sans-serif;font-size:14px;
+  color:var(--text);flex:1;min-width:140px;padding:3px 4px;
+}
+.tag-input::placeholder{color:var(--text-3);}
+
+/* Suggestions */
+.suggestions{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px;}
+.suggestion-chip{
+  padding:5px 13px;background:none;
+  border:1.5px solid var(--border);border-radius:20px;
+  font-size:12px;color:var(--text-2);cursor:pointer;
+  transition:var(--t);font-family:'DM Sans',sans-serif;
+}
+.suggestion-chip:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light);}
+
+/* Textarea */
+textarea{
+  width:100%;padding:12px 14px;
+  background:var(--bg-2);border:1.5px solid var(--border);
+  border-radius:12px;font-family:'DM Sans',sans-serif;
+  font-size:14px;color:var(--text);outline:none;
+  transition:var(--t);resize:vertical;min-height:100px;line-height:1.6;
+}
+textarea:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px var(--accent-glow);
+  background:var(--bg-card);
+}
+textarea::placeholder{color:var(--text-3);}
+
+/* Buttons */
+.btn-primary{
+  width:100%;padding:14px;
+  background:var(--accent);color:white;
+  border:none;border-radius:12px;
+  font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;
+  cursor:pointer;transition:var(--t);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:var(--shadow-accent);
+}
+.btn-primary:hover{background:var(--accent-dark);transform:translateY(-2px);box-shadow:0 12px 28px rgba(47,163,124,0.4);}
+.btn-primary:active{transform:translateY(0);}
+.btn-primary:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
+
+.btn-voice{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 16px;background:none;
+  border:1.5px solid var(--border);border-radius:20px;
+  font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;
+  color:var(--text-2);cursor:pointer;transition:var(--t);margin-top:8px;
+}
+.btn-voice:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light);}
+.btn-voice.recording{border-color:#ef4444;color:#ef4444;background:rgba(239,68,68,0.08);}
+
+/* =============================================
+   KNOWLEDGE BASE PANEL
+============================================= */
+.kb-section-title{
+  font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:1.5px;color:var(--text-3);margin:14px 0 8px;
+}
+.kb-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
+.kb-chip{
+  font-size:11px;padding:4px 10px;
+  background:var(--bg-2);border:1px solid var(--border);
+  border-radius:20px;color:var(--text-2);cursor:pointer;transition:var(--t);
+}
+.kb-chip:hover{background:var(--accent);border-color:var(--accent);color:white;transform:translateY(-1px);}
+
+/* =============================================
+   LOADING
+============================================= */
+.loading-bar{display:none;text-align:center;padding:48px;}
+.loading-bar.active{display:block;}
+.spinner{
+  width:44px;height:44px;margin:0 auto 16px;
+  border:3px solid var(--border);border-top-color:var(--accent);
+  border-radius:50%;animation:spin 0.8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-bar p{color:var(--text-2);font-size:14px;}
+
+/* =============================================
+   RESULT CARD
+============================================= */
+.result-card{
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:18px;overflow:hidden;
+  box-shadow:var(--shadow-lg);animation:fadeUp 0.5s ease;
+  margin-top:20px;
+}
+
+.result-header{
+  background:linear-gradient(135deg,var(--accent) 0%,var(--accent-dark) 100%);
+  padding:22px 28px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
+}
+.result-header h2{
+  font-family:'Playfair Display',serif;
+  font-size:20px;font-weight:700;color:white;
+}
+.result-header-sub{font-size:13px;color:rgba(255,255,255,0.75);margin-top:3px;}
+
+.severity-badge{
+  padding:6px 16px;border-radius:20px;
+  font-size:12px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;
+}
+.severity-low{background:rgba(255,255,255,0.2);color:white;border:1.5px solid rgba(255,255,255,0.4);}
+.severity-med{background:rgba(245,158,11,0.25);color:#fbbf24;border:1.5px solid rgba(245,158,11,0.4);}
+.severity-high{background:rgba(239,68,68,0.25);color:#fca5a5;border:1.5px solid rgba(239,68,68,0.4);}
+
+.result-body{padding:24px 28px;}
+
+/* Urgency banner */
+.urgency-banner{
+  display:flex;align-items:flex-start;gap:12px;
+  background:rgba(239,68,68,0.08);border:1.5px solid rgba(239,68,68,0.25);
+  border-radius:12px;padding:14px 16px;margin-bottom:20px;
+  font-size:13px;color:#dc2626;line-height:1.6;
+}
+.urgency-banner i{font-size:18px;flex-shrink:0;margin-top:1px;}
+
+/* Section label */
+.section-label-sm{
+  font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:1.5px;color:var(--accent);margin-bottom:12px;
+  display:flex;align-items:center;gap:6px;
+}
+.section-label-sm::before{
+  content:'';width:16px;height:2px;background:var(--accent);border-radius:2px;
+}
+
+/* Hypothesis card */
+.hypothesis-main{
+  background:var(--bg-2);border:1.5px solid var(--border);
+  border-radius:14px;padding:18px 20px;margin-bottom:20px;
+  position:relative;overflow:hidden;transition:var(--t);
+}
+.hypothesis-main::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--accent),var(--accent-dark));
+}
+.hyp-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px;}
+.hyp-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--text);}
+.hyp-pct{
+  font-family:'Playfair Display',serif;
+  font-size:28px;font-weight:900;color:var(--accent);line-height:1;
+}
+.prob-bar{height:6px;background:var(--border);border-radius:4px;overflow:hidden;margin-bottom:10px;}
+.prob-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-dark));border-radius:4px;transition:width 1.2s cubic-bezier(0.4,0,0.2,1);}
+.hyp-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.hyp-tag{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 12px;background:var(--accent-light);
+  border-radius:20px;font-size:12px;font-weight:600;color:var(--accent);
+}
+
+/* Specialists */
+.specialists-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
+.specialist-tag{
+  display:flex;align-items:center;gap:7px;
+  background:var(--bg-card);border:1.5px solid var(--border);
+  border-radius:10px;padding:9px 14px;
+  font-size:13px;font-weight:500;color:var(--text);
+  transition:var(--t);
+}
+.specialist-tag:hover{background:var(--accent-light);border-color:var(--accent);color:var(--accent);}
+.specialist-tag i{color:var(--accent);font-size:14px;}
+.prio-urgent{
+  font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700;
+  background:rgba(239,68,68,0.12);color:#dc2626;margin-left:4px;
+}
+.prio-normal{
+  font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700;
+  background:var(--accent-light);color:var(--accent);margin-left:4px;
+}
+
+/* Recommendations */
+.reco-list{list-style:none;}
+.reco-item{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:11px 0;border-bottom:1px solid var(--border);
+  font-size:13px;color:var(--text-2);line-height:1.6;
+}
+.reco-item:last-child{border-bottom:none;}
+.reco-dot{
+  width:22px;height:22px;background:var(--accent-light);
+  border-radius:6px;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-top:1px;
+}
+.reco-dot i{color:var(--accent);font-size:11px;}
+
+/* Result footer */
+.result-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-top:16px;margin-top:16px;
+  border-top:1px solid var(--border);flex-wrap:wrap;gap:10px;
+}
+.result-footer-left{font-size:12px;color:var(--text-3);}
+.result-footer-right{font-size:11px;color:var(--text-3);font-style:italic;max-width:360px;text-align:right;}
+.btn-save-result{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 16px;background:var(--bg-2);
+  border:1.5px solid var(--border);border-radius:10px;
+  font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;
+  color:var(--text-2);cursor:pointer;transition:var(--t);
+}
+.btn-save-result:hover{background:var(--accent-light);border-color:var(--accent);color:var(--accent);}
+
+/* =============================================
+   HISTORY PAGE
+============================================= */
+.history-header{margin-bottom:24px;}
+.history-header h2{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--text);}
+.history-header p{font-size:14px;color:var(--text-2);margin-top:6px;}
+
+.stats-row{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:28px;}
+.stat-card{
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:14px;padding:20px 22px;text-align:center;box-shadow:var(--shadow-sm);
+  transition:var(--t);
+}
+.stat-card:hover{border-color:var(--accent);box-shadow:var(--shadow-md);}
+.stat-val{
+  font-family:'Playfair Display',serif;
+  font-size:36px;font-weight:900;color:var(--accent);line-height:1;
+}
+.stat-lbl{font-size:12px;color:var(--text-3);margin-top:4px;}
+
+.history-empty{text-align:center;padding:60px 20px;}
+.history-empty .empty-icon{font-size:48px;margin-bottom:14px;opacity:0.4;}
+.history-empty p{color:var(--text-3);font-size:14px;line-height:1.7;}
+
+.history-list{display:flex;flex-direction:column;gap:12px;}
+.history-item{
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:14px;padding:18px 22px;
+  cursor:pointer;transition:var(--t);box-shadow:var(--shadow-sm);
+  display:grid;grid-template-columns:1fr auto;align-items:center;gap:16px;
+}
+.history-item:hover{border-color:var(--accent);transform:translateX(4px);box-shadow:var(--shadow-md);}
+.history-date{font-size:11px;color:var(--text-3);margin-bottom:5px;}
+.history-symptoms{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.history-hypothesis{font-size:13px;color:var(--text-2);}
+.history-hypothesis strong{color:var(--accent);}
+.history-arrow{color:var(--accent);font-size:18px;}
+
+/* =============================================
+   MODAL
+============================================= */
+.modal-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,0.55);z-index:5000;
+  backdrop-filter:blur(6px);
+  align-items:center;justify-content:center;padding:20px;
+}
+.modal-overlay.open{display:flex;animation:fadeIn 0.2s ease;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.modal-box{
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:20px;padding:32px;
+  width:100%;max-width:680px;max-height:88vh;overflow-y:auto;
+  position:relative;box-shadow:var(--shadow-lg);
+  animation:slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes slideUp{from{transform:translateY(24px);opacity:0;}to{transform:none;opacity:1;}}
+.modal-close{
+  position:absolute;top:16px;right:16px;
+  width:32px;height:32px;background:var(--bg-2);
+  border:1px solid var(--border);border-radius:8px;
+  font-size:16px;cursor:pointer;color:var(--text-2);
+  display:flex;align-items:center;justify-content:center;transition:var(--t);
+}
+.modal-close:hover{background:var(--accent-light);color:var(--accent);}
+.modal-box h2{
+  font-family:'Playfair Display',serif;
+  font-size:20px;font-weight:700;color:var(--text);margin-bottom:22px;
+  display:flex;align-items:center;gap:8px;
+}
+.modal-box h2 i{color:var(--accent);}
+
+/* =============================================
+   DISCLAIMER
+============================================= */
+.disclaimer{
+  display:flex;gap:10px;align-items:flex-start;
+  background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);
+  border-left:3px solid #f59e0b;border-radius:10px;
+  padding:12px 16px;font-size:12px;color:#92400e;line-height:1.6;
+  margin-bottom:24px;
+}
+.disclaimer i{color:#f59e0b;font-size:14px;flex-shrink:0;margin-top:1px;}
+[data-theme="dark"] .disclaimer{color:#fbbf24;}
+
+/* =============================================
+   TOAST
+============================================= */
+.toast{
+  position:fixed;bottom:24px;right:24px;z-index:9999;
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:12px;padding:14px 20px;
+  font-size:13px;font-weight:500;color:var(--text);
+  box-shadow:var(--shadow-lg);
+  display:flex;align-items:center;gap:8px;
+  transform:translateY(80px);opacity:0;transition:all 0.3s ease;
+  max-width:300px;
+}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast i{color:var(--accent);}
+
+/* =============================================
+   RESPONSIVE
+============================================= */
+@media(max-width:1100px){
+  header,.ia-main{padding-left:32px;padding-right:32px;}
+}
+@media(max-width:900px){
+  .mobile-menu-toggle{display:flex;}
+  .main-nav,.auth-btns{display:none;}
+  .ia-page-header{flex-direction:column;align-items:flex-start;}
+  .ia-nav-tabs{width:100%;}
+  .nav-tab{flex:1;justify-content:center;}
+}
+@media(max-width:640px){
+  header{padding:0 16px;height:60px;}
+  .ia-main{padding:24px 16px 60px;}
+  .card{padding:18px;}
+  .result-body{padding:18px;}
+  .result-header{padding:16px 18px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+<header>
+  <div class="header-logo">
+    <div class="logo-icon"><i class="fa-solid fa-robot"></i></div>
+    <span class="logo-text">Parrot<em>Diag</em></span>
+  </div>
+
+  <nav class="main-nav">
+    <ul>
+      <li><a href="index.html">Accueil</a></li>
+      <li><a href="ia.html" class="active">Évaluer mes symptômes</a></li>
+      <li><a href="patients.html">Les activités</a></li>
+      <li><a href="apropos.html">À propos</a></li>
+    </ul>
+  </nav>
+
+  <div class="header-controls">
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Thème">
+      <span class="theme-icon light-icon">☀️</span>
+      <span class="theme-icon dark-icon">🌙</span>
+      <div class="theme-thumb"></div>
+    </button>
+
+    <!-- User Profile (shown when logged in) -->
+    <div class="profile-menu" id="profileMenu" style="display:none;">
+      <div class="profile-trigger" onclick="toggleProfileMenu()">
+        <div class="profile-avatar" id="profileAvatar">AB</div>
+        <span class="profile-name" id="profileName">Ahmed</span>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="profile-dropdown" id="profileDropdown">
+        <div class="dropdown-header">
+          <div class="dropdown-avatar" id="ddAvatar">AB</div>
+          <div>
+            <div class="dropdown-name" id="ddName">Ahmed Benali</div>
+            <div class="dropdown-email" id="ddEmail">patient@test.ma</div>
+            <span class="dropdown-role" id="ddRole">Patient</span>
+          </div>
+        </div>
+        <div class="dropdown-divider"></div>
+        <div class="dropdown-item" onclick="showPage('history')">
+          <i class="fas fa-history"></i> Mes consultations
+        </div>
+        <div class="dropdown-item"><i class="fas fa-user"></i> Mon profil</div>
+        <div class="dropdown-divider"></div>
+        <div class="dropdown-item logout" onclick="logout()">
+          <i class="fas fa-sign-out-alt"></i> Déconnexion
+        </div>
+      </div>
+    </div>
+
+    <!-- Auth buttons (shown when logged out) -->
+    <div class="auth-btns" id="authBtns" style="display:flex;gap:8px;">
+      <a href="connexionpage.html">
+        <button style="padding:8px 18px;background:none;border:1px solid var(--border);border-radius:10px;font-size:13px;font-weight:500;color:var(--text);cursor:pointer;font-family:inherit;transition:var(--t);" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)'">S'inscrire</button>
+      </a>
+      <a href="connexionpage.html">
+        <button style="padding:8px 18px;background:var(--accent);border:none;border-radius:10px;font-size:13px;font-weight:600;color:white;cursor:pointer;font-family:inherit;">Connexion</button>
+      </a>
+    </div>
+
+    <button class="mobile-menu-toggle" id="mobileToggle" onclick="toggleMobile()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- ═══════════════ MAIN ═══════════════ -->
+<main class="ia-main">
+
+  <!-- Page Header -->
+  <div class="ia-page-header">
+    <div class="ia-page-header-left">
+      <div class="ia-badge">
+        <span class="pulse-dot"></span>
+        IA Médicale · Système Expert
+      </div>
+      <h1>Évaluez vos <em>symptômes</em></h1>
+      <p>Obtenez une orientation médicale personnalisée basée sur notre système expert.</p>
+    </div>
+    <div class="ia-nav-tabs">
+      <button class="nav-tab active" id="nav-home" onclick="showPage('home')">
+        <i class="fas fa-search"></i> Analyse
+      </button>
+      <button class="nav-tab" id="nav-history" onclick="showPage('history')">
+        <i class="fas fa-history"></i> Historique
+      </button>
+    </div>
+  </div>
+
+  <!-- ─── HOME PAGE ─── -->
+  <div class="page active" id="page-home">
+
+    <div class="disclaimer">
+      <i class="fas fa-exclamation-triangle"></i>
+      <span><strong>Avertissement médical :</strong> Cet outil est une aide à l'orientation uniquement. En cas d'urgence, appelez le <strong>15 (SAMU)</strong>.</span>
+    </div>
+
+    <div class="assessment-grid">
+
+      <!-- LEFT: Form -->
+      <div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon"><i class="fas fa-clipboard-list"></i></div>
+            <div class="card-title">Saisie des symptômes</div>
+          </div>
+
+          <!-- Tag Input -->
+          <div class="form-group">
+            <label class="form-label">Symptômes principaux <span style="color:#ef4444">*</span></label>
+            <div class="tag-container" id="tag-container" onclick="focusTagInput()">
+              <input class="tag-input" id="tag-input"
+                placeholder="Tapez un symptôme, Entrée pour valider…"
+                onkeydown="handleTagInput(event)"
+                oninput="updateSuggestions()">
+            </div>
+            <div class="suggestions" id="suggestions-wrap"></div>
+            <button class="btn-voice" id="voiceBtn" onclick="startVoiceInput()">
+              <i class="fas fa-microphone"></i> Dictée vocale
+            </button>
+          </div>
+
+          <!-- Free text -->
+          <div class="form-group">
+            <label class="form-label">Description libre</label>
+            <textarea id="free-text"
+              placeholder="Ex : j'ai mal à la tête et de la fièvre depuis 2 jours, avec des courbatures et une toux sèche…"></textarea>
+          </div>
+
+          <button class="btn-primary" id="analyze-btn" onclick="analyzeSymptoms()">
+            <i class="fas fa-search"></i> Analyser mes symptômes
+          </button>
+        </div>
+
+        <!-- Results -->
+        <div id="results-container">
+          <div class="loading-bar" id="loading-bar">
+            <div class="spinner"></div>
+            <p>Analyse en cours par notre système expert…</p>
+          </div>
+          <div id="result-output"></div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Knowledge Base -->
+      <div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon"><i class="fas fa-book-medical"></i></div>
+            <div class="card-title">Base de Connaissance</div>
+          </div>
+          <p style="font-size:12px;color:var(--text-3);margin-bottom:14px;">Cliquez pour ajouter rapidement des symptômes</p>
+          <div id="kb-categories"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─── HISTORY PAGE ─── -->
+  <div class="page" id="page-history">
+    <div class="history-header">
+      <h2>Historique des consultations</h2>
+      <p>Retrouvez vos évaluations précédentes.</p>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-val" id="stat-total">0</div>
+        <div class="stat-lbl">Consultations</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="stat-last">—</div>
+        <div class="stat-lbl">Dernière visite</div>
+      </div>
+    </div>
+
+    <div id="history-content"></div>
+  </div>
+
+</main>
+
+<!-- ═══════════════ MODAL ═══════════════ -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h2><i class="fas fa-file-medical"></i> Détail de la consultation</h2>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toast-msg"></span></div>
+
+<!-- ═══════════════ SCRIPT ═══════════════ -->
+<script>
+// ══════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════
+const API_BASE = 'http://127.0.0.1:8001';
+const esc = t => {
+  if (!t) return '';
+  const d = document.createElement('div');
+  d.textContent = String(t);
+  return d.innerHTML;
+};
+
+let tags = [];
+let consultations = [];
+let currentUser = null;
+
+// ── Auth check ──
+(function() {
+  const token = localStorage.getItem('authToken');
+  const userStr = localStorage.getItem('currentUser');
+  if (!token || !userStr) {
+    // window.location.href = 'connexionpage.html'; // uncomment in prod
+    return;
+  }
+  try {
+    currentUser = JSON.parse(userStr);
+    if (currentUser) {
+      const initials = currentUser.full_name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+      document.getElementById('profileMenu').style.display = 'block';
+      document.getElementById('authBtns').style.display = 'none';
+      document.getElementById('profileAvatar').textContent = initials;
+      document.getElementById('profileName').textContent = currentUser.full_name.split(' ')[0];
+      document.getElementById('ddAvatar').textContent = initials;
+      document.getElementById('ddName').textContent = currentUser.full_name;
+      document.getElementById('ddEmail').textContent = currentUser.email;
+      const roleMap = {patient:'Patient',doctor:'Médecin',admin:'Admin'};
+      document.getElementById('ddRole').textContent = roleMap[currentUser.role] || currentUser.role;
+    }
+  } catch(e){}
+})();
+
+// ── Knowledge Base ──
+const KNOWLEDGE_BASE = {
+  "🫁 Respiratoire": ["toux sèche","toux grasse","essoufflement","sifflement","douleur thoracique","expectorations"],
+  "🫃 Digestif":     ["nausées","vomissements","douleur abdominale","diarrhée","constipation","ballonnements"],
+  "🧠 Neurologique": ["céphalées","migraine","vertiges","vision floue","engourdissement","confusion"],
+  "🦴 Musculo-squelettique": ["douleur dorsale","lombalgie","arthralgie","myalgie","raideur","courbatures"],
+  "❤️ Cardiaque":   ["palpitations","douleur poitrine","essoufflement effort","syncope","fatigue cardiaque"],
+  "🌡️ Général / Infectieux": ["fièvre","frissons","fatigue","sueurs nocturnes","perte de poids","mal de gorge"],
+};
+
+function renderKnowledgeBase() {
+  const container = document.getElementById('kb-categories');
+  container.innerHTML = '';
+  for (const [cat, syms] of Object.entries(KNOWLEDGE_BASE)) {
+    const div = document.createElement('div');
+    div.innerHTML = `
+      <div class="kb-section-title">${esc(cat)}</div>
+      <div class="kb-chips">
+        ${syms.map(s => `<span class="kb-chip" onclick="addTagFromKB('${esc(s).replace(/'/g,"\\'")}')"> ${esc(s)}</span>`).join('')}
+      </div>`;
+    container.appendChild(div);
+  }
+}
+
+// ── Tags ──
+function focusTagInput() { document.getElementById('tag-input').focus(); }
+
+function handleTagInput(e) {
+  const input = e.target;
+  if ((e.key==='Enter'||e.key===',') && input.value.trim()) {
+    e.preventDefault();
+    addTag(input.value.trim());
+    input.value='';
+    updateSuggestions();
+  } else if (e.key==='Backspace' && input.value==='' && tags.length>0) {
+    removeTag(tags.length-1);
+  }
+}
+
+function addTag(text) {
+  const clean = text.toLowerCase().replace(/,$/,'').trim();
+  if (!clean || tags.includes(clean)) return;
+  tags.push(clean);
+  renderTags();
+}
+
+function addTagFromKB(sym) { addTag(sym); showToast('✓ "' + sym + '" ajouté'); }
+
+function removeTag(idx) { tags.splice(idx,1); renderTags(); }
+
+function renderTags() {
+  const container = document.getElementById('tag-container');
+  const input = document.getElementById('tag-input');
+  container.innerHTML = '';
+  tags.forEach((t,i) => {
+    const span = document.createElement('span');
+    span.className = 'tag';
+    span.innerHTML = esc(t) + `<button onclick="removeTag(${i})">×</button>`;
+    container.appendChild(span);
+  });
+  container.appendChild(input);
+  input.focus();
+}
+
+const COMMON_SUGGESTIONS = ["fièvre","toux","fatigue","maux de tête","douleur abdominale","nausées","essoufflement","vertiges","courbatures","palpitations","diarrhée","frissons"];
+
+function updateSuggestions() {
+  const wrap = document.getElementById('suggestions-wrap');
+  const val = document.getElementById('tag-input').value.toLowerCase();
+  const all = Object.values(KNOWLEDGE_BASE).flat();
+  const pool = val ? [...new Set(all)].filter(s=>s.includes(val)&&!tags.includes(s)) : COMMON_SUGGESTIONS.filter(s=>!tags.includes(s)).slice(0,8);
+  wrap.innerHTML = pool.slice(0,7).map(s =>
+    `<span class="suggestion-chip" onclick="addTagFromInput('${esc(s).replace(/'/g,"\\'")}')"> ${esc(s)}</span>`
+  ).join('');
+}
+
+function addTagFromInput(s) {
+  addTag(s);
+  document.getElementById('tag-input').value='';
+  updateSuggestions();
+}
+
+// ── Voice ──
+function startVoiceInput() {
+  if (!('SpeechRecognition' in window)&&!('webkitSpeechRecognition' in window)) {
+    showToast('⚠️ Reconnaissance vocale non supportée'); return;
+  }
+  const SR = window.SpeechRecognition||window.webkitSpeechRecognition;
+  const r = new SR(); r.lang='fr-FR'; r.interimResults=false;
+  const btn = document.getElementById('voiceBtn');
+  r.onstart = ()=>{btn.classList.add('recording');btn.innerHTML='<i class="fas fa-microphone-slash"></i> Écoute…';};
+  r.onresult = e=>{
+    const freeText = document.getElementById('free-text');
+    freeText.value = (freeText.value?freeText.value+'. ':'')+e.results[0][0].transcript;
+    showToast('✓ Transcription réussie');
+  };
+  r.onerror = e=>showToast('❌ Erreur micro: '+e.error);
+  r.onend = ()=>{btn.classList.remove('recording');btn.innerHTML='<i class="fas fa-microphone"></i> Dictée vocale';};
+  r.start();
+}
+
+// ── Analyze ──
+async function analyzeSymptoms() {
+  const freeText = document.getElementById('free-text').value.trim();
+  const symptomText = tags.length>0 ? tags.join(', ') : '';
+  const combined = [symptomText,freeText].filter(Boolean).join('. ');
+  if (!combined) { showToast('⚠️ Veuillez saisir au moins un symptôme'); return; }
+
+  document.getElementById('loading-bar').classList.add('active');
+  document.getElementById('result-output').innerHTML='';
+  document.getElementById('analyze-btn').disabled=true;
+
+  try {
+    const res = await fetch(API_BASE+'/analyze/knowledge', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+localStorage.getItem('authToken')},
+      body:JSON.stringify({symptomes:combined,patient_id:currentUser?currentUser.id:null,conversation_id:Date.now().toString(),lang:'fr',include_recommendations:true,include_emergency:true})
+    });
+    document.getElementById('loading-bar').classList.remove('active');
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success) { renderResults(data,{symptoms:combined}); saveToLocalHistory(data,{symptoms:combined}); }
+      else showError(data.message||'Analyse échouée');
+    } else {
+      let msg='Erreur serveur ('+res.status+')';
+      try{const ed=await res.json();msg=ed.detail||msg;}catch{}
+      showError(msg);
+    }
+  } catch(err) {
+    document.getElementById('loading-bar').classList.remove('active');
+    showError('Serveur inaccessible. Vérifiez que le backend tourne sur le port 8001.');
+  }
+  document.getElementById('analyze-btn').disabled=false;
+}
+
+function showError(msg) {
+  document.getElementById('result-output').innerHTML = `
+    <div class="card" style="margin-top:20px;text-align:center;padding:36px;">
+      <i class="fas fa-exclamation-circle" style="font-size:2.5rem;color:#ef4444;margin-bottom:12px;display:block;"></i>
+      <p style="color:var(--text-2);font-size:14px;">${esc(msg)}</p>
+    </div>`;
+}
+
+// ── Render Results ──
+function renderResults(data, meta) {
+  const isUrgent = data.urgence;
+  const isAbsolute = data.urgence_absolue;
+  const sev = isAbsolute?'high':(isUrgent?'med':'low');
+  const sevLabel = {low:'Bénin',med:'Modéré',high:'Sérieux'};
+  const pct = Math.round((data.probabilite||0.5)*100);
+
+  const urgencyHTML = (isAbsolute||isUrgent) ? `
+    <div class="urgency-banner">
+      <i class="fas fa-exclamation-triangle"></i>
+      <div>
+        <strong>${isAbsolute?'URGENCE ABSOLUE — Appelez le 15 immédiatement':'Consultation urgente recommandée'}</strong>
+        ${data.urgence_detail&&data.urgence_detail.message?`<br>${esc(data.urgence_detail.message)}`:''}
+      </div>
+    </div>` : '';
+
+  const recoHTML = (data.recommandations||[]).map(r=>`
+    <li class="reco-item">
+      <div class="reco-dot"><i class="fas fa-lightbulb"></i></div>
+      <span>${esc(r)}</span>
+    </li>`).join('');
+
+  const specialistIcon = {'Pneumologie':'🫁','Cardiologie':'❤️','Neurologie':'🧠','Gastro-entérologie':'🫃','Médecine générale':'👨‍⚕️','Psychiatrie':'🧘','Endocrinologie':'🔬','Allergologie':'🌿','Urologie':'💧','Oncologie':'🏥','Chirurgie digestive':'🏥','Néphrologie':'💊'};
+  const specIcon = specialistIcon[data.specialite]||'👨‍⚕️';
+  const fiabilite = data.fiabilite||'';
+  const model = data.model_utilise||'';
+
+  document.getElementById('result-output').innerHTML = `
+    <div class="result-card">
+      <div class="result-header">
+        <div>
+          <h2>Résultats de l'analyse</h2>
+          <div class="result-header-sub">
+            ${model?`Modèle : ${esc(model)}`:''}
+            ${fiabilite?` · Fiabilité : ${esc(fiabilite)}`:''}
+          </div>
+        </div>
+        <span class="severity-badge severity-${sev}">${sevLabel[sev]}</span>
+      </div>
+      <div class="result-body">
+        ${urgencyHTML}
+
+        <div class="section-label-sm" style="margin-bottom:14px;">Diagnostic principal</div>
+        <div class="hypothesis-main">
+          <div class="hyp-top">
+            <div class="hyp-name">${esc(data.maladie)}</div>
+            <div class="hyp-pct">${pct}%</div>
+          </div>
+          <div class="prob-bar"><div class="prob-fill" style="width:${pct}%"></div></div>
+          <div class="hyp-meta">
+            <span class="hyp-tag"><i class="fas fa-stethoscope" style="font-size:10px;"></i>${esc(data.specialite)}</span>
+            ${data.critere_orientation?`<span style="font-size:12px;color:var(--text-3);">${esc(data.critere_orientation)}</span>`:''}
+          </div>
+        </div>
+
+        <div class="section-label-sm" style="margin-bottom:12px;">Spécialiste recommandé</div>
+        <div class="specialists-row">
+          <div class="specialist-tag">
+            <span style="font-size:18px;">${specIcon}</span>
+            <span>${esc(data.specialite)}</span>
+            <span class="${isUrgent?'prio-urgent':'prio-normal'}">${isUrgent?'Urgent':'Conseillé'}</span>
+          </div>
+        </div>
+
+        <div class="section-label-sm" style="margin-bottom:12px;">Recommandations</div>
+        <ul class="reco-list">${recoHTML}</ul>
+
+        <div class="result-footer">
+          <div class="result-footer-left">
+            <i class="fas fa-calendar" style="color:var(--accent);margin-right:5px;"></i>
+            ${new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})}
+          </div>
+          <button class="btn-save-result" onclick="showToast('✓ Consultation sauvegardée')">
+            <i class="fas fa-bookmark"></i> Sauvegarder
+          </button>
+          <div class="result-footer-right">⚠️ ${esc(data.avertissement||'Cet outil est une aide à la décision uniquement.')}</div>
+        </div>
+      </div>
+    </div>`;
+
+  document.getElementById('result-output').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ── History ──
+function saveToLocalHistory(data, meta) {
+  const entry = {
+    id:Date.now(),date:new Date().toISOString(),
+    symptoms:meta.symptoms,maladie:data.maladie,
+    probabilite:data.probabilite,specialite:data.specialite,
+    recommandations:data.recommandations||[],urgence:data.urgence||false,
+    fiabilite:data.fiabilite||'',model_utilise:data.model_utilise||'',
+    alternatives:(data.alternatives||[]).slice(0,3),
+  };
+  consultations.unshift(entry);
+  if(consultations.length>100) consultations.pop();
+  localStorage.setItem('medassist_history',JSON.stringify(consultations));
+  updateStats();
+}
+
+async function loadHistory() {
+  consultations = JSON.parse(localStorage.getItem('medassist_history')||'[]');
+  if (currentUser&&currentUser.id) {
+    try {
+      const res = await fetch(API_BASE+'/patients/'+currentUser.id+'/consultations-ia',{headers:{'Authorization':'Bearer '+localStorage.getItem('authToken')}});
+      if (res.ok) {
+        const data = await res.json();
+        if (data.consultations&&data.consultations.length) {
+          const localIds = new Set(consultations.map(c=>c.id));
+          data.consultations.forEach(c=>{
+            const entry={id:'api_'+c.id,date:c.created_at,symptoms:c.symptomes||'',maladie:c.maladie_diagnostiquee||c.maladie_predite||'',probabilite:c.confidence||c.probabilite||0.5,specialite:c.specialite_recommandee||c.specialite||'',recommandations:[],urgence:(c.urgence_niveau||0)>=2};
+            if(c.recommandations){try{entry.recommandations=JSON.parse(c.recommandations);}catch{}}
+            if(!localIds.has(entry.id)) consultations.push(entry);
+          });
+          consultations.sort((a,b)=>new Date(b.date)-new Date(a.date));
+        }
+      }
+    } catch{}
+  }
+  updateStats();
+}
+
+function updateStats() {
+  document.getElementById('stat-total').textContent = consultations.length;
+  if (consultations.length>0) {
+    const last = new Date(consultations[0].date);
+    document.getElementById('stat-last').textContent = last.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+  }
+}
+
+function renderHistory() {
+  const container = document.getElementById('history-content');
+  if (consultations.length===0) {
+    container.innerHTML = `
+      <div class="history-empty">
+        <div class="empty-icon">📋</div>
+        <p>Aucune consultation enregistrée pour le moment.<br>Effectuez votre première évaluation !</p>
+      </div>`;
+    return;
+  }
+  container.innerHTML = `<div class="history-list">${
+    consultations.map((c,i)=>{
+      const date = new Date(c.date).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+      const pct = Math.round((c.probabilite||0.5)*100);
+      const icon = c.urgence?'🔴':'🟢';
+      return `<div class="history-item" onclick="openHistoryItem(${i})">
+        <div>
+          <div class="history-date">${esc(date)}</div>
+          <div class="history-symptoms">${icon} ${esc(c.symptoms||c.maladie)}</div>
+          <div class="history-hypothesis">Hypothèse : <strong>${esc(c.maladie)}</strong> (${pct}%) · ${esc(c.specialite)}</div>
+        </div>
+        <span class="history-arrow">›</span>
+      </div>`;
+    }).join('')
+  }</div>`;
+}
+
+function openHistoryItem(idx) {
+  const c = consultations[idx];
+  if (!c) return;
+  const date = new Date(c.date).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const pct = Math.round((c.probabilite||0.5)*100);
+  document.getElementById('modal-content').innerHTML = `
+    <p style="font-size:12px;color:var(--text-3);margin-bottom:20px;">${esc(date)}</p>
+    <div style="margin-bottom:18px;">
+      <div class="section-label-sm" style="margin-bottom:10px;">Symptômes</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        ${(c.symptoms||'').split(/[,.]/).filter(Boolean).map(s=>`<span class="tag">${esc(s.trim())}</span>`).join('')}
+      </div>
+    </div>
+    <div class="hypothesis-main" style="margin-bottom:18px;">
+      <div class="hyp-top">
+        <div class="hyp-name">${esc(c.maladie)}</div>
+        <div class="hyp-pct">${pct}%</div>
+      </div>
+      <div class="prob-bar"><div class="prob-fill" style="width:${pct}%"></div></div>
+      <div class="hyp-meta">
+        <span class="hyp-tag"><i class="fas fa-stethoscope" style="font-size:10px;"></i>${esc(c.specialite)}</span>
+        ${c.urgence?'<span class="prio-urgent">Urgent</span>':'<span class="prio-normal">Normal</span>'}
+        ${c.fiabilite?`<span style="font-size:11px;color:var(--text-3);">Fiabilité: ${esc(c.fiabilite)}</span>`:''}
+      </div>
+    </div>
+    <div style="margin-bottom:18px;">
+      <div class="section-label-sm" style="margin-bottom:10px;">Recommandations</div>
+      <ul class="reco-list" style="background:var(--bg-2);border-radius:12px;padding:12px 16px;">
+        ${(c.recommandations||[]).map(r=>`<li class="reco-item"><div class="reco-dot"><i class="fas fa-lightbulb"></i></div><span>${esc(r)}</span></li>`).join('')}
+      </ul>
+    </div>
+    <div style="display:flex;justify-content:flex-end;padding-top:14px;border-top:1px solid var(--border);">
+      <button class="btn-save-result" style="color:#ef4444;border-color:rgba(239,68,68,0.3);" onclick="deleteConsultation(${idx})">
+        <i class="fas fa-trash"></i> Supprimer
+      </button>
+    </div>`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function deleteConsultation(idx) {
+  consultations.splice(idx,1);
+  localStorage.setItem('medassist_history',JSON.stringify(consultations));
+  closeModal();
+  renderHistory();
+  updateStats();
+  showToast('🗑️ Consultation supprimée');
+}
+
+// ── Navigation ──
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.getElementById('nav-'+name).classList.add('active');
+  if(name==='history') renderHistory();
+}
+
+// ── Modal ──
+function closeModalOutside(e) { if(e.target===document.getElementById('modal-overlay')) closeModal(); }
+function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+
+// ── Profile Menu ──
+function toggleProfileMenu() { document.getElementById('profileMenu').classList.toggle('open'); }
+document.addEventListener('click',e=>{ if(!document.getElementById('profileMenu').contains(e.target)) document.getElementById('profileMenu').classList.remove('open'); });
+
+// ── Logout ──
+function logout() {
+  localStorage.removeItem('authToken');
+  localStorage.removeItem('currentUser');
+  window.location.href='connexionpage.html';
+}
+
+// ── Mobile ──
+function toggleMobile() { document.getElementById('mobileToggle').classList.toggle('active'); }
+
+// ── Theme ──
+const themeToggle = document.getElementById('themeToggle');
+themeToggle.addEventListener('click',()=>{
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme')==='dark';
+  html.setAttribute('data-theme',isDark?'light':'dark');
+  localStorage.setItem('theme',isDark?'light':'dark');
+});
+const savedTheme = localStorage.getItem('theme');
+if(savedTheme) document.documentElement.setAttribute('data-theme',savedTheme);
+
+// ── Toast ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+// ── Init ──
+renderKnowledgeBase();
+updateSuggestions();
+loadHistory();
+</script>
+</body>
+</html>

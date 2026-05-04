@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ordonnance — ParrotDiag</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root {
+      --green:     #1a6b4a;
+      --green-mid: #2a9068;
+      --green-light: #3eb882;
+      --gold:      #c9a84c;
+      --gold-light: #e8c97a;
+      --bg:        #f6f4ef;
+      --bg2:       #eeeae0;
+      --card:      #ffffff;
+      --ink:       #0e1f18;
+      --ink2:      #2d4a3a;
+      --ink3:      #7a9688;
+      --border:    rgba(26,107,74,0.13);
+      --shadow:    0 32px 80px rgba(14,31,24,0.12);
+    }
+    [data-theme="dark"] {
+      --bg:        #0b1510;
+      --bg2:       #111d17;
+      --card:      #152018;
+      --ink:       #e8f0ec;
+      --ink2:      #a0c4b0;
+      --ink3:      #506a5a;
+      --border:    rgba(62,184,130,0.12);
+      --shadow:    0 32px 80px rgba(0,0,0,0.45);
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 20px 80px;
+      transition: background .4s, color .4s;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* ── Background texture ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image:
+        radial-gradient(ellipse 80% 60% at 10% 0%, rgba(62,184,130,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 90% 100%, rgba(201,168,76,0.06) 0%, transparent 60%);
+    }
+    body::after {
+      content: '';
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%231a6b4a' fill-opacity='0.025'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      opacity: .5;
+    }
+
+    /* ── Everything above background ── */
+    .page-wrapper { position: relative; z-index: 1; width: 100%; max-width: 800px; }
+
+    /* ── Top bar ── */
+    .topbar {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 36px;
+      opacity: 0; animation: fadeUp .6s .1s forwards;
+    }
+    .logo-wrap { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .logo-gem {
+      width: 42px; height: 42px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--green), var(--green-mid));
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 17px;
+      box-shadow: 0 4px 20px rgba(26,107,74,0.35);
+    }
+    .logo-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px; font-weight: 600; color: var(--ink);
+      letter-spacing: .5px;
+    }
+    .logo-name span { color: var(--green-mid); font-style: italic; }
+
+    .topbar-right { display: flex; align-items: center; gap: 10px; }
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 9px 18px; border-radius: 50px;
+      font-size: 13px; font-weight: 500; cursor: pointer;
+      background: var(--card); color: var(--ink2);
+      border: 1px solid var(--border);
+      font-family: 'Outfit', sans-serif; transition: all .25s;
+      text-decoration: none; white-space: nowrap;
+    }
+    .btn-ghost:hover {
+      background: var(--green); color: white; border-color: var(--green);
+      box-shadow: 0 4px 16px rgba(26,107,74,0.3);
+    }
+    .btn-theme {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: var(--card); border: 1px solid var(--border);
+      cursor: pointer; display: flex; align-items: center;
+      justify-content: center; font-size: 15px; transition: all .25s;
+    }
+    .btn-theme:hover { border-color: var(--gold); }
+
+    /* ── Main card ── */
+    .rx-card {
+      background: var(--card);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      opacity: 0; animation: fadeUp .7s .2s forwards;
+    }
+
+    /* ── Hero banner ── */
+    .rx-hero {
+      position: relative;
+      background: linear-gradient(135deg, var(--green) 0%, var(--green-mid) 55%, #1a8f5c 100%);
+      padding: 36px 44px 40px;
+      overflow: hidden;
+    }
+    .rx-hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='50' r='40' fill='none' stroke='white' stroke-width='.4' stroke-opacity='.08'/%3E%3Ccircle cx='50' cy='50' r='25' fill='none' stroke='white' stroke-width='.4' stroke-opacity='.08'/%3E%3C/svg%3E") repeat;
+      background-size: 120px 120px;
+    }
+    .rx-hero::after {
+      content: '';
+      position: absolute;
+      width: 320px; height: 320px; border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      top: -120px; right: -60px; pointer-events: none;
+    }
+    .rx-hero-content { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; flex-wrap: wrap; }
+
+    .rx-eyebrow {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 50px; padding: 4px 14px;
+      font-size: 11px; font-weight: 600; letter-spacing: 1.5px;
+      text-transform: uppercase; color: rgba(255,255,255,0.9);
+      margin-bottom: 16px;
+    }
+    .rx-hero h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 32px; font-weight: 700; color: white;
+      line-height: 1.15; margin-bottom: 8px; letter-spacing: .3px;
+    }
+    .rx-hero-sub { font-size: 14px; color: rgba(255,255,255,0.75); display: flex; align-items: center; gap: 6px; }
+
+    .rx-badge-wrap { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+    .rx-status {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 18px; border-radius: 50px;
+      font-size: 12px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase;
+    }
+    .rx-status.active {
+      background: rgba(255,255,255,0.18);
+      border: 1.5px solid rgba(255,255,255,0.4);
+      color: white;
+    }
+    .rx-status.active::before {
+      content: ''; width: 7px; height: 7px; border-radius: 50%;
+      background: #6fffc3; box-shadow: 0 0 8px #6fffc3;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    .rx-status.expired {
+      background: rgba(239,68,68,0.2); border: 1.5px solid rgba(239,68,68,0.4); color: #fca5a5;
+    }
+    .rx-number-tag {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px; color: rgba(255,255,255,0.55);
+      letter-spacing: 1px;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: .6; transform: scale(1.4); }
+    }
+
+    /* ── Gold divider ── */
+    .gold-divider {
+      height: 3px;
+      background: linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 40%, transparent 100%);
+    }
+
+    /* ── Body ── */
+    .rx-body { padding: 36px 44px; }
+
+    /* ── Meta grid ── */
+    .meta-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1px; background: var(--border);
+      border-radius: 16px; overflow: hidden;
+      margin-bottom: 36px; border: 1px solid var(--border);
+    }
+    .meta-item {
+      background: var(--bg); padding: 18px 20px;
+      transition: background .2s;
+    }
+    .meta-item:hover { background: var(--bg2); }
+    .meta-key {
+      font-size: 10px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 1.2px; color: var(--ink3); margin-bottom: 5px;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .meta-key i { color: var(--green-mid); font-size: 9px; }
+    .meta-val { font-size: 14px; font-weight: 500; color: var(--ink); line-height: 1.3; }
+
+    /* ── Section heading ── */
+    .sec-head {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 18px; margin-top: 32px;
+    }
+    .sec-head:first-child { margin-top: 0; }
+    .sec-icon {
+      width: 34px; height: 34px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--green), var(--green-mid));
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 13px; flex-shrink: 0;
+    }
+    .sec-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px; font-weight: 600; color: var(--ink);
+      letter-spacing: .2px;
+    }
+    .sec-line { flex: 1; height: 1px; background: var(--border); }
+
+    /* ── Medications table ── */
+    .meds-table-wrap {
+      border-radius: 16px; overflow: hidden;
+      border: 1px solid var(--border); margin-bottom: 8px;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr {
+      background: linear-gradient(90deg, rgba(26,107,74,0.08), rgba(62,184,130,0.05));
+    }
+    thead th {
+      padding: 13px 18px; text-align: left;
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.3px;
+      color: var(--green);
+    }
+    tbody tr { border-top: 1px solid var(--border); transition: background .2s; }
+    tbody tr:hover { background: rgba(26,107,74,0.03); }
+    tbody td { padding: 15px 18px; font-size: 14px; color: var(--ink2); vertical-align: middle; }
+    .med-name { font-weight: 600; color: var(--ink); font-size: 15px; }
+    .dosage-pill {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--green), var(--green-mid));
+      color: white; border-radius: 50px;
+      padding: 3px 13px; font-size: 12px; font-weight: 600;
+    }
+    .freq-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 50px; padding: 3px 12px;
+      font-size: 12px; color: var(--ink2);
+    }
+    .dur-tag { font-size: 13px; color: var(--ink3); }
+
+    /* ── Note boxes ── */
+    .note-box {
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-top: 20px;
+      display: flex; gap: 14px; align-items: flex-start;
+    }
+    .note-box.instructions {
+      background: rgba(26,107,74,0.06);
+      border: 1px solid rgba(26,107,74,0.15);
+    }
+    .note-box.notes-block {
+      background: rgba(201,168,76,0.07);
+      border: 1px solid rgba(201,168,76,0.2);
+    }
+    .note-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; flex-shrink: 0;
+    }
+    .instructions .note-icon { background: rgba(26,107,74,0.15); color: var(--green); }
+    .notes-block .note-icon { background: rgba(201,168,76,0.15); color: var(--gold); }
+    .note-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+    .instructions .note-label { color: var(--green); }
+    .notes-block .note-label { color: var(--gold); }
+    .note-text { font-size: 14px; color: var(--ink2); line-height: 1.65; }
+
+    /* ── Actions ── */
+    .rx-actions {
+      display: flex; gap: 12px; align-items: center;
+      padding: 28px 44px 32px;
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 28px; border-radius: 50px;
+      font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: all .25s; border: none;
+      background: linear-gradient(135deg, var(--green), var(--green-mid));
+      color: white;
+      box-shadow: 0 6px 24px rgba(26,107,74,0.35);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(26,107,74,0.45); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 24px; border-radius: 50px;
+      font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 500;
+      cursor: pointer; transition: all .25s;
+      background: transparent; color: var(--ink2);
+      border: 1.5px solid var(--border);
+      text-decoration: none;
+    }
+    .btn-secondary:hover { border-color: var(--green); color: var(--green); background: rgba(26,107,74,0.05); }
+
+    .spacer { flex: 1; }
+    .watermark {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 12px; color: var(--ink3); font-style: italic;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .watermark i { font-size: 10px; color: var(--green-light); }
+
+    /* ── Error / Loading state ── */
+    .state-box {
+      padding: 80px 40px; text-align: center;
+    }
+    .state-icon {
+      width: 72px; height: 72px; border-radius: 20px;
+      margin: 0 auto 24px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px;
+    }
+    .state-icon.loading { background: rgba(26,107,74,0.1); color: var(--green); }
+    .state-icon.error { background: rgba(239,68,68,0.1); color: #ef4444; }
+    .state-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 600; margin-bottom: 10px; }
+    .state-sub { font-size: 14px; color: var(--ink3); margin-bottom: 28px; line-height: 1.6; }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin { animation: spin .8s linear infinite; display: inline-block; }
+
+    /* ── Stagger children ── */
+    .rx-body > * { opacity: 0; animation: fadeUp .5s forwards; }
+    .rx-body > *:nth-child(1) { animation-delay: .35s; }
+    .rx-body > *:nth-child(2) { animation-delay: .45s; }
+    .rx-body > *:nth-child(3) { animation-delay: .55s; }
+    .rx-body > *:nth-child(4) { animation-delay: .65s; }
+    .rx-body > *:nth-child(5) { animation-delay: .75s; }
+
+    /* ── Print ── */
+    @media print {
+      body { background: white; padding: 0; }
+      .topbar, .rx-actions { display: none !important; }
+      body::before, body::after { display: none; }
+      .rx-card { box-shadow: none; border: none; }
+      .rx-body > * { opacity: 1 !important; animation: none !important; }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .page-wrapper { padding: 80px 24px 40px; }
+      .rx-card { max-width: 100%; }
+    }
+
+    @media (max-width: 768px) {
+      .topbar { padding: 0 20px; }
+      .logo-name { font-size: 18px; }
+      .rx-hero { padding: 28px 24px 32px; }
+      .rx-body { padding: 24px 20px; }
+    }
+
+    @media (max-width: 640px) {
+      .page-wrapper { padding: 70px 16px 32px; }
+      .topbar { padding: 0 16px; height: 56px; }
+      .rx-hero { padding: 24px 20px 28px; }
+      .rx-body { padding: 20px 16px; }
+      .rx-actions { padding: 16px 20px 20px; flex-wrap: wrap; gap: 10px; }
+      .rx-hero h1 { font-size: 22px; }
+      .rx-hero-content { flex-direction: column; }
+      .rx-badge-wrap { align-items: flex-start; }
+      .meta-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .btn-ghost, .btn-primary { padding: 10px 16px; font-size: 13px; }
+    }
+
+    @media (max-width: 480px) {
+      .page-wrapper { padding: 60px 12px 24px; }
+      .topbar { padding: 0 12px; }
+      .rx-hero h1 { font-size: 20px; }
+      .meta-grid { grid-template-columns: 1fr; }
+      .rx-actions { justify-content: center; }
+      .rx-actions button { flex: 1; min-width: 120px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <a href="patients.html" class="logo-wrap">
+      <div class="logo-gem"><i class="fas fa-robot"></i></div>
+      <span class="logo-name">Parrot<span>Diag</span></span>
+    </a>
+    <div class="topbar-right">
+      <button class="btn-theme" id="themeBtn" title="Changer le thème">🌿</button>
+      <a href="javascript:history.back()" class="btn-ghost">
+        <i class="fas fa-arrow-left"></i> Retour
+      </a>
+    </div>
+  </div>
+
+  <!-- Card -->
+  <div class="rx-card" id="rxCard">
+    <div id="rxContent">
+      <!-- Loading -->
+      <div class="state-box">
+        <div class="state-icon loading">
+          <i class="fas fa-leaf spin"></i>
+        </div>
+        <div class="state-title">Chargement de l'ordonnance…</div>
+        <div class="state-sub">Récupération des données en cours</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ── Theme ──
+  (function() {
+    const saved = localStorage.getItem('parrotTheme') || 'light';
+    document.documentElement.setAttribute('data-theme', saved);
+    document.getElementById('themeBtn').textContent = saved === 'dark' ? '☀️' : '🌿';
+  })();
+  document.getElementById('themeBtn').addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme');
+    const next = cur === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('parrotTheme', next);
+    document.getElementById('themeBtn').textContent = next === 'dark' ? '☀️' : '🌿';
+  });
+
+  // ── Config ──
+  const API_URL = "http://127.0.0.1:8000";
+  const params = new URLSearchParams(window.location.search);
+  const prescriptionId = parseInt(params.get('id'));
+
+  // ── Utils ──
+  function fmtDate(str) {
+    if (!str) return '—';
+    const d = new Date(str);
+    if (isNaN(d)) return str;
+    return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+  function isActive(p) {
+    return !p.expiry_date || new Date(p.expiry_date) > new Date();
+  }
+
+  // ── Render ──
+  function render(p) {
+    currentPrescription = p;
+    const active = isActive(p);
+    const meds = p.medications || [];
+
+    const rows = meds.length
+      ? meds.map(m => `
+        <tr>
+          <td><span class="med-name">${m.name || m.nom || '—'}</span></td>
+          <td><span class="dosage-pill">${m.dosage || '—'}</span></td>
+          <td><span class="freq-chip"><i class="fas fa-clock" style="font-size:10px;color:var(--green-mid);"></i> ${m.frequency || m.frequence || '—'}</span></td>
+          <td><span class="dur-tag">${m.duration || m.duree || '—'}</span></td>
+        </tr>`).join('')
+      : `<tr><td colspan="4" style="text-align:center;padding:28px;color:var(--ink3);font-style:italic;">Aucun médicament enregistré</td></tr>`;
+
+    document.getElementById('rxContent').innerHTML = `
+      <!-- Hero -->
+      <div class="rx-hero">
+        <div class="rx-hero-content">
+          <div class="rx-hero-left">
+            <div class="rx-eyebrow">
+              <i class="fas fa-file-prescription"></i> Ordonnance médicale
+            </div>
+            <h1>${p.diagnosis || 'Ordonnance'}</h1>
+            <div class="rx-hero-sub">
+              <i class="fas fa-user-md"></i>
+              Dr. ${p.doctor_name || '—'} &nbsp;·&nbsp; ${p.specialty || 'Médecin'}
+            </div>
+          </div>
+          <div class="rx-badge-wrap">
+            <div class="rx-status ${active ? 'active' : 'expired'}">
+              ${active ? 'En cours' : 'Expirée'}
+            </div>
+            <div class="rx-number-tag">N° ${p.prescription_number || p.id || 'N/A'}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gold line -->
+      <div class="gold-divider"></div>
+
+      <!-- Body -->
+      <div class="rx-body">
+
+        <!-- Meta -->
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-key"><i class="fas fa-hashtag"></i> Numéro</div>
+            <div class="meta-val">${p.prescription_number || p.id || '—'}</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-key"><i class="fas fa-calendar-alt"></i> Émise le</div>
+            <div class="meta-val">${fmtDate(p.date || p.issue_date)}</div>
+          </div>
+          ${p.expiry_date ? `
+          <div class="meta-item">
+            <div class="meta-key"><i class="fas fa-hourglass-end"></i> Expire le</div>
+            <div class="meta-val">${fmtDate(p.expiry_date)}</div>
+          </div>` : ''}
+          <div class="meta-item">
+            <div class="meta-key"><i class="fas fa-stethoscope"></i> Spécialité</div>
+            <div class="meta-val">${p.specialty || '—'}</div>
+          </div>
+        </div>
+
+        <!-- Médicaments -->
+        <div class="sec-head">
+          <div class="sec-icon"><i class="fas fa-pills"></i></div>
+          <span class="sec-title">Médicaments prescrits</span>
+          <div class="sec-line"></div>
+        </div>
+        <div class="meds-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Médicament</th>
+                <th>Dosage</th>
+                <th>Fréquence</th>
+                <th>Durée</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+
+        <!-- Instructions -->
+        ${p.instructions ? `
+        <div class="note-box instructions">
+          <div class="note-icon"><i class="fas fa-clipboard-list"></i></div>
+          <div>
+            <div class="note-label">Instructions</div>
+            <div class="note-text">${p.instructions}</div>
+          </div>
+        </div>` : ''}
+
+        <!-- Notes -->
+        ${p.notes ? `
+        <div class="note-box notes-block">
+          <div class="note-icon"><i class="fas fa-star"></i></div>
+          <div>
+            <div class="note-label">Notes du médecin</div>
+            <div class="note-text">${p.notes}</div>
+          </div>
+        </div>` : ''}
+
+      </div>
+
+      <!-- Actions -->
+      <div class="rx-actions">
+        <button class="btn-primary" onclick="downloadPDF()">
+          <i class="fas fa-download"></i> Télécharger PDF
+        </button>
+        <a href="javascript:history.back()" class="btn-secondary">
+          <i class="fas fa-times"></i> Fermer
+        </a>
+        <div class="spacer"></div>
+        <div class="watermark">
+          <i class="fas fa-shield-alt"></i> Document officiel ParrotDiag
+        </div>
+      </div>
+    `;
+  }
+
+  // ── Error state ──
+  function renderError(msg) {
+    document.getElementById('rxContent').innerHTML = `
+      <div class="state-box">
+        <div class="state-icon error"><i class="fas fa-times-circle"></i></div>
+        <div class="state-title">Ordonnance introuvable</div>
+        <div class="state-sub">${msg}</div>
+        <a href="javascript:history.back()" class="btn-secondary" style="margin:0 auto;display:inline-flex;">
+          <i class="fas fa-arrow-left"></i> Retour
+        </a>
+      </div>`;
+  }
+
+  // ── Elegant PDF Generator ──
+  let currentPrescription = null;
+
+  function downloadPDF() {
+    const p = currentPrescription;
+    if (!p) return;
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+    const W = 210, H = 297;
+    const green     = [26, 107, 74];
+    const greenMid  = [42, 144, 104];
+    const gold      = [201, 168, 76];
+    const goldLight = [232, 201, 122];
+    const ink       = [14, 31, 24];
+    const ink2      = [45, 74, 58];
+    const ink3      = [122, 150, 136];
+    const white     = [255, 255, 255];
+    const bgPage    = [246, 244, 239];
+    const bgMeta    = [238, 234, 224];
+
+    // ── Page background ──
+    doc.setFillColor(...bgPage);
+    doc.rect(0, 0, W, H, 'F');
+
+    // ── Subtle corner decorations ──
+    doc.setFillColor(26, 107, 74, 0.04);
+    doc.setDrawColor(...green);
+    doc.setLineWidth(0.3);
+    doc.setGState(doc.GState({ opacity: 0.06 }));
+    for (let r of [60, 80, 100]) {
+      doc.circle(W + 10, -10, r, 'S');
+    }
+    doc.setGState(doc.GState({ opacity: 1 }));
+
+    // ════════════════════════════════
+    // HERO BANNER
+    // ════════════════════════════════
+    // Main gradient — simulate with 2 rects
+    doc.setFillColor(...green);
+    doc.roundedRect(14, 14, W - 28, 52, 6, 6, 'F');
+    doc.setFillColor(...greenMid);
+    doc.setGState(doc.GState({ opacity: 0.45 }));
+    doc.roundedRect(80, 14, W - 94, 52, 6, 6, 'F');
+    doc.setGState(doc.GState({ opacity: 1 }));
+
+    // Decorative circles inside banner
+    doc.setDrawColor(255, 255, 255);
+    doc.setLineWidth(0.4);
+    doc.setGState(doc.GState({ opacity: 0.08 }));
+    doc.circle(W - 20, 20, 38, 'S');
+    doc.circle(W - 20, 20, 24, 'S');
+    doc.setGState(doc.GState({ opacity: 1 }));
+
+    // Logo icon (rounded square)
+    doc.setFillColor(255, 255, 255);
+    doc.setGState(doc.GState({ opacity: 0.2 }));
+    doc.roundedRect(20, 22, 14, 14, 3, 3, 'F');
+    doc.setGState(doc.GState({ opacity: 1 }));
+    doc.setFontSize(8);
+    doc.setTextColor(...white);
+    doc.text('Rx', 23.5, 31);
+
+    // Brand name
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...white);
+    doc.text('ParrotDiag', 37, 29);
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'normal');
+    doc.setGState(doc.GState({ opacity: 0.65 }));
+    doc.text('Espace Patient — Document Officiel', 37, 34);
+    doc.setGState(doc.GState({ opacity: 1 }));
+
+    // Ordonnance title
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...white);
+    doc.text(p.diagnosis || 'Ordonnance Médicale', 20, 50);
+
+    // Doctor line
+    doc.setFontSize(8.5);
+    doc.setFont('helvetica', 'normal');
+    doc.setGState(doc.GState({ opacity: 0.75 }));
+    doc.text(`Dr. ${p.doctor_name || '—'}  ·  ${p.specialty || 'Médecin'}`, 20, 57);
+    doc.setGState(doc.GState({ opacity: 1 }));
+
+    // Status badge (right side)
+    const active = !p.expiry_date || new Date(p.expiry_date) > new Date();
+    doc.setFillColor(255, 255, 255);
+    doc.setGState(doc.GState({ opacity: 0.18 }));
+    doc.roundedRect(W - 52, 22, 38, 10, 5, 5, 'F');
+    doc.setGState(doc.GState({ opacity: 1 }));
+    doc.setFontSize(7.5);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...white);
+    const statusText = active ? '● EN COURS' : '● EXPIRÉE';
+    doc.text(statusText, W - 45, 28.5, { align: 'center' });
+
+    // N° ordonnance
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'normal');
+    doc.setGState(doc.GState({ opacity: 0.55 }));
+    doc.text(`N° ${p.prescription_number || p.id || 'N/A'}`, W - 45, 35, { align: 'center' });
+    doc.setGState(doc.GState({ opacity: 1 }));
+
+    // ════════════════════════════════
+    // GOLD SEPARATOR
+    // ════════════════════════════════
+    doc.setFillColor(...gold);
+    doc.rect(14, 66, W - 28, 1.5, 'F');
+    doc.setFillColor(...goldLight);
+    doc.setGState(doc.GState({ opacity: 0.5 }));
+    doc.rect(80, 66, 40, 1.5, 'F');
+    doc.setGState(doc.GState({ opacity: 1 }));
+
+    // ════════════════════════════════
+    // META INFO GRID
+    // ════════════════════════════════
+    let y = 74;
+    const metaItems = [
+      { label: 'N° ORDONNANCE', val: p.prescription_number || p.id || '—' },
+      { label: 'DATE D\'ÉMISSION', val: fmtDate(p.date || p.issue_date) },
+      { label: 'EXPIRATION', val: p.expiry_date ? fmtDate(p.expiry_date) : '—' },
+      { label: 'SPÉCIALITÉ', val: p.specialty || '—' },
+    ];
+
+    const colW = (W - 28) / 2;
+    metaItems.forEach((item, i) => {
+      const col = i % 2;
+      const row = Math.floor(i / 2);
+      const mx = 14 + col * colW;
+      const my = y + row * 20;
+
+      // Cell bg
+      doc.setFillColor(...bgMeta);
+      doc.roundedRect(mx + 1, my, colW - 2, 17, 3, 3, 'F');
+
+      // Left accent bar
+      doc.setFillColor(...green);
+      doc.roundedRect(mx + 1, my, 2.5, 17, 1, 1, 'F');
+
+      // Label
+      doc.setFontSize(7);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...ink3);
+      doc.text(item.label, mx + 7, my + 6.5);
+
+      // Value
+      doc.setFontSize(9.5);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(...ink);
+      doc.text(String(item.val), mx + 7, my + 13);
+    });
+
+    y += 46;
+
+    // ════════════════════════════════
+    // SECTION: MÉDICAMENTS
+    // ════════════════════════════════
+    // Section header
+    doc.setFillColor(...green);
+    doc.roundedRect(14, y, 8, 8, 2, 2, 'F');
+    doc.setFontSize(6.5);
+    doc.setTextColor(...white);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Rx', 15.5, y + 5.3);
+
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...ink);
+    doc.text('Médicaments Prescrits', 25, y + 6.5);
+
+    // Decorative line
+    doc.setDrawColor(...gold);
+    doc.setLineWidth(0.8);
+    doc.line(80, y + 4, W - 14, y + 4);
+    doc.setLineWidth(0.3);
+    doc.setDrawColor(...goldLight);
+    doc.line(80, y + 5.5, W - 40, y + 5.5);
+
+    y += 14;
+
+    // Table header
+    doc.setFillColor(...green);
+    doc.roundedRect(14, y, W - 28, 9, 2, 2, 'F');
+
+    const cols = [14, 70, 110, 155];
+    const headers = ['MÉDICAMENT', 'DOSAGE', 'FRÉQUENCE', 'DURÉE'];
+    headers.forEach((h, i) => {
+      doc.setFontSize(7);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...white);
+      doc.text(h, cols[i] + 3, y + 6);
+    });
+
+    y += 9;
+
+    // Table rows
+    const meds = p.medications || [];
+    if (meds.length === 0) {
+      doc.setFillColor(248, 248, 248);
+      doc.rect(14, y, W - 28, 12, 'F');
+      doc.setFontSize(9);
+      doc.setTextColor(...ink3);
+      doc.setFont('helvetica', 'italic');
+      doc.text('Aucun médicament enregistré', W / 2, y + 8, { align: 'center' });
+      y += 12;
+    } else {
+      meds.forEach((m, i) => {
+        const rowH = 13;
+        // Alternating rows
+        if (i % 2 === 0) {
+          doc.setFillColor(252, 252, 250);
+        } else {
+          doc.setFillColor(...bgMeta);
+        }
+        doc.rect(14, y, W - 28, rowH, 'F');
+
+        // Left accent
+        doc.setFillColor(...greenMid);
+        doc.setGState(doc.GState({ opacity: 0.35 }));
+        doc.rect(14, y, 2, rowH, 'F');
+        doc.setGState(doc.GState({ opacity: 1 }));
+
+        // Medication name
+        doc.setFontSize(9.5);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(...ink);
+        doc.text(m.name || m.nom || '—', cols[0] + 4, y + 8.5);
+
+        // Dosage pill
+        const dosageTxt = m.dosage || '—';
+        const dw = doc.getTextWidth(dosageTxt) + 6;
+        doc.setFillColor(...green);
+        doc.roundedRect(cols[1] + 2, y + 3, dw, 7, 3.5, 3.5, 'F');
+        doc.setFontSize(7.5);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(...white);
+        doc.text(dosageTxt, cols[1] + 5, y + 8);
+
+        // Frequency
+        doc.setFontSize(8.5);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(...ink2);
+        doc.text(m.frequency || m.frequence || '—', cols[2] + 3, y + 8.5);
+
+        // Duration
+        doc.setFontSize(8.5);
+        doc.setTextColor(...ink3);
+        doc.text(m.duration || m.duree || '—', cols[3] + 3, y + 8.5);
+
+        // Bottom border
+        doc.setDrawColor(220, 230, 225);
+        doc.setLineWidth(0.2);
+        doc.line(14, y + rowH, W - 14, y + rowH);
+
+        y += rowH;
+      });
+    }
+
+    y += 8;
+
+    // ════════════════════════════════
+    // INSTRUCTIONS
+    // ════════════════════════════════
+    if (p.instructions) {
+      doc.setFillColor(232, 247, 242);
+      doc.roundedRect(14, y, W - 28, 5, 2, 2, 'F');
+
+      // Left bar
+      doc.setFillColor(...green);
+      doc.roundedRect(14, y, 3, 5, 1, 1, 'F');
+
+      doc.setFontSize(7);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...green);
+      doc.text('INSTRUCTIONS', 20, y + 3.5);
+
+      y += 5;
+
+      const instrLines = doc.splitTextToSize(p.instructions, W - 40);
+      const instrH = instrLines.length * 5 + 8;
+      doc.setFillColor(240, 250, 245);
+      doc.rect(14, y, W - 28, instrH, 'F');
+      doc.setFillColor(...green);
+      doc.rect(14, y, 3, instrH, 'F');
+
+      doc.setFontSize(8.5);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(...ink2);
+      doc.text(instrLines, 21, y + 6);
+      y += instrH + 6;
+    }
+
+    // ════════════════════════════════
+    // NOTES
+    // ════════════════════════════════
+    if (p.notes) {
+      doc.setFillColor(252, 247, 232);
+      doc.roundedRect(14, y, W - 28, 5, 2, 2, 'F');
+      doc.setFillColor(...gold);
+      doc.roundedRect(14, y, 3, 5, 1, 1, 'F');
+      doc.setFontSize(7);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...gold);
+      doc.text('NOTES DU MÉDECIN', 20, y + 3.5);
+      y += 5;
+
+      const notesLines = doc.splitTextToSize(p.notes, W - 40);
+      const notesH = notesLines.length * 5 + 8;
+      doc.setFillColor(255, 252, 240);
+      doc.rect(14, y, W - 28, notesH, 'F');
+      doc.setFillColor(...gold);
+      doc.rect(14, y, 3, notesH, 'F');
+      doc.setFontSize(8.5);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(...ink2);
+      doc.text(notesLines, 21, y + 6);
+      y += notesH + 6;
+    }
+
+    // ════════════════════════════════
+    // FOOTER
+    // ════════════════════════════════
+    const footerY = H - 22;
+
+    // Footer bg
+    doc.setFillColor(...green);
+    doc.rect(0, footerY, W, 22, 'F');
+
+    // Gold top border
+    doc.setFillColor(...gold);
+    doc.rect(0, footerY, W, 1.5, 'F');
+
+    // Left: brand
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...white);
+    doc.text('ParrotDiag', 14, footerY + 9);
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'normal');
+    doc.setGState(doc.GState({ opacity: 0.6 }));
+    doc.text('Document médical confidentiel', 14, footerY + 15);
+    doc.setGState(doc.GState({ opacity: 1 }));
+
+    // Center: date
+    doc.setFontSize(7.5);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...white);
+    doc.setGState(doc.GState({ opacity: 0.75 }));
+    doc.text(`Généré le ${new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}`, W / 2, footerY + 12, { align: 'center' });
+    doc.setGState(doc.GState({ opacity: 1 }));
+
+    // Right: N°
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...white);
+    doc.text(`N° ${p.prescription_number || p.id || 'N/A'}`, W - 14, footerY + 9, { align: 'right' });
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'normal');
+    doc.setGState(doc.GState({ opacity: 0.6 }));
+    doc.text('Ordonnance officielle', W - 14, footerY + 15, { align: 'right' });
+    doc.setGState(doc.GState({ opacity: 1 }));
+
+    // ── Save ──
+    const filename = `ordonnance_${p.prescription_number || p.id || 'parrotdiag'}.pdf`;
+    doc.save(filename);
+  }
+
+  // ── Fetch ──
+  async function init() {
+    if (!prescriptionId || isNaN(prescriptionId)) {
+      renderError('Aucun identifiant fourni dans l\'URL.'); return;
+    }
+    const token = localStorage.getItem('token');
+    const userStr = localStorage.getItem('user');
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    try {
+      // Try direct endpoint
+      let res = await fetch(`${API_URL}/prescriptions/${prescriptionId}`, { headers });
+      if (res.ok) { render(await res.json()); return; }
+
+      // Fallback: patient prescriptions list
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        const all = await fetch(`${API_URL}/patients/${user.id}/prescriptions`, { headers });
+        if (all.ok) {
+          const list = await all.json();
+          const found = list.find(p => p.id === prescriptionId);
+          if (found) { render(found); return; }
+          renderError(`L'ordonnance n°${prescriptionId} est introuvable dans votre dossier.`); return;
+        }
+      }
+      renderError(`Erreur serveur (${res.status}).<br>Vérifiez que le backend est démarré.`);
+    } catch(e) {
+      renderError(`Impossible de joindre le serveur <strong>${API_URL}</strong>.<br>Assurez-vous que le backend FastAPI est actif.`);
+    }
+  }
+
+  init();
+</script>
+</body>
+</html>

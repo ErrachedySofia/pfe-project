@@ -1,0 +1,871 @@
+<!doctype html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ParrotDiag — Auth</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    :root {
+      --accent: #2fa37c;
+      --accent-dark: #1d7558;
+      --accent-glow: rgba(47, 163, 124, 0.2);
+      --accent-light: #e8f7f2;
+      --bg: #fafaf9;
+      --bg-2: #f3f1ed;
+      --bg-card: #ffffff;
+      --bg-glass: rgba(255,255,255,0.75);
+      --text: #1a2421;
+      --text-2: #4a5d57;
+      --text-3: #8a9e99;
+      --border: rgba(0,0,0,0.08);
+      --border-strong: rgba(0,0,0,0.15);
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+      --shadow-md: 0 8px 24px rgba(0,0,0,0.1);
+      --shadow-lg: 0 20px 48px rgba(0,0,0,0.14);
+      --shadow-accent: 0 8px 24px rgba(47,163,124,0.25);
+      --header-bg: rgba(250,250,249,0.9);
+      --nav-link: #4a5d57;
+      --t: all 0.25s cubic-bezier(0.4,0,0.2,1);
+    }
+    [data-theme="dark"] {
+      --bg: #0f1a17;
+      --bg-2: #162019;
+      --bg-card: #1c2b25;
+      --bg-glass: rgba(28,43,37,0.85);
+      --text: #e8f0ed;
+      --text-2: #93b3a8;
+      --text-3: #566f67;
+      --border: rgba(255,255,255,0.07);
+      --border-strong: rgba(255,255,255,0.14);
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+      --shadow-md: 0 8px 24px rgba(0,0,0,0.4);
+      --shadow-lg: 0 20px 48px rgba(0,0,0,0.5);
+      --header-bg: rgba(15,26,23,0.92);
+      --nav-link: #93b3a8;
+      --accent-light: rgba(47,163,124,0.12);
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      transition: background 0.35s ease, color 0.35s ease;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+    a { text-decoration: none; color: inherit; }
+    ul { list-style: none; }
+
+    /* ── HEADER ── */
+    header {
+      position: sticky; top: 0; z-index: 1000;
+      background: var(--header-bg);
+      backdrop-filter: blur(16px) saturate(160%);
+      border-bottom: 1px solid var(--border);
+      padding: 0 64px; height: 70px;
+      display: flex; align-items: center; justify-content: space-between; gap: 24px;
+      transition: var(--t);
+    }
+    .header-logo { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .logo-icon {
+      width: 38px; height: 38px; background: var(--accent);
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 16px;
+    }
+    .logo-text { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--text); }
+    .logo-text em { color: var(--accent); font-style: normal; }
+    .main-nav ul { display: flex; gap: 4px; }
+    .main-nav a {
+      padding: 6px 14px; font-size: 14px; font-weight: 500;
+      color: var(--nav-link); border-radius: 8px; transition: var(--t);
+    }
+    .main-nav a:hover, .main-nav a.active { background: var(--accent-light); color: var(--accent); }
+    .header-controls { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+    .lang-switcher { position: relative; }
+    .lang-btn {
+      display: flex; align-items: center; gap: 6px; padding: 7px 13px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 10px; font-size: 13px; font-weight: 500;
+      color: var(--text); cursor: pointer; transition: var(--t); font-family: inherit;
+    }
+    .lang-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .lang-btn .fa-chevron-down { font-size: 10px; opacity: 0.6; }
+    .lang-dropdown {
+      position: absolute; top: calc(100% + 8px); right: 0;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 12px; box-shadow: var(--shadow-md);
+      overflow: hidden; min-width: 150px;
+      opacity: 0; visibility: hidden; transform: translateY(-6px);
+      transition: var(--t); z-index: 100;
+    }
+    .lang-dropdown.open { opacity: 1; visibility: visible; transform: translateY(0); }
+    .lang-option { padding: 10px 16px; font-size: 13px; cursor: pointer; color: var(--text-2); transition: background 0.15s; }
+    .lang-option:hover { background: var(--accent-light); color: var(--accent); }
+    .theme-toggle {
+      position: relative; width: 56px; height: 30px;
+      background: var(--bg-2); border: 1px solid var(--border);
+      border-radius: 30px; cursor: pointer; padding: 0;
+      display: flex; align-items: center; transition: var(--t); overflow: hidden;
+    }
+    .theme-toggle:hover { border-color: var(--accent); }
+    .theme-icon { position: absolute; font-size: 13px; transition: var(--t); pointer-events: none; }
+    .light-icon { left: 6px; opacity: 1; }
+    .dark-icon { right: 6px; opacity: 0.4; }
+    [data-theme="dark"] .light-icon { opacity: 0.4; }
+    [data-theme="dark"] .dark-icon { opacity: 1; }
+    .theme-thumb {
+      position: absolute; left: 3px; width: 24px; height: 24px;
+      background: white; border-radius: 50%; box-shadow: var(--shadow-sm);
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    [data-theme="dark"] .theme-thumb { transform: translateX(26px); background: var(--accent); }
+    .auth-buttons { display: flex; gap: 8px; }
+    .btn-outline {
+      padding: 9px 20px; background: transparent; color: var(--text);
+      border: 1px solid var(--border-strong); border-radius: 10px;
+      font-size: 14px; font-weight: 500; cursor: pointer; transition: var(--t);
+      display: inline-flex; align-items: center; gap: 7px; font-family: inherit;
+    }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+    .btn-primary-header {
+      padding: 9px 20px; background: var(--accent); color: white;
+      border: none; border-radius: 10px; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: var(--t); display: inline-flex; align-items: center; gap: 7px; font-family: inherit;
+    }
+    .btn-primary-header:hover { background: var(--accent-dark); transform: translateY(-1px); box-shadow: var(--shadow-accent); }
+
+    /* ── MAIN ── */
+    main {
+      display: grid; grid-template-columns: 1fr 1fr;
+      min-height: calc(100vh - 70px);
+      background: linear-gradient(135deg, var(--bg) 0%, var(--bg-2) 100%);
+      position: relative; overflow: hidden;
+    }
+    .bg-shapes { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+    .shape { position: absolute; border-radius: 50%; filter: blur(80px); }
+    .shape-1 { width: 500px; height: 500px; top: -150px; left: -100px; background: var(--accent-glow); }
+    .shape-2 { width: 300px; height: 300px; bottom: -80px; right: 45%; background: rgba(47,163,124,0.06); }
+
+    /* ── LEFT HERO ── */
+    .auth-hero {
+      position: relative; z-index: 1; padding: 80px 64px;
+      display: flex; flex-direction: column; justify-content: center; gap: 24px;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px;
+      background: var(--accent-light); border: 1px solid var(--accent-glow);
+      border-radius: 30px; font-size: 12px; font-weight: 600; color: var(--accent);
+      letter-spacing: 0.5px; text-transform: uppercase; width: fit-content;
+    }
+    .pulse-dot {
+      width: 8px; height: 8px; background: var(--accent);
+      border-radius: 50%; animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(47,163,124,0.5); }
+      50% { box-shadow: 0 0 0 6px transparent; }
+    }
+    .auth-hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(34px, 4vw, 52px); font-weight: 900; line-height: 1.1; color: var(--text);
+    }
+    .auth-hero h1 em { color: var(--accent); font-style: italic; }
+    .auth-hero p { font-size: 16px; line-height: 1.75; color: var(--text-2); max-width: 420px; }
+    .hero-features { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
+    .hero-features li { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text-2); }
+    .hero-features i { color: var(--accent); width: 16px; }
+    .float-cards { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px; }
+    .float-card {
+      background: var(--bg-glass); backdrop-filter: blur(12px);
+      border: 1px solid var(--border); border-radius: 14px;
+      padding: 12px 16px; display: flex; align-items: center; gap: 10px;
+      box-shadow: var(--shadow-md); font-size: 13px;
+      animation: floatCard 4s ease-in-out infinite;
+    }
+    .float-card:nth-child(2) { animation-delay: 1.5s; }
+    .float-card:nth-child(3) { animation-delay: 3s; }
+    .float-card i { color: var(--accent); font-size: 18px; }
+    .float-card div { display: flex; flex-direction: column; line-height: 1.3; }
+    .float-card strong { font-weight: 600; color: var(--text); font-size: 13px; }
+    .float-card span { font-size: 11px; color: var(--text-2); }
+    @keyframes floatCard {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    /* ── RIGHT FORM ── */
+    .auth-panel {
+      position: relative; z-index: 1;
+      display: flex; align-items: center; justify-content: center; padding: 40px;
+    }
+    .auth-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 24px; padding: 40px;
+      width: 100%; max-width: 440px; box-shadow: var(--shadow-lg);
+    }
+    .tabs {
+      display: flex; background: var(--bg-2); border-radius: 14px;
+      padding: 5px; gap: 6px; margin-bottom: 32px;
+    }
+    .tab {
+      flex: 1; text-align: center; padding: 10px; cursor: pointer;
+      font-size: 14px; font-weight: 600; border-radius: 10px;
+      color: var(--text-2); transition: var(--t);
+    }
+    .tab.active { background: var(--bg-card); color: var(--accent); box-shadow: var(--shadow-sm); }
+    .form-heading { margin-bottom: 24px; }
+    .form-heading h3 {
+      font-family: 'Playfair Display', serif; font-size: 22px;
+      font-weight: 700; color: var(--text); margin-bottom: 6px;
+    }
+    .form-heading p { font-size: 14px; color: var(--text-2); }
+    .form-field { margin-bottom: 16px; }
+    .form-field label { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7px; }
+    .input-wrap {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--bg-2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 14px; transition: var(--t);
+    }
+    .input-wrap:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+      background: var(--bg-card);
+    }
+    .input-wrap .icon { font-size: 15px; color: var(--text-3); flex-shrink: 0; width: 16px; }
+    .input-wrap input, .input-wrap select {
+      flex: 1; border: none; outline: none;
+      background: transparent; font-size: 14px; color: var(--text); font-family: inherit;
+    }
+    .input-wrap input::placeholder { color: var(--text-3); }
+    .input-wrap select { appearance: none; cursor: pointer; }
+    .input-wrap select option { background: var(--bg-card); color: var(--text); }
+    .eye-toggle {
+      background: none; border: none; cursor: pointer;
+      color: var(--text-3); font-size: 15px; padding: 0; transition: var(--t);
+    }
+    .eye-toggle:hover { color: var(--accent); }
+    .btn-submit {
+      width: 100%; margin-top: 8px; padding: 13px;
+      background: var(--accent); color: white; border: none;
+      border-radius: 12px; font-size: 15px; font-weight: 600;
+      cursor: pointer; transition: var(--t); font-family: inherit;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-submit:hover { background: var(--accent-dark); transform: translateY(-2px); box-shadow: var(--shadow-accent); }
+    .btn-submit:active { transform: translateY(0); }
+    .btn-submit:disabled { opacity: .65; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+    .form-footer { margin-top: 16px; text-align: center; font-size: 13px; color: var(--text-3); }
+    .form-footer a { color: var(--accent); font-weight: 500; cursor: pointer; }
+    .form-footer a:hover { text-decoration: underline; }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      padding: 16px 20px; background: var(--bg-card);
+      border-radius: 12px; box-shadow: var(--shadow-lg);
+      display: flex; align-items: center; gap: 12px;
+      transform: translateX(150%); transition: transform 0.3s ease;
+      z-index: 9999; border-left: 4px solid var(--accent);
+      min-width: 300px; max-width: 420px;
+    }
+    .toast.show { transform: translateX(0); }
+    .toast.success { border-left-color: #2fa37c; }
+    .toast.error   { border-left-color: #e53e5a; }
+    .toast.warning { border-left-color: #f59e0b; }
+    .toast.info    { border-left-color: #3b82f6; }
+    .toast-icon { font-size: 20px; }
+    .toast.success .toast-icon { color: #2fa37c; }
+    .toast.error   .toast-icon { color: #e53e5a; }
+    .toast.warning .toast-icon { color: #f59e0b; }
+    .toast.info    .toast-icon { color: #3b82f6; }
+    .toast-content { flex: 1; font-size: 14px; color: var(--text); font-weight: 500; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-2); }
+    ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+    /* Mobile Menu Toggle */
+    .mobile-menu-toggle {
+      display: none;
+      width: 40px; height: 40px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      align-items: center; justify-content: center;
+      flex-direction: column; gap: 5px; padding: 10px;
+      transition: var(--t);
+    }
+    .mobile-menu-toggle:hover { border-color: var(--accent); }
+    .mobile-menu-toggle span {
+      display: block; width: 100%; height: 2px;
+      background: var(--text); border-radius: 2px;
+      transition: var(--t);
+    }
+    .mobile-menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+    .mobile-menu-toggle.active span:nth-child(2) { opacity: 0; }
+    .mobile-menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+    .mobile-nav-overlay {
+      position: fixed; inset: 0; top: 70px;
+      background: var(--bg-card); z-index: 999;
+      padding: 24px; display: none;
+      flex-direction: column; gap: 16px;
+    }
+    .mobile-nav-overlay.active { display: flex; }
+    .mobile-nav-overlay ul { display: flex; flex-direction: column; gap: 8px; }
+    .mobile-nav-overlay a {
+      display: block; padding: 14px 18px;
+      font-size: 16px; font-weight: 500;
+      color: var(--text); background: var(--bg-2);
+      border-radius: 12px; transition: var(--t);
+    }
+    .mobile-nav-overlay a:hover { background: var(--accent); color: white; }
+
+    @media (max-width: 900px) {
+      main { grid-template-columns: 1fr; }
+      .auth-hero { display: none; }
+      header { padding: 0 24px; }
+      .main-nav { display: none; }
+      .mobile-menu-toggle { display: flex; }
+    }
+    @media (max-width: 640px) {
+      header { padding: 0 16px; height: 60px; }
+      .mobile-nav-overlay { top: 60px; padding: 16px; }
+      .auth-panel { padding: 24px 16px; }
+      .auth-card { padding: 24px 18px; border-radius: 16px; }
+      .auth-card h2 { font-size: 22px; }
+      .form-grid-2 { grid-template-columns: 1fr; }
+      .logo-text { font-size: 18px; }
+      .logo-icon { width: 32px; height: 32px; font-size: 14px; }
+    }
+    @media (max-width: 480px) {
+      header { padding: 0 12px; }
+      .header-controls { gap: 8px; }
+      .lang-btn span:not(.fa-chevron-down):nth-child(2) { display: none; }
+      .auth-panel { padding: 16px 12px; }
+      .auth-card { padding: 20px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-logo">
+    <div class="logo-icon"><i class="fa-solid fa-robot"></i></div>
+    <span class="logo-text">Parrot<em>Diag</em></span>
+  </div>
+  <nav class="main-nav">
+    <ul>
+      <li><a href="index.html">Accueil</a></li>
+      <li><a href="ia.html">Évaluer mes symptômes</a></li>
+      <li><a href="#">Recommandations</a></li>
+      <li><a href="#">À propos</a></li>
+    </ul>
+  </nav>
+  <div class="header-controls">
+    <div class="lang-switcher" id="langSwitcher">
+      <button class="lang-btn" id="langBtn">
+        <span id="currentFlag">🇫🇷</span>
+        <span id="currentLangLabel">FR</span>
+        <i class="fas fa-chevron-down"></i>
+      </button>
+      <div class="lang-dropdown" id="langDropdown">
+        <div class="lang-option" data-lang="en" data-flag="🇬🇧" data-label="EN">🇬🇧 English</div>
+        <div class="lang-option" data-lang="fr" data-flag="🇫🇷" data-label="FR">🇫🇷 Français</div>
+        <div class="lang-option" data-lang="ar" data-flag="🇲🇦" data-label="AR">🇲🇦 العربية</div>
+        <div class="lang-option" data-lang="es" data-flag="🇪🇸" data-label="ES">🇪🇸 Español</div>
+      </div>
+    </div>
+    <button class="theme-toggle" id="themeToggle" aria-label="Changer le thème">
+      <span class="theme-icon light-icon">☀️</span>
+      <span class="theme-icon dark-icon">🌙</span>
+      <div class="theme-thumb"></div>
+    </button>
+    <div class="auth-buttons">
+      <button class="btn-outline" onclick="switchTab('signup')">S'inscrire</button>
+      <button class="btn-primary-header" onclick="switchTab('login')">Se connecter</button>
+    </div>
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+</header>
+
+<!-- Mobile Navigation Overlay -->
+<nav class="mobile-nav-overlay" id="mobileNavOverlay">
+  <ul>
+    <li><a href="index.html">Accueil</a></li>
+    <li><a href="ia.html">Évaluer mes symptômes</a></li>
+    <li><a href="patients.html">Recommandations</a></li>
+    <li><a href="apropos.html">À propos</a></li>
+  </ul>
+</nav>
+
+<main>
+  <div class="bg-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+  </div>
+
+  <!-- Left hero -->
+  <div class="auth-hero">
+    <div class="hero-badge"><span class="pulse-dot"></span> Plateforme Santé Alimentée par l'IA</div>
+    <h1>Votre santé,<br>guidée par l'<em>IA</em></h1>
+    <p>Rejoignez ParrotDiag — votre assistant santé intelligent pour une évaluation précoce des symptômes, des recommandations personnalisées et une tranquillité d'esprit.</p>
+    <ul class="hero-features">
+      <li><i class="fas fa-bolt"></i> Analyse rapide des symptômes en quelques secondes</li>
+      <li><i class="fas fa-user-check"></i> Recommandations santé personnalisées</li>
+      <li><i class="fas fa-history"></i> Suivez votre historique de santé</li>
+      <li><i class="fas fa-lock"></i> Gestion sécurisée et privée des données</li>
+    </ul>
+    <div class="float-cards">
+      <div class="float-card"><i class="fas fa-heartbeat"></i><div><strong>Fréquence cardiaque</strong><span>72 bpm ↑</span></div></div>
+      <div class="float-card"><i class="fas fa-stethoscope"></i><div><strong>Médecin IA</strong><span>En ligne</span></div></div>
+      <div class="float-card"><i class="fas fa-user-md"></i><div><strong>Consultations</strong><span>12 suivies</span></div></div>
+    </div>
+  </div>
+
+  <!-- Right form -->
+  <div class="auth-panel">
+    <div class="auth-card">
+      <div class="tabs">
+        <div class="tab active" id="loginTab" onclick="switchTab('login')">Connexion</div>
+        <div class="tab" id="signupTab" onclick="switchTab('signup')">Inscription</div>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <form id="loginForm" novalidate>
+        <div class="form-heading">
+          <h3>Bon retour !</h3>
+          <p>Connectez-vous pour accéder à votre tableau de bord santé IA</p>
+        </div>
+        <div class="form-field">
+          <label>Adresse e-mail</label>
+          <div class="input-wrap">
+            <i class="fa-regular fa-envelope icon"></i>
+            <input type="email" id="loginEmail" placeholder="vous@exemple.com" required autocomplete="email">
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Mot de passe</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-lock icon"></i>
+            <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+            <button type="button" class="eye-toggle" onclick="togglePassword('loginPassword', this)">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+        </div>
+        <button type="submit" class="btn-submit" id="loginBtn">
+          <i class="fas fa-arrow-right-to-bracket"></i> Se connecter
+        </button>
+        <p class="form-footer">
+          Pas encore de compte ? <a onclick="switchTab('signup')">S'inscrire</a>
+          &nbsp;·&nbsp; <a href="#">Mot de passe oublié ?</a>
+        </p>
+      </form>
+
+      <!-- SIGN UP FORM -->
+      <form id="signupForm" style="display:none;" novalidate>
+        <div class="form-heading">
+          <h3>Créer votre compte</h3>
+          <p>Inscrivez-vous pour accéder à votre tableau de bord santé IA</p>
+        </div>
+        <div class="form-field">
+          <label>Nom complet</label>
+          <div class="input-wrap">
+            <i class="fa-regular fa-user icon"></i>
+            <input type="text" id="fullName" placeholder="Jean Dupont" required autocomplete="name">
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Adresse e-mail</label>
+          <div class="input-wrap">
+            <i class="fa-regular fa-envelope icon"></i>
+            <input type="email" id="email" placeholder="vous@exemple.com" required autocomplete="email">
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Mot de passe</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-lock icon"></i>
+            <input type="password" id="password" placeholder="Min. 6 caractères" required autocomplete="new-password">
+            <button type="button" class="eye-toggle" onclick="togglePassword('password', this)">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Rôle</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-user-tag icon"></i>
+            <select id="role" required>
+              <option value="" disabled selected>Sélectionnez votre rôle</option>
+              <option value="patient">Patient</option>
+              <option value="doctor">Médecin</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Sexe</label>
+          <div class="input-wrap">
+            <i class="fa-solid fa-venus-mars icon"></i>
+            <select id="sex" required>
+              <option value="" disabled selected>Sélectionnez votre sexe</option>
+              <option value="male">Homme</option>
+              <option value="female">Femme</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn-submit" id="signupBtn">
+          <i class="fas fa-user-plus"></i> Créer un compte
+        </button>
+        <p class="form-footer">
+          Déjà un compte ? <a onclick="switchTab('login')">Se connecter</a>
+        </p>
+      </form>
+    </div>
+  </div>
+</main>
+
+<!-- Toast -->
+<div class="toast" id="toastEl">
+  <i class="fas fa-info-circle toast-icon" id="toastIcon"></i>
+  <div class="toast-content" id="toastMessage"></div>
+</div>
+
+<script>
+// ════════════════════════════════════════════
+//  CONFIG
+// ════════════════════════════════════════════
+const API_URL = "http://127.0.0.1:8000";
+
+const ROLE_REDIRECT = {
+  doctor:  'doctor-dashboard.html',
+  patient: 'index.html'
+};
+
+// ════════════════════════════════════════════
+//  SAVE AUTH — unified keys for ALL pages
+//  index.html / script.js use:  'token' + 'user'
+//  ia.html / ia.js use:         'authToken' + 'currentUser'
+//  We save BOTH so every page works
+// ════════════════════════════════════════════
+function saveAuth(token, userData) {
+  // Keys used by script.js / index.html
+  localStorage.setItem('token',       token);
+  localStorage.setItem('user',        JSON.stringify(userData));
+  // Keys used by ia.html / ia.js
+  localStorage.setItem('authToken',   token);
+  localStorage.setItem('currentUser', JSON.stringify(userData));
+}
+
+function clearAuth() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  localStorage.removeItem('authToken');
+  localStorage.removeItem('currentUser');
+}
+
+// ════════════════════════════════════════════
+//  AUTO-REDIRECT IF ALREADY LOGGED IN
+// ════════════════════════════════════════════
+(function checkAlreadyLoggedIn() {
+  try {
+    const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+    const user  = JSON.parse(localStorage.getItem('user') || localStorage.getItem('currentUser') || 'null');
+    if (token && user && user.role) {
+      window.location.replace(ROLE_REDIRECT[user.role] || 'index.html');
+    }
+  } catch(e) {
+    clearAuth();
+  }
+})();
+
+// ════════════════════════════════════════════
+//  TAB SWITCHING
+// ════════════════════════════════════════════
+function switchTab(tab) {
+  document.getElementById('loginTab').classList.toggle('active',  tab === 'login');
+  document.getElementById('signupTab').classList.toggle('active', tab === 'signup');
+  document.getElementById('loginForm').style.display  = tab === 'login'  ? 'block' : 'none';
+  document.getElementById('signupForm').style.display = tab === 'signup' ? 'block' : 'none';
+}
+
+// ════════════════════════════════════════════
+//  TOGGLE PASSWORD
+// ════════════════════════════════════════════
+function togglePassword(inputId, btn) {
+  const input = document.getElementById(inputId);
+  const icon  = btn.querySelector('i');
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.classList.replace('fa-eye', 'fa-eye-slash');
+  } else {
+    input.type = 'password';
+    icon.classList.replace('fa-eye-slash', 'fa-eye');
+  }
+}
+
+// ════════════════════════════════════════════
+//  REDIRECT BASED ON ROLE
+// ════════════════════════════════════════════
+function redirectBasedOnRole(role) {
+  window.location.replace(ROLE_REDIRECT[role] || 'index.html');
+}
+
+// ════════════════════════════════════════════
+//  LOGOUT — callable from other pages
+//  Usage: logout() from any page
+// ════════════════════════════════════════════
+function logout() {
+  clearAuth();
+  showToast('Logged out successfully', 'success');
+  setTimeout(() => window.location.replace('connexionpage.html'), 1200);
+}
+
+// ════════════════════════════════════════════
+//  LOGIN
+// ════════════════════════════════════════════
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const email    = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+
+  if (!email || !password) {
+    showToast('Please fill in all fields', 'warning');
+    return;
+  }
+
+  const btn      = document.getElementById('loginBtn');
+  const original = btn.innerHTML;
+  btn.innerHTML  = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+  btn.disabled   = true;
+
+  try {
+    const response = await fetch(`${API_URL}/login`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ email, password })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      // Handle different API response shapes
+      let token, userData;
+
+      if (data.access_token && data.user) {
+        token    = data.access_token;
+        userData = data.user;
+      } else if (data.token && data.user) {
+        token    = data.token;
+        userData = data.user;
+      } else if (data.role) {
+        // user object returned directly
+        token    = data.token || data.access_token || `session-${Date.now()}`;
+        userData = data;
+      } else {
+        showToast('Unknown response format from server', 'error');
+        return;
+      }
+
+      if (!userData.role) {
+        showToast('User data incomplete — no role found', 'error');
+        return;
+      }
+
+      // ✅ Save with ALL key variants
+      saveAuth(token, userData);
+
+      const name    = userData.full_name || userData.name || email.split('@')[0];
+      const welcome = userData.role === 'doctor'
+        ? `👨‍⚕️ Welcome Dr. ${name}!`
+        : `✅ Welcome ${name}!`;
+
+      showToast(welcome, 'success');
+      setTimeout(() => redirectBasedOnRole(userData.role), 1000);
+
+    } else {
+      showToast(data.detail || data.message || 'Incorrect email or password', 'error');
+    }
+
+  } catch (err) {
+    console.error('Login error:', err);
+    showToast('Cannot connect to server. Is the backend running?', 'error');
+  } finally {
+    btn.innerHTML = original;
+    btn.disabled  = false;
+  }
+});
+
+// ════════════════════════════════════════════
+//  SIGNUP
+// ════════════════════════════════════════════
+document.getElementById('signupForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const full_name = document.getElementById('fullName').value.trim();
+  const email     = document.getElementById('email').value.trim();
+  const password  = document.getElementById('password').value;
+  const role      = document.getElementById('role').value;
+  const sex       = document.getElementById('sex').value;
+
+  if (!full_name || !email || !password || !role || !sex) {
+    showToast('Please fill in all fields', 'warning');
+    return;
+  }
+  if (password.length < 6) {
+    showToast('Password must be at least 6 characters', 'warning');
+    return;
+  }
+
+  const btn      = document.getElementById('signupBtn');
+  const original = btn.innerHTML;
+  btn.innerHTML  = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+  btn.disabled   = true;
+
+  try {
+    const response = await fetch(`${API_URL}/register`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ full_name, email, password, role, sex })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      showToast('✅ Account created! Please log in.', 'success');
+      document.getElementById('loginEmail').value    = email;
+      document.getElementById('loginPassword').value = '';
+      setTimeout(() => switchTab('login'), 2000);
+    } else {
+      showToast(data.detail || data.message || 'Registration error', 'error');
+    }
+
+  } catch (err) {
+    console.error('Signup error:', err);
+    showToast('Cannot connect to server. Is the backend running?', 'error');
+  } finally {
+    btn.innerHTML = original;
+    btn.disabled  = false;
+  }
+});
+
+// ════════════════════════════════════════════
+//  TOAST
+// ════════════════════════════════════════════
+let toastTimer;
+function showToast(message, type = 'info') {
+  const el  = document.getElementById('toastEl');
+  const ico = document.getElementById('toastIcon');
+  const msg = document.getElementById('toastMessage');
+
+  const icons = {
+    success: 'fa-check-circle',
+    error:   'fa-exclamation-circle',
+    warning: 'fa-exclamation-triangle',
+    info:    'fa-info-circle'
+  };
+
+  el.className = `toast ${type}`;
+  ico.className = `fas ${icons[type] || icons.info} toast-icon`;
+  msg.textContent = message;
+
+  clearTimeout(toastTimer);
+  // force reflow so transition replays
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3800);
+}
+
+// ════════════════════════════════════════════
+//  THEME
+// ════════════════════════════════════════════
+const themeToggle = document.getElementById('themeToggle');
+document.documentElement.setAttribute('data-theme', localStorage.getItem('parrotTheme') || 'light');
+themeToggle.addEventListener('click', () => {
+  const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('parrotTheme', next);
+});
+
+// ════════════════════════════════════════════
+//  LANGUAGE
+// ════════════════════════════════════════════
+const langBtn      = document.getElementById('langBtn');
+const langDropdown = document.getElementById('langDropdown');
+langBtn.addEventListener('click', e => { e.stopPropagation(); langDropdown.classList.toggle('open'); });
+document.addEventListener('click', e => { if (!e.target.closest('#langSwitcher')) langDropdown.classList.remove('open'); });
+document.querySelectorAll('.lang-option').forEach(opt => {
+  opt.addEventListener('click', () => {
+    document.getElementById('currentFlag').textContent      = opt.dataset.flag;
+    document.getElementById('currentLangLabel').textContent = opt.dataset.label;
+    langDropdown.classList.remove('open');
+    localStorage.setItem('preferredLang', opt.dataset.lang);
+  });
+});
+const savedLang = localStorage.getItem('preferredLang');
+if (savedLang) {
+  const opt = document.querySelector(`.lang-option[data-lang="${savedLang}"]`);
+  if (opt) {
+    document.getElementById('currentFlag').textContent      = opt.dataset.flag;
+    document.getElementById('currentLangLabel').textContent = opt.dataset.label;
+  }
+}
+
+// ══════════════════════════════════════════════════════
+//   MOBILE MENU
+// ══════════════════════════════════════════════════════
+(function initMobileMenu() {
+  const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+  const mobileNavOverlay = document.getElementById('mobileNavOverlay');
+  
+  if (mobileMenuToggle && mobileNavOverlay) {
+    mobileMenuToggle.addEventListener('click', () => {
+      mobileMenuToggle.classList.toggle('active');
+      mobileNavOverlay.classList.toggle('active');
+      document.body.style.overflow = mobileNavOverlay.classList.contains('active') ? 'hidden' : '';
+    });
+    
+    // Close mobile menu when clicking on a link
+    const mobileNavLinks = mobileNavOverlay.querySelectorAll('a');
+    mobileNavLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenuToggle.classList.remove('active');
+        mobileNavOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+      });
+    });
+    
+    // Close mobile menu on window resize
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 900) {
+        mobileMenuToggle.classList.remove('active');
+        mobileNavOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    });
+  }
+})();
+
+// Expose globally for other pages
+window.switchTab      = switchTab;
+window.togglePassword = togglePassword;
+window.logout         = logout;
+window.saveAuth       = saveAuth;
+window.clearAuth      = clearAuth;
+</script>
+</body>
+</html>
